@@ -1,0 +1,20 @@
+sudo: false
+language: java
+dist: trusty
+cache:
+  directories:
+  - $HOME/.m2
+  - $HOME/.sonar/cache
+jdk:
+- oraclejdk8
+install: true
+jobs:
+  include:
+  - stage: build
+    name: quick build
+    script: mvn clean package -U
+  - name: quality build
+    script: mvn clean package sonar:sonar -P jacoco -U
+addons:
+  sonarcloud:
+    organization: xdean-github
