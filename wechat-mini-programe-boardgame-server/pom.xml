@@ -10,5 +10,6 @@
   <modules>
   	<module>wechat-mini-programe-boardgame-server-games</module>
   	<module>wechat-mini-programe-boardgame-server-app</module>
+  	<module>wechat-mini-programe-boardgame-server-common</module>
   </modules>
 </project>
