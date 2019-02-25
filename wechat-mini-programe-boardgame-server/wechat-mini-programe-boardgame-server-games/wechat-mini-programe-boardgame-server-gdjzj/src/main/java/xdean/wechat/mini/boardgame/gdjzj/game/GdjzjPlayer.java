@@ -8,12 +8,14 @@ public class GdjzjPlayer {
   final Player player;
   final int index;
   final GdjzjBoard board;
+  final GdjzjRole role;
   int turn;
 
-  public GdjzjPlayer(Player player, int index, GdjzjBoard board) {
+  public GdjzjPlayer(Player player, int index, GdjzjBoard board, GdjzjRole role) {
     this.player = player;
     this.index = index;
     this.board = board;
+    this.role = role;
   }
 
   public GdjzjWatchCardResult watchCard(int index) {

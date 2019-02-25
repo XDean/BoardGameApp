@@ -1,6 +1,7 @@
 package xdean.wechat.mini.boardgame.gdjzj.game;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -18,8 +19,9 @@ public class GdjzjBoard {
 
   public GdjzjBoard(Player[] players) {
     this.cards = createCards();
+    List<GdjzjRole> roles = GdjzjRole.getRoles(players.length);
     this.players = ImmutableList.copyOf(IntStream.range(0, players.length)
-        .mapToObj(i -> new GdjzjPlayer(players[i], i, this))
+        .mapToObj(i -> new GdjzjPlayer(players[i], i, this, roles.get(i)))
         .collect(Collectors.toList()));
   }
 
