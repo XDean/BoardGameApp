@@ -19,4 +19,7 @@
 		<developerConnection>scm:${scm.url}</developerConnection>
 		<url>${scm.url}</url>
 	</scm>
+	<modules>
+		<module>wechat-mini-programe-boardgame-server</module>
+	</modules>
 </project>
