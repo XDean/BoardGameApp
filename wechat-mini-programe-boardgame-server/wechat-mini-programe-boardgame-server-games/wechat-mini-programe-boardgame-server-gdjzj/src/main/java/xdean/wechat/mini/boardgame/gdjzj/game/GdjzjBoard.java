@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import xdean.jex.extra.collection.IntList;
 import xdean.wechat.mini.boardgame.server.model.Player;
 
 public class GdjzjBoard {
@@ -16,6 +17,7 @@ public class GdjzjBoard {
   ImmutableList<GdjzjPlayer> players;
 
   IntegerProperty currentPlayer = new SimpleIntegerProperty(this, "currentPlayer");
+  IntegerProperty currentTurn = new SimpleIntegerProperty(this, "currentTurn");
 
   public GdjzjBoard(Player[] players) {
     this.cards = createCards();
@@ -23,6 +25,11 @@ public class GdjzjBoard {
     this.players = ImmutableList.copyOf(IntStream.range(0, players.length)
         .mapToObj(i -> new GdjzjPlayer(players[i], i, this, roles.get(i)))
         .collect(Collectors.toList()));
+  }
+
+  public IntList getLeftPlayers() {
+    int turn = currentTurn.get();
+    return IntList.create(players.stream().filter(p -> p.turnInfos[turn].order < 0).mapToInt(p -> p.index).toArray());
   }
 
   private ImmutableList<GdjzjCard> createCards() {
