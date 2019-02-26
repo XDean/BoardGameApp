@@ -10,10 +10,13 @@ import xdean.wechat.mini.boardgame.server.model.exception.MiniBoardgameException
 public class GdjzjPlayer {
   static class TurnInfo {
     int order = -1;
-    boolean attacked = false;
-    int watchCard;
+    boolean skip = false;
+    boolean attack = false;
+    int watchCard = -1;
     GdjzjWatchCardResult cardResult;
-    int watchPlayer;
+    int watchCard2 = -1;
+    GdjzjWatchCardResult cardResult2;
+    int watchPlayer = -1;
     GdjzjWatchPlayerResult playerResult;
   }
 
@@ -61,8 +64,20 @@ public class GdjzjPlayer {
     } else {
       result = GdjzjWatchCardResult.FALSE;
     }
-    getTurnInfo().watchCard = index;
-    getTurnInfo().cardResult = result;
+    if (getTurnInfo().watchCard == -1) {
+      getTurnInfo().watchCard = index;
+      getTurnInfo().cardResult = result;
+    } else {
+      checkRole(GdjzjRole.XU_YUAN);
+      if (getTurnInfo().watchCard2 != -1) {
+        throw MiniBoardgameException.builder()
+            .code(GdjzjErrorCode.ILLEGAL_STATE)
+            .message("The player has watched cards")
+            .build();
+      }
+      getTurnInfo().watchCard2 = index;
+      getTurnInfo().cardResult2 = result;
+    }
     return result;
   }
 
@@ -90,11 +105,11 @@ public class GdjzjPlayer {
           .code(GdjzjErrorCode.ATTACK_SELF)
           .build();
     }
-    board.players.get(index).turnInfos[board.currentTurn.get()].attacked = true;
+    board.players.get(index).turnInfos[board.currentTurn.get()].attack = true;
   }
 
   private boolean isAttacked() {
-    return getTurnInfo().attacked;
+    return getTurnInfo().attack;
   }
 
   private TurnInfo getTurnInfo() {
