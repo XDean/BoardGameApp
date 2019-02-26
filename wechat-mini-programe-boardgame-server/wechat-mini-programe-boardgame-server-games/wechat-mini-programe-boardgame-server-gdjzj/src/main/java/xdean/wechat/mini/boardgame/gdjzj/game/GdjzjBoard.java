@@ -57,6 +57,46 @@ public class GdjzjBoard {
     return new GdjzjVoteCardResult(result.size() > 0 ? result.get(0) : -1, result.size() > 1 ? result.get(1) : -1);
   }
 
+  public int getScore() {
+    int score = 0;
+    score += getVoteCardResult(0).getScore(this);
+    score += getVoteCardResult(1).getScore(this);
+    score += getVoteCardResult(2).getScore(this);
+    if (score == 6) {
+      return score;
+    }
+
+    Optional<GdjzjPlayer> boss = getPlayer(GdjzjRole.LAO_CHAOFENG);
+    int bossIndex = boss.map(p -> p.index).orElse(-1);
+    if (!boss
+        .map(p -> p.vote)
+        .filter(i -> i != -1)
+        .map(i -> players.get(i).role == GdjzjRole.XU_YUAN)
+        .orElse(false)) {
+      score += 2;
+    }
+    if (!getPlayer(GdjzjRole.YAO_BURAN)
+        .map(p -> p.vote)
+        .filter(i -> i != -1)
+        .map(i -> players.get(i).role == GdjzjRole.FANG_ZHEN)
+        .orElse(false)) {
+      score += 1;
+    }
+    long playerCount = players.stream()
+        .filter(p -> p.role.position)
+        .count();
+    long rightCount = players.stream()
+        .filter(p -> p.role.position)
+        .map(p -> p.vote)
+        .filter(i -> i != -1)
+        .filter(i -> i == bossIndex)
+        .count();
+    if (rightCount > playerCount / 2) {
+      score += 1;
+    }
+    return score;
+  }
+
   public IntList getLeftPlayers() {
     int turn = currentTurn.get();
     return IntList.create(players.stream().filter(p -> p.turnInfos[turn].order < 0).mapToInt(p -> p.index).toArray());
