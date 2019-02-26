@@ -12,12 +12,12 @@ public class GdjzjPlayer {
     int order = -1;
     boolean skip = false;
     boolean attack = false;
-    int watchCard = -1;
-    GdjzjWatchCardResult cardResult;
-    int watchCard2 = -1;
-    GdjzjWatchCardResult cardResult2;
-    int watchPlayer = -1;
-    GdjzjWatchPlayerResult playerResult;
+    int checkCard = -1;
+    GdjzjCheckCardResult cardResult;
+    int checkCard2 = -1;
+    GdjzjCheckCardResult cardResult2;
+    int checkPlayer = -1;
+    GdjzjCheckPlayerResult playerResult;
     boolean reverseCard = false;
   }
 
@@ -61,48 +61,54 @@ public class GdjzjPlayer {
     board.currentPlayer.set(index);
   }
 
-  public GdjzjWatchCardResult watchCard(int index) {
+  public GdjzjCheckCardResult checkCard(int index) {
     checkCurrent();
-    GdjzjWatchCardResult result;
+    if (index / 4 != board.currentTurn.get()) {
+      throw MiniBoardgameException.builder()
+          .code(GdjzjErrorCode.ILLEGAL_CARD)
+          .message("This card can't be checked in this turn")
+          .build();
+    }
+    GdjzjCheckCardResult result;
     GdjzjCard card = board.cards.get(index);
     if (getTurnInfo().skip) {
-      result = GdjzjWatchCardResult.SKIPPED;
+      result = GdjzjCheckCardResult.SKIPPED;
     } else if (getTurnInfo().attack) {
-      result = GdjzjWatchCardResult.ATTACKED;
+      result = GdjzjCheckCardResult.ATTACKED;
     } else if (role.position ? card.real ^ card.reverse : card.real) {
-      result = GdjzjWatchCardResult.TRUE;
+      result = GdjzjCheckCardResult.TRUE;
     } else {
-      result = GdjzjWatchCardResult.FALSE;
+      result = GdjzjCheckCardResult.FALSE;
     }
-    if (getTurnInfo().watchCard == -1) {
-      getTurnInfo().watchCard = index;
+    if (getTurnInfo().checkCard == -1) {
+      getTurnInfo().checkCard = index;
       getTurnInfo().cardResult = result;
     } else {
       checkRole(GdjzjRole.XU_YUAN);
-      if (getTurnInfo().watchCard2 != -1) {
+      if (getTurnInfo().checkCard2 != -1) {
         throw MiniBoardgameException.builder()
             .code(GdjzjErrorCode.ILLEGAL_STATE)
-            .message("The player has watched cards")
+            .message("The player has checked cards")
             .build();
       }
-      getTurnInfo().watchCard2 = index;
+      getTurnInfo().checkCard2 = index;
       getTurnInfo().cardResult2 = result;
     }
     return result;
   }
 
-  public GdjzjWatchPlayerResult watchPlayer(int index) {
+  public GdjzjCheckPlayerResult checkPlayer(int index) {
     checkCurrent();
     checkRole(GdjzjRole.FANG_ZHEN);
-    GdjzjWatchPlayerResult result;
+    GdjzjCheckPlayerResult result;
     if (getTurnInfo().attack) {
-      result = GdjzjWatchPlayerResult.ATTACKED;
+      result = GdjzjCheckPlayerResult.ATTACKED;
     } else if (board.players.get(index).role.position) {
-      result = GdjzjWatchPlayerResult.TRUE;
+      result = GdjzjCheckPlayerResult.TRUE;
     } else {
-      result = GdjzjWatchPlayerResult.FALSE;
+      result = GdjzjCheckPlayerResult.FALSE;
     }
-    getTurnInfo().watchPlayer = index;
+    getTurnInfo().checkPlayer = index;
     getTurnInfo().playerResult = result;
     return result;
   }

@@ -1,6 +1,6 @@
 package xdean.wechat.mini.boardgame.gdjzj.game;
 
-public enum GdjzjWatchCardResult {
+public enum GdjzjCheckCardResult {
   TRUE,
   FALSE,
   ATTACKED,
