@@ -25,7 +25,7 @@ public class GdjzjPlayer {
   final int index;
   final GdjzjBoard board;
   final GdjzjRole role;
-  TurnInfo[] turnInfos = new TurnInfo[3];
+  final TurnInfo[] turnInfos = new TurnInfo[3];
 
   public GdjzjPlayer(Player player, int index, GdjzjBoard board, GdjzjRole role) {
     this.player = player;
@@ -75,7 +75,7 @@ public class GdjzjPlayer {
       result = GdjzjCheckCardResult.SKIPPED;
     } else if (getTurnInfo().attack) {
       result = GdjzjCheckCardResult.ATTACKED;
-    } else if (role.position ? card.real ^ card.reverse : card.real) {
+    } else if ((role.position && role != GdjzjRole.JI_YUNFU) ? card.real ^ card.reverse : card.real) {
       result = GdjzjCheckCardResult.TRUE;
     } else {
       result = GdjzjCheckCardResult.FALSE;
@@ -121,7 +121,13 @@ public class GdjzjPlayer {
           .code(GdjzjErrorCode.ATTACK_SELF)
           .build();
     }
-    board.players.get(index).turnInfos[board.currentTurn.get()].attack = true;
+    GdjzjPlayer target = board.players.get(index);
+    target.turnInfos[board.currentTurn.get()].attack = true;
+    if (target.role == GdjzjRole.JI_YUNFU) {
+      for (int i = board.currentTurn.get(); i < 3; i++) {
+        target.turnInfos[i].attack = true;
+      }
+    }
   }
 
   public void reverseCard() {
