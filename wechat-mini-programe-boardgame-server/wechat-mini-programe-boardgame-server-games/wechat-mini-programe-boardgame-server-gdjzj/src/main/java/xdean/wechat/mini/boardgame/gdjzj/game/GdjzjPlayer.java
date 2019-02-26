@@ -18,6 +18,7 @@ public class GdjzjPlayer {
     GdjzjWatchCardResult cardResult2;
     int watchPlayer = -1;
     GdjzjWatchPlayerResult playerResult;
+    boolean reverseCard = false;
   }
 
   final Player player;
@@ -63,11 +64,12 @@ public class GdjzjPlayer {
   public GdjzjWatchCardResult watchCard(int index) {
     checkCurrent();
     GdjzjWatchCardResult result;
+    GdjzjCard card = board.cards.get(index);
     if (getTurnInfo().skip) {
       result = GdjzjWatchCardResult.SKIPPED;
     } else if (getTurnInfo().attack) {
       result = GdjzjWatchCardResult.ATTACKED;
-    } else if (board.cards.get(index).real) {
+    } else if (role.position ? card.real ^ card.reverse : card.real) {
       result = GdjzjWatchCardResult.TRUE;
     } else {
       result = GdjzjWatchCardResult.FALSE;
@@ -114,6 +116,15 @@ public class GdjzjPlayer {
           .build();
     }
     board.players.get(index).turnInfos[board.currentTurn.get()].attack = true;
+  }
+
+  public void reverseCard() {
+    checkCurrent();
+    checkRole(GdjzjRole.LAO_CHAOFENG);
+    if (!getTurnInfo().reverseCard) {
+      getTurnInfo().reverseCard = true;
+      board.cards.forEach(c -> c.reverse = true);
+    }
   }
 
   private TurnInfo getTurnInfo() {
