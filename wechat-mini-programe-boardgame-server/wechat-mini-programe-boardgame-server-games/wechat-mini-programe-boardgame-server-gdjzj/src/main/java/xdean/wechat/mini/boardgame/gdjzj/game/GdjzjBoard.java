@@ -66,18 +66,18 @@ public class GdjzjBoard {
     return players.stream().filter(p -> p.role == role).findFirst();
   }
 
+  private ImmutableList<GdjzjCard> createCards() {
+    return ImmutableList.copyOf(IntStream.range(0, 12)
+        .mapToObj(i -> new GdjzjCard(i, i / 2 == 0))
+        .sorted(Comparator.comparing(c -> c.index % 4 + Math.random()))
+        .collect(Collectors.toList()));
+  }
+
   public static void assertTurn(int turn) {
     if (turn < 0 || turn > 2) {
       throw MiniBoardgameException.builder()
           .code(GdjzjErrorCode.ILLEGAL_TURN)
           .build();
     }
-  }
-
-  private ImmutableList<GdjzjCard> createCards() {
-    return ImmutableList.copyOf(IntStream.range(0, 12)
-        .mapToObj(i -> new GdjzjCard(i, i / 2 == 0))
-        .sorted(Comparator.comparing(c -> c.index % 4 + Math.random()))
-        .collect(Collectors.toList()));
   }
 }

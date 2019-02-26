@@ -23,7 +23,6 @@ public class GdjzjPlayer {
     boolean vote;
     int vote1;
     int vote2;
-
   }
 
   final Player player;
@@ -31,6 +30,7 @@ public class GdjzjPlayer {
   final GdjzjBoard board;
   final GdjzjRole role;
   final TurnInfo[] turnInfos = new TurnInfo[3];
+  int vote;
 
   public GdjzjPlayer(Player player, int index, GdjzjBoard board, GdjzjRole role) {
     this.player = player;
@@ -163,12 +163,23 @@ public class GdjzjPlayer {
     if (turnInfo.vote) {
       throw MiniBoardgameException.builder()
           .code(GdjzjErrorCode.ILLEGAL_STATE)
-          .message("You have voted")
+          .message("You have voted card this turn")
           .build();
     }
     turnInfo.vote = true;
     turnInfo.vote1 = a;
     turnInfo.vote2 = b;
+  }
+
+  public void votePlayer(int index) {
+    assertPlayer(index);
+    if (vote != -1) {
+      throw MiniBoardgameException.builder()
+          .code(GdjzjErrorCode.ILLEGAL_STATE)
+          .message("You have voted player")
+          .build();
+    }
+    vote = index;
   }
 
   private TurnInfo getTurnInfo() {
@@ -179,6 +190,7 @@ public class GdjzjPlayer {
     if (board.currentPlayer.get() != index) {
       throw MiniBoardgameException.builder()
           .code(GdjzjErrorCode.ILLEGAL_PLAYER)
+          .message("You are not the active player")
           .build();
     }
   }
@@ -188,6 +200,15 @@ public class GdjzjPlayer {
       throw MiniBoardgameException.builder()
           .code(GdjzjErrorCode.ILLEGAL_CARD)
           .message("This card can't be used in this turn")
+          .build();
+    }
+  }
+
+  private void assertPlayer(int index) {
+    if (index < 0 || index >= board.players.size()) {
+      throw MiniBoardgameException.builder()
+          .code(GdjzjErrorCode.ILLEGAL_PLAYER)
+          .message("Illegal player index")
           .build();
     }
   }
