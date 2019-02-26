@@ -1,4 +1,4 @@
-package xdean.wechat.mini.boardgame.server.controller;
+package xdean.wechat.mini.boardgame.server.sockettest;
 
 import static xdean.jex.util.lang.ExceptionUtil.uncheck;
 
