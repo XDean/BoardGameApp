@@ -4,6 +4,7 @@ import xdean.wechat.mini.boardgame.server.model.exception.MiniBoardgameErrorCode
 
 public enum GdjzjErrorCode implements MiniBoardgameErrorCode {
   ILLEGAL_STATE,
+  ILLEGAL_TURN,
   ILLEGAL_PLAYER,
   ILLEGAL_CARD,
   ILLEGAL_ROLE,

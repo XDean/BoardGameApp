@@ -19,6 +19,11 @@ public class GdjzjPlayer {
     int checkPlayer = -1;
     GdjzjCheckPlayerResult playerResult;
     boolean reverseCard = false;
+
+    boolean vote;
+    int vote1;
+    int vote2;
+
   }
 
   final Player player;
@@ -44,7 +49,7 @@ public class GdjzjPlayer {
   }
 
   public void selectNextPlayer(int index) {
-    checkCurrent();
+    assertCurrentPlayer();
     IntList leftPlayers = board.getLeftPlayers();
     if (leftPlayers.isEmpty()) {
       throw MiniBoardgameException.builder()
@@ -62,13 +67,8 @@ public class GdjzjPlayer {
   }
 
   public GdjzjCheckCardResult checkCard(int index) {
-    checkCurrent();
-    if (index / 4 != board.currentTurn.get()) {
-      throw MiniBoardgameException.builder()
-          .code(GdjzjErrorCode.ILLEGAL_CARD)
-          .message("This card can't be checked in this turn")
-          .build();
-    }
+    assertCurrentPlayer();
+    assertCard(index);
     GdjzjCheckCardResult result;
     GdjzjCard card = board.cards.get(index);
     if (getTurnInfo().skip) {
@@ -84,7 +84,7 @@ public class GdjzjPlayer {
       getTurnInfo().checkCard = index;
       getTurnInfo().cardResult = result;
     } else {
-      checkRole(GdjzjRole.XU_YUAN);
+      assertRole(GdjzjRole.XU_YUAN);
       if (getTurnInfo().checkCard2 != -1) {
         throw MiniBoardgameException.builder()
             .code(GdjzjErrorCode.ILLEGAL_STATE)
@@ -98,8 +98,8 @@ public class GdjzjPlayer {
   }
 
   public GdjzjCheckPlayerResult checkPlayer(int index) {
-    checkCurrent();
-    checkRole(GdjzjRole.FANG_ZHEN);
+    assertCurrentPlayer();
+    assertRole(GdjzjRole.FANG_ZHEN);
     GdjzjCheckPlayerResult result;
     if (getTurnInfo().attack) {
       result = GdjzjCheckPlayerResult.ATTACKED;
@@ -114,8 +114,8 @@ public class GdjzjPlayer {
   }
 
   public void attackPlayer(int index) {
-    checkCurrent();
-    checkRole(GdjzjRole.YAO_BURAN);
+    assertCurrentPlayer();
+    assertRole(GdjzjRole.YAO_BURAN);
     if (index == this.index) {
       throw MiniBoardgameException.builder()
           .code(GdjzjErrorCode.ATTACK_SELF)
@@ -144,8 +144,8 @@ public class GdjzjPlayer {
   }
 
   public void reverseCard() {
-    checkCurrent();
-    checkRole(GdjzjRole.LAO_CHAOFENG);
+    assertCurrentPlayer();
+    assertRole(GdjzjRole.LAO_CHAOFENG);
     if (!getTurnInfo().reverseCard) {
       getTurnInfo().reverseCard = true;
       board.cards.forEach(c -> c.reverse = true);
@@ -153,14 +153,29 @@ public class GdjzjPlayer {
   }
 
   public void voteCard(int a, int b) {
-
+    if (a != -1) {
+      assertCard(a);
+    }
+    if (b != -1) {
+      assertCard(b);
+    }
+    TurnInfo turnInfo = getTurnInfo();
+    if (turnInfo.vote) {
+      throw MiniBoardgameException.builder()
+          .code(GdjzjErrorCode.ILLEGAL_STATE)
+          .message("You have voted")
+          .build();
+    }
+    turnInfo.vote = true;
+    turnInfo.vote1 = a;
+    turnInfo.vote2 = b;
   }
 
   private TurnInfo getTurnInfo() {
     return turnInfos[board.currentTurn.get()];
   }
 
-  private void checkCurrent() {
+  private void assertCurrentPlayer() {
     if (board.currentPlayer.get() != index) {
       throw MiniBoardgameException.builder()
           .code(GdjzjErrorCode.ILLEGAL_PLAYER)
@@ -168,7 +183,16 @@ public class GdjzjPlayer {
     }
   }
 
-  private void checkRole(GdjzjRole... roles) {
+  private void assertCard(int index) {
+    if (index / 4 != board.currentTurn.get()) {
+      throw MiniBoardgameException.builder()
+          .code(GdjzjErrorCode.ILLEGAL_CARD)
+          .message("This card can't be used in this turn")
+          .build();
+    }
+  }
+
+  private void assertRole(GdjzjRole... roles) {
     if (!Arrays.asList(roles).contains(role)) {
       throw MiniBoardgameException.builder()
           .message("Illegal role to use the skill. Expect: " + Arrays.toString(roles))
