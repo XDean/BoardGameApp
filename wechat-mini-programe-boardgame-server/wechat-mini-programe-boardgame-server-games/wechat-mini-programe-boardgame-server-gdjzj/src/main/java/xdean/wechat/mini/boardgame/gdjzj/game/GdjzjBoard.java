@@ -2,6 +2,7 @@ package xdean.wechat.mini.boardgame.gdjzj.game;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -30,6 +31,10 @@ public class GdjzjBoard {
   public IntList getLeftPlayers() {
     int turn = currentTurn.get();
     return IntList.create(players.stream().filter(p -> p.turnInfos[turn].order < 0).mapToInt(p -> p.index).toArray());
+  }
+
+  public Optional<GdjzjPlayer> getPlayer(GdjzjRole role) {
+    return players.stream().filter(p -> p.role == role).findFirst();
   }
 
   private ImmutableList<GdjzjCard> createCards() {

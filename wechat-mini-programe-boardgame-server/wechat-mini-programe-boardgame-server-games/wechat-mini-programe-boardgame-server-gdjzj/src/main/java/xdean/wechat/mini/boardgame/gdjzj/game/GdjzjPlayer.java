@@ -8,7 +8,7 @@ import xdean.wechat.mini.boardgame.server.model.Player;
 import xdean.wechat.mini.boardgame.server.model.exception.MiniBoardgameException;
 
 public class GdjzjPlayer {
-  static class TurnInfo {
+  public static class TurnInfo {
     int order = -1;
     boolean skip = false;
     boolean attack = false;
@@ -121,12 +121,25 @@ public class GdjzjPlayer {
           .code(GdjzjErrorCode.ATTACK_SELF)
           .build();
     }
-    GdjzjPlayer target = board.players.get(index);
-    target.turnInfos[board.currentTurn.get()].attack = true;
-    if (target.role == GdjzjRole.JI_YUNFU) {
-      for (int i = board.currentTurn.get(); i < 3; i++) {
-        target.turnInfos[i].attack = true;
+    board.players.get(index).attacked();
+  }
+
+  private void attacked() {
+    int turn = board.currentTurn.get();
+    if (turnInfos[turn].order != -1) {
+      turn++;
+    }
+    if (turn < 3) {
+      if (role == GdjzjRole.JI_YUNFU) {
+        for (int i = turn; i < 3; i++) {
+          turnInfos[i].attack = true;
+        }
+      } else {
+        turnInfos[turn].attack = true;
       }
+    }
+    if (role == GdjzjRole.FANG_ZHEN) {
+      board.getPlayer(GdjzjRole.XU_YUAN).ifPresent(p -> p.attacked());
     }
   }
 
@@ -137,6 +150,10 @@ public class GdjzjPlayer {
       getTurnInfo().reverseCard = true;
       board.cards.forEach(c -> c.reverse = true);
     }
+  }
+
+  public void voteCard(int a, int b) {
+
   }
 
   private TurnInfo getTurnInfo() {
