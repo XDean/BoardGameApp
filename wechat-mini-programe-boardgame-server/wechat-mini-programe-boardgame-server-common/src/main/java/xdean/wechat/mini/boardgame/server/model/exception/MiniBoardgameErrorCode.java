@@ -1,5 +1,7 @@
 package xdean.wechat.mini.boardgame.server.model.exception;
 
-public interface MiniBoardgameErrorCode {
+import java.io.Serializable;
+
+public interface MiniBoardgameErrorCode extends Serializable {
 
 }
