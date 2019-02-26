@@ -33,6 +33,12 @@ public class GdjzjPlayer {
     this.role = role;
     for (int i = 0; i < 3; i++) {
       turnInfos[i] = new TurnInfo();
+      if (role == GdjzjRole.FANG_ZHEN) {
+        turnInfos[i].skip = true;
+      }
+    }
+    if (role == GdjzjRole.HUANG_YANYAN || role == GdjzjRole.MUHU_JIANAI) {
+      turnInfos[(int) (Math.random() * 3)].skip = true;
     }
   }
 
@@ -57,7 +63,9 @@ public class GdjzjPlayer {
   public GdjzjWatchCardResult watchCard(int index) {
     checkCurrent();
     GdjzjWatchCardResult result;
-    if (isAttacked()) {
+    if (getTurnInfo().skip) {
+      result = GdjzjWatchCardResult.SKIPPED;
+    } else if (getTurnInfo().attack) {
       result = GdjzjWatchCardResult.ATTACKED;
     } else if (board.cards.get(index).real) {
       result = GdjzjWatchCardResult.TRUE;
@@ -85,7 +93,7 @@ public class GdjzjPlayer {
     checkCurrent();
     checkRole(GdjzjRole.FANG_ZHEN);
     GdjzjWatchPlayerResult result;
-    if (isAttacked()) {
+    if (getTurnInfo().attack) {
       result = GdjzjWatchPlayerResult.ATTACKED;
     } else if (board.players.get(index).role.position) {
       result = GdjzjWatchPlayerResult.TRUE;
@@ -106,10 +114,6 @@ public class GdjzjPlayer {
           .build();
     }
     board.players.get(index).turnInfos[board.currentTurn.get()].attack = true;
-  }
-
-  private boolean isAttacked() {
-    return getTurnInfo().attack;
   }
 
   private TurnInfo getTurnInfo() {
