@@ -107,9 +107,12 @@ public class GdjzjBoard {
   }
 
   private ImmutableList<GdjzjCard> createCards() {
-    return ImmutableList.copyOf(IntStream.range(0, 12)
+    List<GdjzjCard> collect = IntStream.range(0, 12)
         .mapToObj(i -> new GdjzjCard(i, i / 2 == 0))
         .sorted(Comparator.comparing(c -> c.index % 4 + Math.random()))
+        .collect(Collectors.toList());
+    return ImmutableList.copyOf(IntStream.range(0, 12)
+        .mapToObj(i -> new GdjzjCard(i, collect.get(i).real))
         .collect(Collectors.toList()));
   }
 
