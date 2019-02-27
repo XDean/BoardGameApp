@@ -11,4 +11,4 @@ server:
   http:
     port: 8080
   servlet:
-    context-path: mini-boardgame
+    context-path: /mini-boardgame
