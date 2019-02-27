@@ -10,3 +10,5 @@ server:
     key-store-type: PKCS12
   http:
     port: 8080
+  servlet:
+    context-path: mini-boardgame

@@ -1,4 +1,4 @@
-package xdean.wechat.mini.boardgame.server.controller;
+package xdean.wechat.mini.boardgame.server.endpoint;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.reactivex.schedulers.Schedulers;
 
 @RestController
-public class SystemController {
+public class SystemEndPoint {
 
   private @Inject ApplicationContext applicationContext;
 
