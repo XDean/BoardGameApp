@@ -5,6 +5,6 @@ import lombok.Value;
 
 @Value
 @Builder
-public class JoinGameRequest {
+public class ExitGameRequest {
   int roomId;
 }
