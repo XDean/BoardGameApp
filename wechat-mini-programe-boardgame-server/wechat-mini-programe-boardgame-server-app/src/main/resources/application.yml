@@ -2,4 +2,11 @@ logging:
   level:
     xdean: DEBUG
 server:
-  port: 80
+  port: 8081
+  ssl:
+    key-store: classpath:mini-boardgame.keystore.p12
+    key-alias: mini-boardgame
+    key-store-password: ENC(1dMghz7ibVQjt7nzopiT4bQLVb3xqCMK)
+    key-store-type: PKCS12
+  http:
+    port: 8080
