@@ -1,41 +1,42 @@
 package xdean.wechat.mini.boardgame.server.security;
 
-import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
-
-import java.util.Date;
-
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.auth0.jwt.JWT;
-
 import xdean.wechat.mini.boardgame.server.security.model.ApplicationUser;
-import xdean.wechat.mini.boardgame.server.security.model.LoginResponse;
 import xdean.wechat.mini.boardgame.server.security.model.SignUpResponse;
-import xdean.wechat.mini.boardgame.server.security.service.ApplicationUserRepository;
 
 @RestController
 public class AuthEndpoint {
 
   @Inject
-  ApplicationUserRepository applicationUserRepository;
+  UserDetailsManager userDetailsManager;
 
   @Inject
-  BCryptPasswordEncoder bCryptPasswordEncoder;
+  AuthenticationManager authenticationManager;
 
   @Inject
-  SecurityProperties properties;
+  PasswordEncoder passwordEncoder;
 
   @RequestMapping("/sign-up")
   public SignUpResponse signUp(
-      HttpServletResponse res,
+      HttpServletRequest request,
+      HttpServletResponse response,
       @RequestBody(required = false) ApplicationUser user,
       @RequestParam(required = false) String username,
       @RequestParam(required = false) String password) {
@@ -47,7 +48,7 @@ public class AuthEndpoint {
             .errorCode(SignUpResponse.INPUT_USERNAME_PASSWORD)
             .build();
       } else {
-        user = new ApplicationUser(0, username, password);
+        user = new ApplicationUser(username, password);
       }
     }
     if (!user.getUsername().matches("^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$")) {
@@ -64,62 +65,37 @@ public class AuthEndpoint {
           .errorCode(SignUpResponse.ILLEGAL_PASSWORD)
           .build();
     }
-    ApplicationUser find = applicationUserRepository.findByUsername(user.getUsername());
-    if (find != null) {
+    boolean exist = userDetailsManager.userExists(user.getUsername());
+    if (exist) {
       return SignUpResponse.builder()
           .success(false)
           .message("User name exist")
           .errorCode(SignUpResponse.USERNAME_EXIST)
           .build();
     }
-    user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-    applicationUserRepository.save(user);
-    addToken(res, user);
+    UserDetails u = User.builder()
+        .username(user.getUsername())
+        .password(user.getPassword())
+        .passwordEncoder(passwordEncoder::encode)
+        .authorities("USER")
+        .build();
+    userDetailsManager.createUser(u);
+    authenticateUserAndSetSession(u, user.getPassword(), request);
     return SignUpResponse.builder()
         .success(true)
         .message("Sign up success")
         .build();
   }
 
-  @RequestMapping("/login")
-  public LoginResponse login(
-      HttpServletResponse res,
-      @RequestBody(required = false) ApplicationUser user,
-      @RequestParam(required = false) String username,
-      @RequestParam(required = false) String password) {
-    if (user == null) {
-      if (username == null || password == null) {
-        return LoginResponse.builder()
-            .success(false)
-            .message("Please input username and password or goto sign-up")
-            .errorCode(LoginResponse.INPUT_USERNAME_PASSWORD)
-            .build();
-      } else {
-        user = new ApplicationUser(0, username, password);
-      }
-    }
-    ApplicationUser find = applicationUserRepository.findByUsername(user.getUsername());
-    if (find != null) {
-      if (bCryptPasswordEncoder.matches(user.getPassword(), find.getPassword())) {
-        addToken(res, user);
-        return LoginResponse.builder()
-            .success(true)
-            .message("Login success")
-            .build();
-      }
-    }
-    return LoginResponse.builder()
-        .success(false)
-        .message("Wrong password or user not exist")
-        .errorCode(LoginResponse.WRONG_PASSWORD_OR_USERNAME_NOT_EXIST)
-        .build();
-  }
+  private void authenticateUserAndSetSession(UserDetails user, String rawPassword, HttpServletRequest request) {
+    String username = user.getUsername();
+    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, rawPassword);
 
-  private void addToken(HttpServletResponse res, ApplicationUser user) {
-    String token = JWT.create()
-        .withSubject(user.getUsername())
-        .withExpiresAt(new Date(System.currentTimeMillis() + properties.getExpirationTime()))
-        .sign(HMAC512(properties.getSecretKey().getBytes()));
-    res.addHeader(HttpHeaders.AUTHORIZATION, properties.getTokenPrefix() + token);
+    request.getSession();
+
+    token.setDetails(new WebAuthenticationDetails(request));
+    Authentication authenticatedUser = authenticationManager.authenticate(token);
+
+    SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
   }
 }

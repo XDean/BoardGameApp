@@ -19,6 +19,3 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-mini-boardgame:
-  security:
-    secret-key: ENC(BhTqzwxzS5oY04HMULaGxAY1iZwBVxox)
