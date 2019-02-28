@@ -2,7 +2,7 @@ logging:
   level:
     xdean: DEBUG
 server:
-  port: 8081
+  port: 8081 # https port
   ssl:
     key-store: classpath:mini-boardgame.keystore.p12
     key-alias: mini-boardgame
@@ -10,5 +10,15 @@ server:
     key-store-type: PKCS12
   http:
     port: 8080
-  servlet:
-    context-path: /mini-boardgame
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/mini-boardgame
+    username: mini-boardgame
+    password: ENC(r03++s+FMaITOgqaD6bMPkQ5GaEOI+Oo)
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+mini-boardgame:
+  security:
+    secret-key: ENC(BhTqzwxzS5oY04HMULaGxAY1iZwBVxox)
