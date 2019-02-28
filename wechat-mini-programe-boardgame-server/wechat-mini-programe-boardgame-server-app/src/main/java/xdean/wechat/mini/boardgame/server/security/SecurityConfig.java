@@ -3,6 +3,7 @@ package xdean.wechat.mini.boardgame.server.security;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
@@ -21,6 +23,9 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Inject
   DataSource dataSource;
+
+  @Inject
+  DataSourceProperties dataSourceProperties;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -36,9 +41,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    JdbcUserDetailsManager m = userDetailsManager();
     auth
-        .userDetailsService(userDetailsManager())
+        .userDetailsService(m)
         .passwordEncoder(passwordEncoder());
+    if (!m.userExists("admin")) {
+      m.createUser(User.builder()
+          .username("admin")
+          .password(dataSourceProperties.getPassword())
+          .passwordEncoder(passwordEncoder()::encode)
+          .authorities("USER", "ADMIN")
+          .build());
+    }
   }
 
   @Bean

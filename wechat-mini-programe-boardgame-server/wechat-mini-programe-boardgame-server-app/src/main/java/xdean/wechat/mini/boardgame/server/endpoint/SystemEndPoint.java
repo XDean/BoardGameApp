@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.reactivex.schedulers.Schedulers;
+import xdean.wechat.mini.boardgame.server.security.annotation.AdminAuth;
 
 @RestController
 public class SystemEndPoint {
@@ -36,6 +37,7 @@ public class SystemEndPoint {
     return "Set to " + who + "!";
   }
 
+  @AdminAuth
   @GetMapping("/shutdown")
   public String shutdown(@RequestParam(name = "delay", required = false, defaultValue = "1000") int delay) {
     Schedulers.io().scheduleDirect(() -> SpringApplication.exit(applicationContext), delay, TimeUnit.MILLISECONDS);
