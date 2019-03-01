@@ -2,15 +2,8 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.github.XDean</groupId>
-    <artifactId>mini-boardgame</artifactId>
+    <artifactId>mini-boardgame-server</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>mini-boardgame-server</artifactId>
-  <packaging>pom</packaging>
-  <modules>
-  	<module>mini-boardgame-server-games</module>
-  	<module>mini-boardgame-server-app</module>
-  	<module>mini-boardgame-server-common</module>
-  	<module>mini-boardgame-server-wechat</module>
-  </modules>
+  <artifactId>mini-boardgame-server-wechat</artifactId>
 </project>
