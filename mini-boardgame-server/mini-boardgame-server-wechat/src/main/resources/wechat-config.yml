@@ -1,0 +1,5 @@
+mini-boardgame:
+  wechat:
+    auth-url: https://api.weixin.qq.com/sns/jscode2session
+    app-id: ENC(QbF/dCzBU7CTSwfcIH64gfKoffWa/mHw8H+e0A+AYb4=)
+    app-secret: ENC(VjdV7Gl5EglLpXzuvTLWZWTvPV3Nrfj0tmxoMfhI/KIldI3TIVuO7uXb05MOYgv7)
