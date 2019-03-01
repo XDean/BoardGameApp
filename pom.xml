@@ -7,11 +7,11 @@
 		<artifactId>oss-parent</artifactId>
 		<version>1.1</version>
 	</parent>
-	<artifactId>wechat-mini-programe-boardgame</artifactId>
+	<artifactId>mini-boardgame</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Mini Boardgame</name>
-	<description>Wechat Mini Program Boardgame</description>
+	<description>Mini Boardgame</description>
 	<url>${repository.url}</url>
 
 	<properties>
@@ -21,7 +21,7 @@
 	</properties>
 
 	<modules>
-		<module>wechat-mini-programe-boardgame-server</module>
+		<module>mini-boardgame-server</module>
 	</modules>
 
 	<dependencyManagement>

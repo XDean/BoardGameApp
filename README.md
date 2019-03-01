@@ -1,5 +1,4 @@
 # Mini Boardgame
-[![Build Status](https://travis-ci.org/XDean/wechat-mini-programe-boardgame.svg?branch=master)](https://travis-ci.org/XDean/wechat-mini-programe-boardgame)
+[![Build Status](https://travis-ci.org/XDean/mini-boardgame.svg?branch=master)](https://travis-ci.org/XDean/mini-boardgame)
 
-
-Wechat Mini Program Boardgame
+Mini Boardgame
