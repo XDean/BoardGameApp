@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.server.security.handler;
+package xdean.mini.boardgame.server.security;
 
 import org.springframework.security.core.AuthenticationException;
 

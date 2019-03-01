@@ -16,9 +16,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import xdean.mini.boardgame.server.security.handler.OpenIdAuthFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -35,13 +32,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     http
         .csrf().disable()
         .authorizeRequests()
-        .antMatchers("/sign-up").permitAll()
+        .antMatchers("/sign-up", "/login**").permitAll()
         .antMatchers("/**/favicon.ico", "/webjars/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .formLogin().defaultSuccessUrl("/hello")
-        .and().logout()
-        .and().addFilterBefore(openIdAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+        .and().logout();
   }
 
   @Override
@@ -64,11 +60,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected AuthenticationManager authenticationManager() throws Exception {
     return super.authenticationManager();
-  }
-
-  @Bean
-  public OpenIdAuthFilter openIdAuthFilter() {
-    return new OpenIdAuthFilter();
   }
 
   @Bean

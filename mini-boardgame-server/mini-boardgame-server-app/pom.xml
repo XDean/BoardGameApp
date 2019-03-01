@@ -9,6 +9,16 @@
 	<artifactId>mini-boardgame-server-app</artifactId>
 
 	<dependencies>
+    <dependency>
+      <groupId>com.github.XDean</groupId>
+      <artifactId>mini-boardgame-server-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.XDean</groupId>
+      <artifactId>mini-boardgame-server-wechat</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
