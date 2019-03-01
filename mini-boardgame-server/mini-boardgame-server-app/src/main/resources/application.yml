@@ -6,7 +6,7 @@ server:
   ssl:
     key-store: classpath:mini-boardgame.keystore.p12
     key-alias: mini-boardgame
-    key-store-password: ENC(1dMghz7ibVQjt7nzopiT4bQLVb3xqCMK)
+    key-store-password: ENC(kHTwtAi3oPbc3XUJM64j8P4G9Za2dwuH)
     key-store-type: PKCS12
   http:
     port: 8080
@@ -14,11 +14,10 @@ spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/
     username: mini-boardgame
-    password: ENC(mGx6EfldKnWAtnW1Inuaybklce0prGqF)
+    password: ENC(WDimEjwoPfGeLqyfXtds2+Xtat0jmwRn)
     driver-class-name: com.mysql.jdbc.Driver
     schema:
     - classpath:security_schema.sql
-    initialization-mode: always
   jpa:
     hibernate:
       ddl-auto: update
