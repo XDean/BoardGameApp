@@ -7,8 +7,6 @@ import lombok.Builder.Default;
 @Value
 @Builder
 public class ExitGameResponse {
-  boolean success;
-
   @Default
-  int errorCode = -1;
+  int errorCode = 0;
 }

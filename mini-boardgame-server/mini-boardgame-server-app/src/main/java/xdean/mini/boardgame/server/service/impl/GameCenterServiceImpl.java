@@ -35,14 +35,12 @@ public class GameCenterServiceImpl implements GameCenterService {
     Optional<GameService> game = findGame(request.getGameName());
     if (!game.isPresent()) {
       return CreateGameResponse.builder()
-          .success(false)
           .errorCode(GameCenterErrorCode.NO_SUCH_GAME)
           .build();
     }
     synchronized (player) {
       if (player.getRoomId() != -1) {
         return CreateGameResponse.builder()
-            .success(false)
             .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
             .build();
       }
@@ -52,7 +50,6 @@ public class GameCenterServiceImpl implements GameCenterService {
       rooms.put(roomId, room);
       player.setRoomId(roomId);
       return CreateGameResponse.builder()
-          .success(true)
           .roomId(roomId)
           .build();
     }
@@ -63,21 +60,18 @@ public class GameCenterServiceImpl implements GameCenterService {
     GameRoom room = rooms.get(request.getRoomId());
     if (room == null) {
       return JoinGameResponse.builder()
-          .success(false)
           .errorCode(GameCenterErrorCode.NO_SUCH_ROOM)
           .build();
     }
     synchronized (player) {
       if (player.getRoomId() != -1) {
         return JoinGameResponse.builder()
-            .success(false)
             .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
             .build();
       }
       room.addPlayer(player);
       player.setRoomId(room.id);
       return JoinGameResponse.builder()
-          .success(true)
           .build();
     }
   }
@@ -87,14 +81,12 @@ public class GameCenterServiceImpl implements GameCenterService {
     GameRoom room = rooms.get(request.getRoomId());
     if (room == null) {
       return ExitGameResponse.builder()
-          .success(false)
           .errorCode(GameCenterErrorCode.NO_SUCH_ROOM)
           .build();
     }
     synchronized (player) {
       if (player.getRoomId() == -1) {
         return ExitGameResponse.builder()
-            .success(false)
             .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
             .build();
       }
@@ -104,7 +96,6 @@ public class GameCenterServiceImpl implements GameCenterService {
         rooms.remove(room.id, room);
       }
       return ExitGameResponse.builder()
-          .success(true)
           .build();
     }
   }
