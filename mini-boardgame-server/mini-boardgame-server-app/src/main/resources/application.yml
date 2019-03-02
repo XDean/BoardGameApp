@@ -17,7 +17,9 @@ spring:
     password: ENC(WDimEjwoPfGeLqyfXtds2+Xtat0jmwRn)
     driver-class-name: com.mysql.jdbc.Driver
     schema:
-    - classpath:security_schema.sql
+    - classpath:sql/schema/db_schema.sql
+    - classpath:sql/schema/security_schema.sql
+    - classpath:sql/schema/users_schema.sql
     initialization-mode: always
   jpa:
     hibernate:

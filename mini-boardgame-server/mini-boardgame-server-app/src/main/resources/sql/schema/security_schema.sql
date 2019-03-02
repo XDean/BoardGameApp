@@ -1,7 +1,3 @@
-CREATE DATABASE IF NOT EXISTS mini_boardgame;
-
-USE mini_boardgame;
-
 CREATE TABLE IF NOT EXISTS users(
       `username` VARCHAR(512) NOT NULL PRIMARY KEY,
       `password` VARCHAR(512) NOT NULL,
