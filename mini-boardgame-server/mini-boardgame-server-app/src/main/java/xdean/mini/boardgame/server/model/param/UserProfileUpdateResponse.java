@@ -8,7 +8,7 @@ import xdean.mini.boardgame.server.model.UserProfile;
 @Data
 @Builder
 public class UserProfileUpdateResponse {
-  public static final int NOT_CURRENT_USER = 1;
+  public static final int HAVE_NOT_LOGIN = 1;
   public static final int ILLEGAL_INPUT = 2;
 
   @Default

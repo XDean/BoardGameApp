@@ -2,8 +2,8 @@ package xdean.mini.boardgame.server.service;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import xdean.mini.boardgame.server.model.UserProfile;
+import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 
-public interface UserProfileRepo extends JpaRepository<UserProfile, String> {
+public interface UserProfileRepo extends JpaRepository<UserProfileEntity, Integer> {
 
 }

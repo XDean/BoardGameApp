@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,14 +14,21 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import xdean.mini.boardgame.server.model.UserProfile;
+import xdean.mini.boardgame.server.model.entity.UserEntity;
+import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.model.param.UserProfileResponse;
+import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateResponse;
+import xdean.mini.boardgame.server.service.UserEntityRepo;
 import xdean.mini.boardgame.server.service.UserProfileRepo;
 import xdean.mini.boardgame.server.util.UserUtil;
 
 @RestController
 @Api(tags = "User/Profile")
 public class UserProfileEndPoint {
+
+  @Inject
+  UserEntityRepo userEntityRepo;
 
   @Inject
   UserProfileRepo userProfileRepo;
@@ -34,9 +42,13 @@ public class UserProfileEndPoint {
     if (username == null) {
       return UserProfileResponse.builder().errorCode(UserProfileResponse.INPUT_USER).build();
     }
-    Optional<UserProfile> p = userProfileRepo.findById(username);
+    Optional<UserEntity> p = userEntityRepo.findByUsername(username);
     if (p.isPresent()) {
-      return UserProfileResponse.builder().profile(p.get()).build();
+      UserProfileEntity profile = p.get().getProfile();
+      if (profile == null) {
+        return UserProfileResponse.builder().errorCode(UserProfileResponse.PROFILE_NOT_FOUND).build();
+      }
+      return UserProfileResponse.builder().profile(profile.getProfile()).build();
     } else {
       return UserProfileResponse.builder().errorCode(UserProfileResponse.USER_NOT_FOUND).build();
     }
@@ -44,12 +56,23 @@ public class UserProfileEndPoint {
 
   @ApiOperation("Update user profile")
   @PostMapping(path = "/user/profile-set")
-  public UserProfileUpdateResponse updateUserProfile(@RequestBody UserProfile profile) {
+  public UserProfileUpdateResponse updateUserProfile(@Validated @RequestBody UserProfileUpdateRequest request) {
     String username = UserUtil.getAuthUser().map(u -> u.getUsername()).orElse(null);
-    if (username == null || !username.equals(profile.getUsername())) {
-      return UserProfileUpdateResponse.builder().errorCode(UserProfileUpdateResponse.NOT_CURRENT_USER).build();
+    if (username == null) {
+      return UserProfileUpdateResponse.builder().errorCode(UserProfileUpdateResponse.HAVE_NOT_LOGIN).build();
     }
-    UserProfile p = userProfileRepo.save(profile);
-    return UserProfileUpdateResponse.builder().profile(p).build();
+    Optional<UserEntity> u = userEntityRepo.findByUsername(username);
+    if (!u.isPresent()) {
+      throw new IllegalStateException("A user loged in but there is no record in DB");
+    }
+    UserProfileEntity p = userProfileRepo.save(UserProfileEntity.builder()
+        .userId(u.get().getId())
+        .profile(UserProfile.builder()
+            .male(request.getProfile().isMale())
+            .nickname(request.getProfile().getNickname())
+            .avatarUrl(request.getProfile().getAvatarUrl())
+            .build())
+        .build());
+    return UserProfileUpdateResponse.builder().profile(p.getProfile()).build();
   }
 }
