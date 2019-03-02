@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.server.security;
+package xdean.mini.boardgame.server.endpoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,15 +21,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import xdean.jex.log.Logable;
+import xdean.mini.boardgame.server.security.OpenIdAuthProvider;
 import xdean.mini.boardgame.server.security.model.LoginOpenIdResponse;
 import xdean.mini.boardgame.server.security.model.SignUpResponse;
 
 @RestController
-public class AuthEndpoint implements Logable {
+@Api(tags = "User")
+public class UserEndpoint implements Logable {
 
   @Inject
   UserDetailsManager userDetailsManager;
@@ -43,7 +48,8 @@ public class AuthEndpoint implements Logable {
   @Autowired(required = false)
   List<OpenIdAuthProvider> providers = Collections.emptyList();
 
-  @RequestMapping("/sign-up")
+  @ApiOperation("Sign up a new user")
+  @RequestMapping(path = "/sign-up", method = { GET, POST })
   public SignUpResponse signUp(
       HttpServletRequest request,
       HttpServletResponse response,
@@ -92,7 +98,8 @@ public class AuthEndpoint implements Logable {
         .build();
   }
 
-  @RequestMapping("/login-openid")
+  @ApiOperation("Login with openid")
+  @RequestMapping(path = "/login-openid", method = { GET, POST })
   public LoginOpenIdResponse loginOpenId(
       HttpServletRequest request,
       @RequestParam(name = "token", required = false) String token,

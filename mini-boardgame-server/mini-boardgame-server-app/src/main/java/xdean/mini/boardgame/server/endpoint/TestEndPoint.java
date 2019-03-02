@@ -1,0 +1,44 @@
+package xdean.mini.boardgame.server.endpoint;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+
+@RestController
+@Api(tags = "Test")
+public class TestEndPoint {
+  @GetMapping("/hello")
+  public String hello(@RequestParam(name = "who", required = false) String who) {
+    if (who == null) {
+      who = "World";
+      Authentication a = SecurityContextHolder.getContext().getAuthentication();
+      if (a != null) {
+        Object p = a.getPrincipal();
+        if (p instanceof User) {
+          who = ((User) p).getUsername().toString();
+        }
+      }
+    }
+    return "Hello " + who + "!";
+  }
+
+  @GetMapping("/hello-cookie")
+  public String helloCookie(@CookieValue(name = "who", defaultValue = "World") String who) {
+    return "Hello " + who + "!";
+  }
+
+  @GetMapping("/hello-cookie-set")
+  public String setHelloCookie(HttpServletResponse response, @RequestParam(name = "who", defaultValue = "World") String who) {
+    response.addCookie(new Cookie("who", who));
+    return "Set to " + who + "!";
+  }
+}
