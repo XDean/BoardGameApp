@@ -1,4 +1,7 @@
-package xdean.mini.boardgame.server.endpoint;
+package xdean.mini.boardgame.server.security.endpoint;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,8 +35,8 @@ import xdean.mini.boardgame.server.security.model.LoginOpenIdResponse;
 import xdean.mini.boardgame.server.security.model.SignUpResponse;
 
 @RestController
-@Api(tags = "User")
-public class UserEndpoint implements Logable {
+@Api(tags = "User/Auth")
+public class UserAuthEndpoint implements Logable {
 
   @Inject
   UserDetailsManager userDetailsManager;
