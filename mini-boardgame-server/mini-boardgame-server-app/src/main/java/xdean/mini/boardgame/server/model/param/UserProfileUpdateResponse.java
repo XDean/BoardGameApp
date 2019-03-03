@@ -2,10 +2,10 @@ package xdean.mini.boardgame.server.model.param;
 
 import lombok.Builder;
 import lombok.Builder.Default;
-import lombok.Data;
+import lombok.Value;
 import xdean.mini.boardgame.server.model.UserProfile;
 
-@Data
+@Value
 @Builder
 public class UserProfileUpdateResponse {
   public static final int HAVE_NOT_LOGIN = 1;

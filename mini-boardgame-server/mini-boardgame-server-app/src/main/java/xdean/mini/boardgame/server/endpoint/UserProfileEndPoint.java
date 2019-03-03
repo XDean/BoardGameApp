@@ -55,7 +55,7 @@ public class UserProfileEndPoint {
   }
 
   @ApiOperation("Update user profile")
-  @PostMapping(path = "/user/profile-set")
+  @PostMapping(path = "/user/profile")
   public UserProfileUpdateResponse updateUserProfile(@Validated @RequestBody UserProfileUpdateRequest request) {
     String username = UserUtil.getAuthUser().map(u -> u.getUsername()).orElse(null);
     if (username == null) {
