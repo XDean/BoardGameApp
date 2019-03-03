@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import xdean.mini.boardgame.server.service.LoggableDispatcherServlet;
+import xdean.mini.boardgame.server.handler.LoggableDispatcherServlet;
 
 @Configuration
 public class HttpConfig {

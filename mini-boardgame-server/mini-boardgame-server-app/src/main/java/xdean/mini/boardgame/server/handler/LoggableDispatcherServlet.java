@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.server.service;
+package xdean.mini.boardgame.server.handler;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
