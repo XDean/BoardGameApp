@@ -3,6 +3,7 @@ package xdean.mini.boardgame.server.model.entity;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -20,6 +21,9 @@ import xdean.mini.boardgame.server.model.UserProfile;
 public class UserProfileEntity {
   @Id
   long userId;
+
+  @OneToOne
+  UserProfileEntity user;
 
   @Embedded
   UserProfile profile;

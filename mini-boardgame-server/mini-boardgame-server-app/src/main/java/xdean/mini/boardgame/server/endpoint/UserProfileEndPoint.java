@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import xdean.mini.boardgame.server.model.UserProfile;
-import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.model.param.UserProfileResponse;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
@@ -42,9 +41,9 @@ public class UserProfileEndPoint {
     if (username == null) {
       return UserProfileResponse.builder().errorCode(UserProfileResponse.INPUT_USER).build();
     }
-    Optional<UserEntity> p = userEntityRepo.findByUsername(username);
+    Optional<UserProfileEntity> p = userProfileRepo.findByUserUsername(username);
     if (p.isPresent()) {
-      UserProfileEntity profile = p.get().getProfile();
+      UserProfileEntity profile = p.get();
       if (profile == null) {
         return UserProfileResponse.builder().errorCode(UserProfileResponse.PROFILE_NOT_FOUND).build();
       }
@@ -61,12 +60,11 @@ public class UserProfileEndPoint {
     if (username == null) {
       return UserProfileUpdateResponse.builder().errorCode(UserProfileUpdateResponse.HAVE_NOT_LOGIN).build();
     }
-    Optional<UserEntity> u = userEntityRepo.findByUsername(username);
+    Optional<UserProfileEntity> u = userProfileRepo.findByUserUsername(username);
     if (!u.isPresent()) {
       throw new IllegalStateException("A user loged in but there is no record in DB");
     }
-    UserProfileEntity p = userProfileRepo.save(UserProfileEntity.builder()
-        .userId(u.get().getId())
+    UserProfileEntity p = userProfileRepo.save(u.get().toBuilder()
         .profile(UserProfile.builder()
             .male(request.getProfile().isMale())
             .nickname(request.getProfile().getNickname())
