@@ -20,7 +20,7 @@ import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateResponse;
 import xdean.mini.boardgame.server.service.UserEntityRepo;
 import xdean.mini.boardgame.server.service.UserProfileRepo;
-import xdean.mini.boardgame.server.util.UserUtil;
+import xdean.mini.boardgame.server.service.UserService;
 
 @RestController
 @Api(tags = "User/Profile")
@@ -36,7 +36,7 @@ public class UserProfileEndPoint {
   @GetMapping(path = "/user/profile")
   public UserProfileResponse getUserProfile(@RequestParam(name = "username", required = false) String username) {
     if (username == null) {
-      username = UserUtil.getAuthUser().map(u -> u.getUsername()).orElse(null);
+      username = UserService.getAuthUser().map(u -> u.getUsername()).orElse(null);
     }
     if (username == null) {
       return UserProfileResponse.builder().errorCode(UserProfileResponse.INPUT_USER).build();
@@ -56,7 +56,7 @@ public class UserProfileEndPoint {
   @ApiOperation("Update user profile")
   @PostMapping(path = "/user/profile")
   public UserProfileUpdateResponse updateUserProfile(@Validated @RequestBody UserProfileUpdateRequest request) {
-    String username = UserUtil.getAuthUser().map(u -> u.getUsername()).orElse(null);
+    String username = UserService.getAuthUser().map(u -> u.getUsername()).orElse(null);
     if (username == null) {
       return UserProfileUpdateResponse.builder().errorCode(UserProfileUpdateResponse.HAVE_NOT_LOGIN).build();
     }

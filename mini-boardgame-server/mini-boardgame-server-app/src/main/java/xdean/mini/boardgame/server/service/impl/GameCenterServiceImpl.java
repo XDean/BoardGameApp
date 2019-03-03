@@ -78,26 +78,27 @@ public class GameCenterServiceImpl implements GameCenterService {
 
   @Override
   public ExitGameResponse exitGame(GamePlayer player, ExitGameRequest request) {
-    GameRoom room = rooms.get(request.getRoomId());
-    if (room == null) {
-      return ExitGameResponse.builder()
-          .errorCode(GameCenterErrorCode.NO_SUCH_ROOM)
-          .build();
-    }
-    synchronized (player) {
-      if (player.getRoomId() == -1) {
-        return ExitGameResponse.builder()
-            .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
-            .build();
-      }
-      room.removePlayer(player);
-      player.setRoomId(-1);
-      if (room.isEmpty()) {
-        rooms.remove(room.id, room);
-      }
-      return ExitGameResponse.builder()
-          .build();
-    }
+    return null;
+//    GameRoom room = rooms.get(request.getRoomId());
+//    if (room == null) {
+//      return ExitGameResponse.builder()
+//          .errorCode(GameCenterErrorCode.NO_SUCH_ROOM)
+//          .build();
+//    }
+//    synchronized (player) {
+//      if (player.getRoomId() == -1) {
+//        return ExitGameResponse.builder()
+//            .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
+//            .build();
+//      }
+//      room.removePlayer(player);
+//      player.setRoomId(-1);
+//      if (room.isEmpty()) {
+//        rooms.remove(room.id, room);
+//      }
+//      return ExitGameResponse.builder()
+//          .build();
+//    }
   }
 
   private Integer generateId() {

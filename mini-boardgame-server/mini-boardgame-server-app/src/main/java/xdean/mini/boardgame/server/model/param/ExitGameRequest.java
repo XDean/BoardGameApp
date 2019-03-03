@@ -6,5 +6,4 @@ import lombok.Value;
 @Value
 @Builder
 public class ExitGameRequest {
-  int roomId;
 }

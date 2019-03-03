@@ -9,7 +9,7 @@ import lombok.Value;
 @Value
 @Builder
 public class CreateGameRequest {
-  @NotEmpty(message = "Game name can't be empty")
+  @NotEmpty
   String gameName;
 
   @Min(1)
