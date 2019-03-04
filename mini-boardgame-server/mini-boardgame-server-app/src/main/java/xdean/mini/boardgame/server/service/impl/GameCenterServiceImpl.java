@@ -1,6 +1,7 @@
 package xdean.mini.boardgame.server.service.impl;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
@@ -71,10 +73,17 @@ public class GameCenterServiceImpl implements GameCenterService {
       Integer roomId = generateId();
       GameRoomEntity room = GameRoomEntity.builder()
           .id(roomId)
+          .room(GameRoom.builder()
+              .gameName(request.getGameName())
+              .createdTime(new Date())
+              .playerCount(request.getPlayerCount())
+              .roomName(request.getRoomName().isEmpty() ? "Room " + roomId : request.getRoomName())
+              .build())
           .player(player)
           .build();
-      room = gameRoomRepo.save(room);
       player.setRoom(room);
+      room = gameRoomRepo.save(room);
+      // gamePlayerRepo.save(player);
       return CreateGameResponse.builder()
           .roomId(roomId)
           .build();
@@ -108,7 +117,7 @@ public class GameCenterServiceImpl implements GameCenterService {
         room.addPlayer(player);
         player.setRoom(room);
         gameRoomRepo.save(room);
-        // gamePlayerRepo.save(player);
+        gamePlayerRepo.save(player);
         return JoinGameResponse.builder()
             .build();
       }
@@ -126,15 +135,21 @@ public class GameCenterServiceImpl implements GameCenterService {
     synchronized (getLock(user.get().getId())) {
       GamePlayerEntity player = JpaUtil.findOrCreate(gamePlayerRepo, user.get().getId(),
           id -> GamePlayerEntity.builder().userId(id).build());
-      synchronized (getLock(player.getRoom().getId())) {
-        if (player.getRoom() == null) {
-          return ExitGameResponse.builder()
-              .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
-              .build();
-        }
-        player.getRoom().removePlayer(player);
+      GameRoomEntity room = player.getRoom();
+      if (room == null) {
+        return ExitGameResponse.builder()
+            .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
+            .build();
+      }
+      synchronized (getLock(room.getId())) {
         player.setRoom(null);
         gamePlayerRepo.save(player);
+        room.removePlayer(player);
+        if (room.getRoom().getCurrentPlayerCount() == 0) {
+          gameRoomRepo.delete(room);
+        } else {
+          gameRoomRepo.save(room);
+        }
         return ExitGameResponse.builder().build();
       }
     }
@@ -154,7 +169,7 @@ public class GameCenterServiceImpl implements GameCenterService {
   }
 
   private Object getLock(int id) {
-    return locks[id / 32];
+    return locks[id % 32];
   }
 
   @Override

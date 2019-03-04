@@ -1,10 +1,10 @@
 package xdean.mini.boardgame.server.model.param;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,8 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateGameRequest {
-  @NotEmpty
-  String gameName;
+  @Default
+  String gameName = "";
+
+  @Default
+  String roomName = "";
 
   @Min(1)
   int playerCount;

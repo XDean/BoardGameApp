@@ -1,6 +1,5 @@
 package xdean.mini.boardgame.server.service;
 
-import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.param.CreateGameRequest;
 import xdean.mini.boardgame.server.model.param.CreateGameResponse;
 import xdean.mini.boardgame.server.model.param.CurrentGameResponse;

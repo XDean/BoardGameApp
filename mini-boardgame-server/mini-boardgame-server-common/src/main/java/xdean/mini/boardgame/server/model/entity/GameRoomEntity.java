@@ -3,6 +3,7 @@ package xdean.mini.boardgame.server.model.entity;
 import java.util.List;
 
 import javax.persistence.AttributeOverride;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -32,7 +33,7 @@ public class GameRoomEntity {
   GameRoom room;
 
   @Singular
-  @OneToMany(mappedBy = "room")
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
   List<GamePlayerEntity> players;
 
   public void setPlayers(List<GamePlayerEntity> players) {
