@@ -2,6 +2,9 @@ package xdean.mini.boardgame.server.model.entity;
 
 import java.util.List;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -12,6 +15,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
+import xdean.mini.boardgame.server.model.GameRoom;
 
 @Data
 @Entity
@@ -23,7 +27,9 @@ public class GameRoomEntity {
   @Id
   int id;
 
-  String gameName;
+  @Embedded
+  @AttributeOverride(name = "id", column = @Column(insertable = false, updatable = false))
+  GameRoom room;
 
   @Singular
   @OneToMany(mappedBy = "room")

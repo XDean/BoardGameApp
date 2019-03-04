@@ -1,7 +1,6 @@
-package xdean.mini.boardgame.server.model.param;
+package xdean.mini.boardgame.server.model;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,10 +11,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateGameRequest {
-  @NotEmpty
+public class GameRoom {
+
+  int id;
+
   String gameName;
 
-  @Min(1)
   int playerCount;
+
+  String roomName;
+
+  Date createdTime;
 }

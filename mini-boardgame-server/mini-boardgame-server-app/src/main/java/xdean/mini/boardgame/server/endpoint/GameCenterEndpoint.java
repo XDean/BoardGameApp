@@ -5,6 +5,12 @@ import javax.inject.Inject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import xdean.mini.boardgame.server.model.param.CreateGameRequest;
+import xdean.mini.boardgame.server.model.param.CreateGameResponse;
+import xdean.mini.boardgame.server.model.param.ExitGameRequest;
+import xdean.mini.boardgame.server.model.param.ExitGameResponse;
+import xdean.mini.boardgame.server.model.param.JoinGameRequest;
+import xdean.mini.boardgame.server.model.param.JoinGameResponse;
 import xdean.mini.boardgame.server.service.GameCenterService;
 
 @RestController("/game")
@@ -14,17 +20,22 @@ public class GameCenterEndpoint {
   GameCenterService service;
 
   @GetMapping("/create")
-  public void createGame() {
-
+  public CreateGameResponse createGame(CreateGameRequest request) {
+    return service.createGame(request);
   }
 
   @GetMapping("/join")
-  public void joinGame() {
-
+  public JoinGameResponse joinGame(JoinGameRequest request) {
+    return service.joinGame(request);
   }
 
   @GetMapping("/exit")
-  public void exitGame() {
+  public ExitGameResponse exitGame(ExitGameRequest request) {
+    return service.exitGame(request);
+  }
+
+  @GetMapping("")
+  public void findGame() {
 
   }
 }

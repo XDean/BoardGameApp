@@ -1,9 +1,11 @@
 package xdean.mini.boardgame.server.model.param;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
+@Data
 @Builder
+@NoArgsConstructor
 public class ExitGameRequest {
 }
