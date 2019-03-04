@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `user_profiles`(  
-  `user_id` BIGINT NOT NULL ,
+  `user_id` int NOT NULL ,
   `nickname` VARCHAR(127) CHARACTER SET utf8,
   `gender` TINYINT(1),
   `avatar_url` TEXT,

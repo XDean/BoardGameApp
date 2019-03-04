@@ -1,30 +1,31 @@
 package xdean.mini.boardgame.server.model.entity;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Singular;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-@Table(name = "users")
-public class UserEntity {
+@Table(name = "game_rooms")
+public class GameRoomEntity {
   @Id
   int id;
-  String username;
-  String password;
-  boolean enabled;
 
-  @OneToOne
-  @JoinColumn(name = "id")
-  UserProfileEntity profile;
+  String gameName;
+
+  @Singular
+  @OneToMany(mappedBy = "room")
+  List<GamePlayerEntity> players;
 }

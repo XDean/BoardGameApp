@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import xdean.jex.extra.collection.IntList;
 import xdean.mini.boardgame.gdjzj.model.GdjzjErrorCode;
-import xdean.mini.boardgame.server.model.Player;
 import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 
 public class GdjzjPlayer {
@@ -25,15 +24,15 @@ public class GdjzjPlayer {
     int vote2;
   }
 
-  final Player player;
+  final int id;
   final int index;
   final GdjzjBoard board;
   final GdjzjRole role;
   final TurnInfo[] turnInfos = new TurnInfo[3];
   int vote;
 
-  public GdjzjPlayer(Player player, int index, GdjzjBoard board, GdjzjRole role) {
-    this.player = player;
+  public GdjzjPlayer(int id, int index, GdjzjBoard board, GdjzjRole role) {
+    this.id = id;
     this.index = index;
     this.board = board;
     this.role = role;

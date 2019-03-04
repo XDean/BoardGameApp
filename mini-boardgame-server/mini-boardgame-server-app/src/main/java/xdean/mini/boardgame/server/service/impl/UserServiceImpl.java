@@ -7,11 +7,13 @@ import javax.inject.Inject;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Service;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.service.UserEntityRepo;
 import xdean.mini.boardgame.server.service.UserService;
 
+@Service
 public class UserServiceImpl implements UserService {
 
   @Inject

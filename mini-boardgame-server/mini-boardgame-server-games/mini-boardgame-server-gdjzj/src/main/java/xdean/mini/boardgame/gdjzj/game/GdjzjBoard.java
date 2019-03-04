@@ -13,7 +13,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import xdean.jex.extra.collection.IntList;
 import xdean.mini.boardgame.gdjzj.model.GdjzjErrorCode;
-import xdean.mini.boardgame.server.model.Player;
 import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 
 public class GdjzjBoard {
@@ -23,11 +22,11 @@ public class GdjzjBoard {
   IntegerProperty currentPlayer = new SimpleIntegerProperty(this, "currentPlayer");
   IntegerProperty currentTurn = new SimpleIntegerProperty(this, "currentTurn");
 
-  public GdjzjBoard(Player[] players) {
+  public GdjzjBoard(int[] playerIds) {
     this.cards = createCards();
-    List<GdjzjRole> roles = GdjzjRole.getRoles(players.length);
-    this.players = ImmutableList.copyOf(IntStream.range(0, players.length)
-        .mapToObj(i -> new GdjzjPlayer(players[i], i, this, roles.get(i)))
+    List<GdjzjRole> roles = GdjzjRole.getRoles(playerIds.length);
+    this.players = ImmutableList.copyOf(IntStream.range(0, playerIds.length)
+        .mapToObj(i -> new GdjzjPlayer(playerIds[i], i, this, roles.get(i)))
         .collect(Collectors.toList()));
   }
 

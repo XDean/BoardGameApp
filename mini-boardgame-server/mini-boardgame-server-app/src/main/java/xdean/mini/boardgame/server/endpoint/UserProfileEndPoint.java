@@ -18,7 +18,6 @@ import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.model.param.UserProfileResponse;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateResponse;
-import xdean.mini.boardgame.server.service.UserEntityRepo;
 import xdean.mini.boardgame.server.service.UserProfileRepo;
 import xdean.mini.boardgame.server.service.UserService;
 
@@ -26,17 +25,14 @@ import xdean.mini.boardgame.server.service.UserService;
 @Api(tags = "User/Profile")
 public class UserProfileEndPoint {
 
-  @Inject
-  UserEntityRepo userEntityRepo;
-
-  @Inject
-  UserProfileRepo userProfileRepo;
+  private @Inject UserProfileRepo userProfileRepo;
+  private @Inject UserService userService;
 
   @ApiOperation("Get user profile")
   @GetMapping(path = "/user/profile")
   public UserProfileResponse getUserProfile(@RequestParam(name = "username", required = false) String username) {
     if (username == null) {
-      username = UserService.getAuthUser().map(u -> u.getUsername()).orElse(null);
+      username = userService.getCurrentUser().map(u -> u.getUsername()).orElse(null);
     }
     if (username == null) {
       return UserProfileResponse.builder().errorCode(UserProfileResponse.INPUT_USER).build();
@@ -56,7 +52,7 @@ public class UserProfileEndPoint {
   @ApiOperation("Update user profile")
   @PostMapping(path = "/user/profile")
   public UserProfileUpdateResponse updateUserProfile(@Validated @RequestBody UserProfileUpdateRequest request) {
-    String username = UserService.getAuthUser().map(u -> u.getUsername()).orElse(null);
+    String username = userService.getCurrentUser().map(u -> u.getUsername()).orElse(null);
     if (username == null) {
       return UserProfileUpdateResponse.builder().errorCode(UserProfileUpdateResponse.HAVE_NOT_LOGIN).build();
     }
