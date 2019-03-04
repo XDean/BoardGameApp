@@ -159,7 +159,7 @@ public class GameCenterServiceImpl implements GameCenterService {
     Random r = new Random();
     Integer id;
     do {
-      id = r.nextInt(10000);
+      id = r.nextInt(1000000);
     } while (gameRoomRepo.existsById(id));
     return id;
   }
