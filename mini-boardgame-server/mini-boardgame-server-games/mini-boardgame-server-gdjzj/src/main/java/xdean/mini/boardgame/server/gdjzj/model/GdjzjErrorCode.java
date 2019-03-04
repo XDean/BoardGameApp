@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.gdjzj.model;
+package xdean.mini.boardgame.server.gdjzj.model;
 
 import xdean.mini.boardgame.server.model.exception.MiniBoardgameErrorCode;
 

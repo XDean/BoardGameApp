@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.gdjzj;
+package xdean.mini.boardgame.server.gdjzj;
 
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.gdjzj.game;
+package xdean.mini.boardgame.server.gdjzj.game;
 
 public class GdjzjCard {
   final int index;

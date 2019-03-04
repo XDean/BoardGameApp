@@ -1,9 +1,9 @@
-package xdean.mini.boardgame.gdjzj.game;
+package xdean.mini.boardgame.server.gdjzj.game;
 
 import java.util.Arrays;
 
 import xdean.jex.extra.collection.IntList;
-import xdean.mini.boardgame.gdjzj.model.GdjzjErrorCode;
+import xdean.mini.boardgame.server.gdjzj.model.GdjzjErrorCode;
 import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 
 public class GdjzjPlayer {

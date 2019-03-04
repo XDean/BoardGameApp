@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.gdjzj.game;
+package xdean.mini.boardgame.server.gdjzj.game;
 
 import java.util.Arrays;
 import java.util.Comparator;

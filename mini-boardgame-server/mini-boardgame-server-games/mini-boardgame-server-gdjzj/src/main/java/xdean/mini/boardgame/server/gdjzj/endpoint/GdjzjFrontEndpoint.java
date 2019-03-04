@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.gdjzj.endpoint;
+package xdean.mini.boardgame.server.gdjzj.endpoint;
 
 import org.springframework.web.bind.annotation.RestController;
 
