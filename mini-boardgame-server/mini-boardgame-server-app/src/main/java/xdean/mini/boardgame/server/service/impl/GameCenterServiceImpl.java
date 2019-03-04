@@ -4,11 +4,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
@@ -16,11 +18,14 @@ import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.param.CreateGameRequest;
 import xdean.mini.boardgame.server.model.param.CreateGameResponse;
+import xdean.mini.boardgame.server.model.param.CurrentGameResponse;
 import xdean.mini.boardgame.server.model.param.ExitGameRequest;
 import xdean.mini.boardgame.server.model.param.ExitGameResponse;
 import xdean.mini.boardgame.server.model.param.GameCenterErrorCode;
 import xdean.mini.boardgame.server.model.param.JoinGameRequest;
 import xdean.mini.boardgame.server.model.param.JoinGameResponse;
+import xdean.mini.boardgame.server.model.param.SearchGameRequest;
+import xdean.mini.boardgame.server.model.param.SearchGameResponse;
 import xdean.mini.boardgame.server.service.GameCenterService;
 import xdean.mini.boardgame.server.service.GamePlayerRepo;
 import xdean.mini.boardgame.server.service.GameRoomRepo;
@@ -58,7 +63,7 @@ public class GameCenterServiceImpl implements GameCenterService {
     synchronized (getLock(e.getId())) {
       GamePlayerEntity player = JpaUtil.findOrCreate(gamePlayerRepo, e.getId(),
           id -> GamePlayerEntity.builder().userId(id).build());
-      if (player.getRoom().getId() != -1) {
+      if (player.getRoom() != null) {
         return CreateGameResponse.builder()
             .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
             .build();
@@ -95,12 +100,12 @@ public class GameCenterServiceImpl implements GameCenterService {
         GameRoomEntity room = oRoom.get();
         GamePlayerEntity player = JpaUtil.findOrCreate(gamePlayerRepo, user.get().getId(),
             id -> GamePlayerEntity.builder().userId(id).build());
-        if (player.getRoom().getId() != -1) {
+        if (player.getRoom() != null) {
           return JoinGameResponse.builder()
               .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
               .build();
         }
-        room.getPlayers().add(player);
+        room.addPlayer(player);
         player.setRoom(room);
         gameRoomRepo.save(room);
         // gamePlayerRepo.save(player);
@@ -122,11 +127,12 @@ public class GameCenterServiceImpl implements GameCenterService {
       GamePlayerEntity player = JpaUtil.findOrCreate(gamePlayerRepo, user.get().getId(),
           id -> GamePlayerEntity.builder().userId(id).build());
       synchronized (getLock(player.getRoom().getId())) {
-        if (player.getRoom().getId() == -1) {
+        if (player.getRoom() == null) {
           return ExitGameResponse.builder()
               .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
               .build();
         }
+        player.getRoom().removePlayer(player);
         player.setRoom(null);
         gamePlayerRepo.save(player);
         return ExitGameResponse.builder().build();
@@ -149,5 +155,45 @@ public class GameCenterServiceImpl implements GameCenterService {
 
   private Object getLock(int id) {
     return locks[id / 32];
+  }
+
+  @Override
+  public SearchGameResponse searchGame(SearchGameRequest request) {
+    Optional<GameService> game = findGame(request.getGameName());
+    if (!game.isPresent()) {
+      return SearchGameResponse.builder()
+          .errorCode(GameCenterErrorCode.NO_SUCH_GAME)
+          .build();
+    }
+    List<GameRoomEntity> rooms = gameRoomRepo.findAllByRoomGameName(request.getGameName(),
+        PageRequest.of(request.getPage(), request.getPageSize()));
+    return SearchGameResponse.builder()
+        .rooms(rooms.stream()
+            // .peek(e ->
+            // e.getRoom().setCurrentPlayerCount(e.getPlayers().size()))
+            .map(e -> e.getRoom())
+            .collect(Collectors.toList()))
+        .build();
+  }
+
+  @Override
+  public CurrentGameResponse currentGame() {
+    Optional<UserEntity> user = userService.getCurrentUser();
+    if (!user.isPresent()) {
+      return CurrentGameResponse.builder()
+          .errorCode(GameCenterErrorCode.NO_USER)
+          .build();
+    }
+    synchronized (getLock(user.get().getId())) {
+      GamePlayerEntity player = JpaUtil.findOrCreate(gamePlayerRepo, user.get().getId(),
+          id -> GamePlayerEntity.builder().userId(id).build());
+      GameRoomEntity room = player.getRoom();
+      if (room == null) {
+        return CurrentGameResponse.builder()
+            .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
+            .build();
+      }
+      return CurrentGameResponse.builder().room(room.getRoom()).build();
+    }
   }
 }

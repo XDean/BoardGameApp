@@ -14,11 +14,16 @@
 			<artifactId>mini-boardgame-server-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.github.XDean</groupId>
-			<artifactId>mini-boardgame-server-wechat</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>com.github.XDean</groupId>
+      <artifactId>mini-boardgame-server-wechat</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.XDean</groupId>
+      <artifactId>mini-boardgame-server-gdjzj</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-websocket</artifactId>

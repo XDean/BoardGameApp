@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SearchGameRequest {
   String gameName;
-  int limit;
-  int offset;
+  int page;
+  int pageSize;
 }
