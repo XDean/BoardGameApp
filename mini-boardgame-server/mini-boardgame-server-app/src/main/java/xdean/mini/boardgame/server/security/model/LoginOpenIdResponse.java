@@ -14,7 +14,7 @@ public class LoginOpenIdResponse {
   boolean success;
 
   @Default
-  int errorCode = -1;
+  int errorCode = 0;
 
   @Default
   String message = "";
