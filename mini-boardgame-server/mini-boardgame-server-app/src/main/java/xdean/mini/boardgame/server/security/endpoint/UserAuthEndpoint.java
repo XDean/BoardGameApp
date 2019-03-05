@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import xdean.jex.log.Logable;
+import xdean.mini.boardgame.server.handler.DispatchLoginHandler;
 import xdean.mini.boardgame.server.security.OpenIdAuthProvider;
 import xdean.mini.boardgame.server.security.model.LoginOpenIdResponse;
 import xdean.mini.boardgame.server.security.model.SignUpResponse;
@@ -37,6 +38,9 @@ import xdean.mini.boardgame.server.security.model.SignUpResponse;
 @RestController
 @Api(tags = "User/Auth")
 public class UserAuthEndpoint implements Logable {
+
+  @Inject
+  DispatchLoginHandler loginHandler;
 
   @Inject
   UserDetailsManager userDetailsManager;
@@ -93,7 +97,7 @@ public class UserAuthEndpoint implements Logable {
         .authorities("USER")
         .build();
     userDetailsManager.createUser(u);
-    authenticateUserAndSetSession(u, password, request);
+    authenticateUserAndSetSession(u, password, request, response);
     return SignUpResponse.builder()
         .success(true)
         .message("Sign up success")
@@ -104,6 +108,7 @@ public class UserAuthEndpoint implements Logable {
   @RequestMapping(path = "/login-openid", method = { GET, POST })
   public LoginOpenIdResponse loginOpenId(
       HttpServletRequest request,
+      HttpServletResponse response,
       @RequestParam(name = "token", required = false) String token,
       @RequestParam(name = "provider", required = false) String provider) {
     if (token == null || provider == null) {
@@ -137,7 +142,7 @@ public class UserAuthEndpoint implements Logable {
           if (!userDetailsManager.userExists(u.getUsername())) {
             userDetailsManager.createUser(u);
           }
-          authenticateUserAndSetSession(u, result, request);
+          authenticateUserAndSetSession(u, result, request, response);
           return LoginOpenIdResponse.builder()
               .success(true)
               .message("Login Success")
@@ -156,7 +161,8 @@ public class UserAuthEndpoint implements Logable {
         .build();
   }
 
-  private void authenticateUserAndSetSession(UserDetails user, String rawPassword, HttpServletRequest request) {
+  private void authenticateUserAndSetSession(UserDetails user, String rawPassword, HttpServletRequest request,
+      HttpServletResponse response) {
     String username = user.getUsername();
     UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, rawPassword);
 
@@ -166,5 +172,6 @@ public class UserAuthEndpoint implements Logable {
     Authentication authenticatedUser = authenticationManager.authenticate(token);
 
     SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
+    loginHandler.afterSuccess(request, response, username);
   }
 }

@@ -17,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 
+import xdean.mini.boardgame.server.handler.DispatchLoginHandler;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -26,6 +28,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Inject
   DataSourceProperties dataSourceProperties;
+
+  @Inject
+  DispatchLoginHandler loginHandler;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -37,6 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .anyRequest().authenticated()
         .and()
         .formLogin().defaultSuccessUrl("/hello")
+        .successHandler(loginHandler)
         .and().logout();
   }
 

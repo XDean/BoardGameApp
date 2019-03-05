@@ -1,6 +1,7 @@
 package xdean.mini.boardgame.server.endpoint;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import xdean.mini.boardgame.server.model.GameConstants;
 import xdean.mini.boardgame.server.model.param.CreateGameRequest;
 import xdean.mini.boardgame.server.model.param.CreateGameResponse;
 import xdean.mini.boardgame.server.model.param.CurrentGameResponse;
@@ -24,27 +26,39 @@ import xdean.mini.boardgame.server.service.GameCenterService;
 @Api(tags = "Game/Game-Center")
 @RestController
 @RequestMapping("/game")
-public class GameCenterEndpoint {
+public class GameCenterEndpoint implements GameConstants {
 
   @Inject
   GameCenterService service;
 
   @PostMapping("/create")
   @ApiOperation("Create a new game room")
-  public CreateGameResponse createGame(@RequestBody CreateGameRequest request) {
-    return service.createGame(request);
+  public CreateGameResponse createGame(@RequestBody CreateGameRequest request, HttpSession session) {
+    CreateGameResponse response = service.createGame(request);
+    if (response.getRoomId() != -1) {
+      session.setAttribute(ROOM_ID, response.getRoomId());
+    }
+    return response;
   }
 
   @PostMapping("/join")
   @ApiOperation("Join an exist game room")
-  public JoinGameResponse joinGame(@RequestBody JoinGameRequest request) {
-    return service.joinGame(request);
+  public JoinGameResponse joinGame(@RequestBody JoinGameRequest request, HttpSession session) {
+    JoinGameResponse response = service.joinGame(request);
+    if (response.getErrorCode() == 0) {
+      session.setAttribute(ROOM_ID, request.getRoomId());
+    }
+    return response;
   }
 
   @PostMapping("/exit")
   @ApiOperation("Exit game room")
-  public ExitGameResponse exitGame(@RequestBody ExitGameRequest request) {
-    return service.exitGame(request);
+  public ExitGameResponse exitGame(@RequestBody ExitGameRequest request, HttpSession session) {
+    ExitGameResponse response = service.exitGame(request);
+    if (response.getErrorCode() == 0) {
+      session.removeAttribute(ROOM_ID);
+    }
+    return response;
   }
 
   @PostMapping("/search")

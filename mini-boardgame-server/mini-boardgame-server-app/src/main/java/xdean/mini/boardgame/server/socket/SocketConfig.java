@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.server.sockettest;
+package xdean.mini.boardgame.server.socket;
 
 import javax.inject.Inject;
 
@@ -16,7 +16,7 @@ public class SocketConfig implements WebSocketConfigurer {
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
     registry
-        .addHandler(handler, "/socket-test")
+        .addHandler(handler, "/socket-test/**")
         .setAllowedOrigins("*");
   }
 }
