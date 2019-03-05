@@ -11,6 +11,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.GameConstants;
+import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 @Component
 public class GameSocketHandler extends TextWebSocketHandler implements Logable, GameConstants {
@@ -19,19 +20,19 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-    Integer id = (Integer) session.getAttributes().get(ROOM_ID);
-    if (id != null) {
-      trace(session.getRemoteAddress() + " connect to room " + id);
-      GameRoomSocketHandler room = rooms.computeIfAbsent(id, GameRoomSocketHandler::new);
+    GameRoomEntity e = (GameRoomEntity) session.getAttributes().get(ROOM);
+    if (e != null) {
+      trace(session.getRemoteAddress() + " connect to room " + e.getId());
+      GameRoomSocketHandler room = rooms.computeIfAbsent(e.getId(), i -> new GameRoomSocketHandler(e.getRoom()));
       room.sessions.add(session);
     }
   }
 
   @Override
   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-    Integer id = (Integer) session.getAttributes().get(ROOM_ID);
-    if (id != null) {
-      GameRoomSocketHandler room = rooms.get(id);
+    GameRoomEntity e = (GameRoomEntity) session.getAttributes().get(ROOM);
+    if (e != null) {
+      GameRoomSocketHandler room = rooms.get(e.getId());
       if (room != null) {
         room.sessions.remove(session);
       }
@@ -40,11 +41,11 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
 
   @Override
   protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-    Integer id = (Integer) session.getAttributes().get(ROOM_ID);
-    if (id != null) {
-      GameRoomSocketHandler room = rooms.get(id);
+    GameRoomEntity e = (GameRoomEntity) session.getAttributes().get(ROOM);
+    if (e != null) {
+      GameRoomSocketHandler room = rooms.get(e.getId());
       if (room != null) {
-        room.handle(message.getPayload());
+        room.handleMessage(message.getPayload());
       }
     }
   }

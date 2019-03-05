@@ -25,7 +25,7 @@ public class SocketConfig implements WebSocketConfigurer, GameConstants {
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
     registry
         .addHandler(handler, "/socket-test/**")
-        .addHandler(gameHandler, "/game/room").addInterceptors(new HttpSessionHandshakeInterceptor(ImmutableList.of(ROOM_ID)))
+        .addHandler(gameHandler, "/game/room").addInterceptors(new HttpSessionHandshakeInterceptor(ImmutableList.of(ROOM)))
         .setAllowedOrigins("*");
   }
 }
