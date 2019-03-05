@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.server.sockettest;
+package xdean.mini.boardgame.server.socket;
 
 import static xdean.jex.util.lang.ExceptionUtil.uncheck;
 
