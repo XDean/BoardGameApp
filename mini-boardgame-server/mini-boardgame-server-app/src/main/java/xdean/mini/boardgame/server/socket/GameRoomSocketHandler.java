@@ -13,4 +13,7 @@ public class GameRoomSocketHandler {
     this.roomId = roomId;
   }
 
+  public void handle(String message) {
+
+  }
 }
