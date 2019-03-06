@@ -9,7 +9,7 @@ import lombok.Builder.Default;
 import lombok.Data;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class WebSocketEvent<T> {
 
   public static final String ERROR_TOPIC = "ERROR";

@@ -117,7 +117,7 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
         sendMessage(session, WebSocketEvent.builder()
             .type(WebSocketSendType.SELF)
             .topic(WebSocketEvent.ERROR_TOPIC)
-            .payload(e.getMessage())
+            .payload("All messages must be like this message.")
             .build());
         trace("Session send wrong message: " + session, e);
       }

@@ -12,10 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DispatchLoginHandler implements AuthenticationSuccessHandler {
+public class DispatchLoginHandler extends SavedRequestAwareAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
   @Autowired(required = false)
   List<LoginHandler> handlers = Collections.emptyList();
@@ -31,5 +32,6 @@ public class DispatchLoginHandler implements AuthenticationSuccessHandler {
     if (principal instanceof UserDetails) {
       afterSuccess(request, response, ((UserDetails) principal).getUsername());
     }
+    super.onAuthenticationSuccess(request, response, authentication);
   }
 }

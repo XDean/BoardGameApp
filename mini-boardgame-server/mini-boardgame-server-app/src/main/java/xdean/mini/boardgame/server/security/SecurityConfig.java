@@ -41,7 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/**/favicon.ico", "/webjars/**").permitAll()
         .anyRequest().authenticated()
         .and()
-        .formLogin().defaultSuccessUrl("/hello")
+        .formLogin()
+        .defaultSuccessUrl("/hello")
         .successHandler(loginHandler)
         .and().logout();
   }
