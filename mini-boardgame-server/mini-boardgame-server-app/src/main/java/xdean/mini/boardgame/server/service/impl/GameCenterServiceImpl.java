@@ -2,7 +2,9 @@ package xdean.mini.boardgame.server.service.impl;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -13,8 +15,17 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.web.socket.WebSocketSession;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
+import xdean.mini.boardgame.server.model.GameConstants;
 import xdean.mini.boardgame.server.model.GameRoom;
+import xdean.mini.boardgame.server.model.GameConstants.SocketTopic;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
@@ -33,10 +44,13 @@ import xdean.mini.boardgame.server.service.GamePlayerRepo;
 import xdean.mini.boardgame.server.service.GameRoomRepo;
 import xdean.mini.boardgame.server.service.GameService;
 import xdean.mini.boardgame.server.service.UserService;
+import xdean.mini.boardgame.server.socket.GameSocketProvider;
+import xdean.mini.boardgame.server.socket.WebSocketEvent;
+import xdean.mini.boardgame.server.socket.WebSocketSendType;
 import xdean.mini.boardgame.server.util.JpaUtil;
 
 @Service
-public class GameCenterServiceImpl implements GameCenterService {
+public class GameCenterServiceImpl implements GameCenterService, GameSocketProvider {
 
   @Autowired(required = false)
   List<GameService> games = Collections.emptyList();
@@ -210,5 +224,22 @@ public class GameCenterServiceImpl implements GameCenterService {
       }
       return CurrentGameResponse.builder().room(room.getRoom()).build();
     }
+  }
+
+  Map<Integer, Subject<WebSocketEvent<?>>> roomSubjects = new HashMap<>();
+
+  @Override
+  public Observable<WebSocketEvent<?>> handle(WebSocketSession session, GameRoom room,
+      Observable<WebSocketEvent<JsonNode>> input) {
+    Integer id = (Integer) session.getAttributes().get(GameConstants.AttrKey.PLAYER_ID);
+    Assert.notNull(id, "Authed user must have id");
+    Subject<WebSocketEvent<?>> subject = roomSubjects.computeIfAbsent(room.getId(), r -> PublishSubject.create());
+    input.subscribe(e -> {
+    }, e -> subject.onError(e), () -> subject.onNext(WebSocketEvent.builder()
+        .type(WebSocketSendType.SELF)
+        .topic(SocketTopic.PLAYER_DISCONNECT)
+        .attribute("id", id)
+        .build()));
+    return subject;
   }
 }

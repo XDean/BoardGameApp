@@ -29,7 +29,6 @@ import io.reactivex.subjects.Subject;
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.GameConstants;
 import xdean.mini.boardgame.server.model.GameRoom;
-import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 @Component
 public class GameSocketHandler extends TextWebSocketHandler implements Logable, GameConstants {
@@ -43,17 +42,17 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-    GameRoomEntity e = (GameRoomEntity) session.getAttributes().get(ROOM);
+    GameRoom e = (GameRoom) session.getAttributes().get(AttrKey.ROOM);
     if (e != null) {
       trace(session.getRemoteAddress() + " connect to room " + e.getId());
-      GameRoomSocketHandler room = rooms.computeIfAbsent(e.getId(), i -> new GameRoomSocketHandler(e.getRoom()));
+      GameRoomSocketHandler room = rooms.computeIfAbsent(e.getId(), i -> new GameRoomSocketHandler(e));
       room.addSession(session);
     }
   }
 
   @Override
   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-    GameRoomEntity e = (GameRoomEntity) session.getAttributes().get(ROOM);
+    GameRoom e = (GameRoom) session.getAttributes().get(AttrKey.ROOM);
     if (e != null) {
       GameRoomSocketHandler room = rooms.get(e.getId());
       if (room != null) {
@@ -64,7 +63,7 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
 
   @Override
   protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-    GameRoomEntity e = (GameRoomEntity) session.getAttributes().get(ROOM);
+    GameRoom e = (GameRoom) session.getAttributes().get(AttrKey.ROOM);
     if (e != null) {
       GameRoomSocketHandler room = rooms.get(e.getId());
       if (room != null) {

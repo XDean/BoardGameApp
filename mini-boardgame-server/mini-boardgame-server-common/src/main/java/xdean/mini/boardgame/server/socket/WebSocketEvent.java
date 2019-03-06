@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
+import lombok.Singular;
 
 @Data
 @Builder(toBuilder = true)
@@ -19,6 +20,9 @@ public class WebSocketEvent<T> {
   WebSocketSendType type = WebSocketSendType.ALL;
 
   String topic;
-  Map<String, String> attributes;
+
+  @Singular
+  Map<String, Object> attributes;
+
   T payload;
 }

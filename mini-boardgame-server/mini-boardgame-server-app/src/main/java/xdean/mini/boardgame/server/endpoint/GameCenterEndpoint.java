@@ -50,7 +50,7 @@ public class GameCenterEndpoint implements GameConstants, LoginHandler {
   public CreateGameResponse createGame(@RequestBody CreateGameRequest request, HttpSession session) {
     CreateGameResponse response = service.createGame(request);
     if (response.getRoomId() != -1) {
-      roomRepo.findById(response.getRoomId()).ifPresent(e -> session.setAttribute(ROOM, e));
+      roomRepo.findById(response.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e.getRoom()));
     }
     return response;
   }
@@ -60,7 +60,7 @@ public class GameCenterEndpoint implements GameConstants, LoginHandler {
   public JoinGameResponse joinGame(@RequestBody JoinGameRequest request, HttpSession session) {
     JoinGameResponse response = service.joinGame(request);
     if (response.getErrorCode() == 0) {
-      roomRepo.findById(request.getRoomId()).ifPresent(e -> session.setAttribute(ROOM, e));
+      roomRepo.findById(request.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e.getRoom()));
     }
     return response;
   }
@@ -70,7 +70,7 @@ public class GameCenterEndpoint implements GameConstants, LoginHandler {
   public ExitGameResponse exitGame(@RequestBody ExitGameRequest request, HttpSession session) {
     ExitGameResponse response = service.exitGame(request);
     if (response.getErrorCode() == 0) {
-      session.removeAttribute(ROOM);
+      session.removeAttribute(AttrKey.ROOM);
     }
     return response;
   }
@@ -91,7 +91,8 @@ public class GameCenterEndpoint implements GameConstants, LoginHandler {
   public void afterSuccess(HttpServletRequest request, HttpServletResponse response, String username) {
     Optional<UserEntity> user = userService.getUserByUsername(username);
     if (user.isPresent()) {
-      roomRepo.findByPlayersUserId(user.get().getId()).ifPresent(e -> request.getSession().setAttribute(ROOM, e));
+      roomRepo.findByPlayersUserId(user.get().getId()).ifPresent(e -> request.getSession()
+          .setAttribute(AttrKey.ROOM, e.getRoom()));
     }
   }
 }
