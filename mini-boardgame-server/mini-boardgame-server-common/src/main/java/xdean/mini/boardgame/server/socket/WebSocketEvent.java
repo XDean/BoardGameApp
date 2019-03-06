@@ -1,5 +1,24 @@
 package xdean.mini.boardgame.server.socket;
 
-public class WebSocketEvent {
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Data;
+
+@Data
+@Builder
+public class WebSocketEvent<T> {
+
+  public static final String ERROR_TOPIC = "ERROR";
+
+  @Default
+  @JsonIgnore
+  WebSocketSendType type = WebSocketSendType.ALL;
+
+  String topic;
+  Map<String, String> attributes;
+  T payload;
 }
