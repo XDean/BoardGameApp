@@ -39,20 +39,11 @@ import xdean.mini.boardgame.server.security.model.SignUpResponse;
 @Api(tags = "User/Auth")
 public class UserAuthEndpoint implements Logable {
 
-  @Inject
-  DispatchLoginHandler loginHandler;
-
-  @Inject
-  UserDetailsManager userDetailsManager;
-
-  @Inject
-  AuthenticationManager authenticationManager;
-
-  @Inject
-  PasswordEncoder passwordEncoder;
-
-  @Autowired(required = false)
-  List<OpenIdAuthProvider> providers = Collections.emptyList();
+  private @Inject DispatchLoginHandler loginHandler;
+  private @Inject UserDetailsManager userDetailsManager;
+  private @Inject AuthenticationManager authenticationManager;
+  private @Inject PasswordEncoder passwordEncoder;
+  private @Autowired(required = false) List<OpenIdAuthProvider> providers = Collections.emptyList();
 
   @ApiOperation("Sign up a new user")
   @RequestMapping(path = "/sign-up", method = { GET, POST })

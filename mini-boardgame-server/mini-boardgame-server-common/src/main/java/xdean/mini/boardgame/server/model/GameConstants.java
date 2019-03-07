@@ -13,7 +13,7 @@ public interface GameConstants {
   interface AttrKey {
     @Tag(TagKey.SOCKET_ATTR)
     @BeanType(Integer.class)
-    String PLAYER_ID = "PLAYER_ID";
+    String USER_ID = "USER_ID";
 
     @Tag(TagKey.SOCKET_ATTR)
     @BeanType(GameRoom.class)
@@ -21,16 +21,16 @@ public interface GameConstants {
   }
 
   interface SocketTopic {
-    @Attrs(AttrKey.PLAYER_ID)
+    @Attrs(AttrKey.USER_ID)
     String PLAYER_JOIN = "PLAYER_JOIN";
 
-    @Attrs(AttrKey.PLAYER_ID)
+    @Attrs(AttrKey.USER_ID)
     String PLAYER_EXIT = "PLAYER_EXIT";
 
-    @Attrs(AttrKey.PLAYER_ID)
+    @Attrs(AttrKey.USER_ID)
     String PLAYER_CONNECT = "PLAYER_CONNECT";
 
-    @Attrs(AttrKey.PLAYER_ID)
+    @Attrs(AttrKey.USER_ID)
     String PLAYER_DISCONNECT = "PLAYER_DISCONNECT";
   }
 }

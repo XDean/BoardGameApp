@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.inject.Inject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -29,6 +31,7 @@ import io.reactivex.subjects.Subject;
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.GameConstants;
 import xdean.mini.boardgame.server.model.GameRoom;
+import xdean.mini.boardgame.server.service.GameRoomRepo;
 
 @Component
 public class GameSocketHandler extends TextWebSocketHandler implements Logable, GameConstants {
@@ -40,36 +43,50 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
 
   ObjectMapper objectMapper = new ObjectMapper();
 
+  @Inject
+  GameRoomRepo roomRepo;
+
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-    GameRoom e = (GameRoom) session.getAttributes().get(AttrKey.ROOM);
-    if (e != null) {
-      trace(session.getRemoteAddress() + " connect to room " + e.getId());
-      GameRoomSocketHandler room = rooms.computeIfAbsent(e.getId(), i -> new GameRoomSocketHandler(e));
-      room.addSession(session);
+    GameRoom room;
+    try {
+      int id = getRoomIdFromSession(session);
+      room = roomRepo.findById(id).get().getRoom();
+    } catch (Exception ex) {
+      trace("Fail to find room: " + session, ex);
+      session.close(CloseStatus.BAD_DATA.withReason("Can't find room id"));
+      return;
+    }
+    if (room != null) {
+      trace(session.getRemoteAddress() + " connect to room " + room.getId());
+      GameRoomSocketHandler roomHandler = rooms.computeIfAbsent(room.getId(), i -> new GameRoomSocketHandler(room));
+      roomHandler.addSession(session);
     }
   }
 
   @Override
   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-    GameRoom e = (GameRoom) session.getAttributes().get(AttrKey.ROOM);
-    if (e != null) {
-      GameRoomSocketHandler room = rooms.get(e.getId());
-      if (room != null) {
-        room.removeSession(session);
-      }
+    int id = getRoomIdFromSession(session);
+    GameRoomSocketHandler room = rooms.get(id);
+    if (room != null) {
+      room.removeSession(session);
     }
   }
 
   @Override
   protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-    GameRoom e = (GameRoom) session.getAttributes().get(AttrKey.ROOM);
-    if (e != null) {
-      GameRoomSocketHandler room = rooms.get(e.getId());
-      if (room != null) {
-        room.handleMessage(session, message.getPayload());
-      }
+    int id = getRoomIdFromSession(session);
+    GameRoomSocketHandler room = rooms.get(id);
+    if (room != null) {
+      room.handleMessage(session, message.getPayload());
     }
+  }
+
+  private int getRoomIdFromSession(WebSocketSession session) {
+    String path = session.getUri().getPath();
+    String idStr = path.substring(path.lastIndexOf('/') + 1);
+    int id = Integer.parseInt(idStr);
+    return id;
   }
 
   private class GameRoomSocketHandler {
@@ -127,9 +144,11 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
         String str = objectMapper.writeValueAsString(message);
         TextMessage msg = new TextMessage(str);
         if (message.type == WebSocketSendType.SELF) {
-          session.sendMessage(msg);
+          if (session.isOpen()) {
+            session.sendMessage(msg);
+          }
         } else {
-          sessions.forEach(s -> uncheck(() -> s.sendMessage(msg)));
+          sessions.stream().filter(s -> s.isOpen()).forEach(s -> uncheck(() -> s.sendMessage(msg)));
         }
       } catch (IOException e) {
         Subject<WebSocketEvent<JsonNode>> subject = subjects.get(session);

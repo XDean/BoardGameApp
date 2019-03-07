@@ -21,11 +21,12 @@ import org.springframework.web.socket.WebSocketSession;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import xdean.mini.boardgame.server.model.GameConstants;
-import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.GameConstants.SocketTopic;
+import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
@@ -132,6 +133,7 @@ public class GameCenterServiceImpl implements GameCenterService, GameSocketProvi
         player.setRoom(room);
         gameRoomRepo.save(room);
         gamePlayerRepo.save(player);
+        sendEvent(room.getId(), player.getUserId(), SocketTopic.PLAYER_JOIN);
         return JoinGameResponse.builder()
             .build();
       }
@@ -164,26 +166,10 @@ public class GameCenterServiceImpl implements GameCenterService, GameSocketProvi
         } else {
           gameRoomRepo.save(room);
         }
+        sendEvent(room.getId(), player.getUserId(), SocketTopic.PLAYER_EXIT);
         return ExitGameResponse.builder().build();
       }
     }
-  }
-
-  private Integer generateId() {
-    Random r = new Random();
-    Integer id;
-    do {
-      id = r.nextInt(1000000);
-    } while (gameRoomRepo.existsById(id));
-    return id;
-  }
-
-  private Optional<GameService> findGame(String name) {
-    return games.stream().filter(g -> g.name().equals(name)).findFirst();
-  }
-
-  private Object getLock(int id) {
-    return locks[id % 32];
   }
 
   @Override
@@ -231,15 +217,48 @@ public class GameCenterServiceImpl implements GameCenterService, GameSocketProvi
   @Override
   public Observable<WebSocketEvent<?>> handle(WebSocketSession session, GameRoom room,
       Observable<WebSocketEvent<JsonNode>> input) {
-    Integer id = (Integer) session.getAttributes().get(GameConstants.AttrKey.PLAYER_ID);
+    Integer id = (Integer) session.getAttributes().get(GameConstants.AttrKey.USER_ID);
     Assert.notNull(id, "Authed user must have id");
     Subject<WebSocketEvent<?>> subject = roomSubjects.computeIfAbsent(room.getId(), r -> PublishSubject.create());
+    subject.onNext(WebSocketEvent.builder()
+        .type(WebSocketSendType.SELF)
+        .topic(SocketTopic.PLAYER_CONNECT)
+        .attribute(GameConstants.AttrKey.USER_ID, id)
+        .build());
     input.subscribe(e -> {
     }, e -> subject.onError(e), () -> subject.onNext(WebSocketEvent.builder()
         .type(WebSocketSendType.SELF)
         .topic(SocketTopic.PLAYER_DISCONNECT)
-        .attribute("id", id)
+        .attribute(GameConstants.AttrKey.USER_ID, id)
         .build()));
     return subject;
+  }
+
+  private void sendEvent(int roomId, int playerId, String topic) {
+    Subject<WebSocketEvent<?>> subject = roomSubjects.get(roomId);
+    if (subject != null) {
+      subject.onNext(WebSocketEvent.builder()
+          .type(WebSocketSendType.SELF)
+          .topic(topic)
+          .attribute(GameConstants.AttrKey.USER_ID, playerId)
+          .build());
+    }
+  }
+
+  private Integer generateId() {
+    Random r = new Random();
+    Integer id;
+    do {
+      id = r.nextInt(1000000);
+    } while (gameRoomRepo.existsById(id));
+    return id;
+  }
+
+  private Optional<GameService> findGame(String name) {
+    return games.stream().filter(g -> g.name().equals(name)).findFirst();
+  }
+
+  private Object getLock(int id) {
+    return locks[id % 32];
   }
 }

@@ -22,6 +22,5 @@ spring:
     initialization-mode: always
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-    show-sql: true
     hibernate:
       ddl-auto: update

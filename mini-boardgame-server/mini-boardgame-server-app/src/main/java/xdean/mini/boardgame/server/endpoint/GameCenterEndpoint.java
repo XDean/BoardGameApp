@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import xdean.mini.boardgame.server.handler.LoginHandler;
+import xdean.mini.boardgame.server.handler.LoginSuccessHandler;
 import xdean.mini.boardgame.server.model.GameConstants;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.param.CreateGameRequest;
@@ -34,7 +34,7 @@ import xdean.mini.boardgame.server.service.UserService;
 @Api(tags = "Game/Game-Center")
 @RestController
 @RequestMapping("/game")
-public class GameCenterEndpoint implements GameConstants, LoginHandler {
+public class GameCenterEndpoint implements GameConstants, LoginSuccessHandler {
 
   @Inject
   UserService userService;
@@ -50,6 +50,7 @@ public class GameCenterEndpoint implements GameConstants, LoginHandler {
   public CreateGameResponse createGame(@RequestBody CreateGameRequest request, HttpSession session) {
     CreateGameResponse response = service.createGame(request);
     if (response.getRoomId() != -1) {
+      userService.getCurrentUser().ifPresent(e -> session.setAttribute(AttrKey.USER_ID, e.getId()));
       roomRepo.findById(response.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e.getRoom()));
     }
     return response;
@@ -60,6 +61,7 @@ public class GameCenterEndpoint implements GameConstants, LoginHandler {
   public JoinGameResponse joinGame(@RequestBody JoinGameRequest request, HttpSession session) {
     JoinGameResponse response = service.joinGame(request);
     if (response.getErrorCode() == 0) {
+      userService.getCurrentUser().ifPresent(e -> session.setAttribute(AttrKey.USER_ID, e.getId()));
       roomRepo.findById(request.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e.getRoom()));
     }
     return response;
@@ -70,6 +72,7 @@ public class GameCenterEndpoint implements GameConstants, LoginHandler {
   public ExitGameResponse exitGame(@RequestBody ExitGameRequest request, HttpSession session) {
     ExitGameResponse response = service.exitGame(request);
     if (response.getErrorCode() == 0) {
+      session.removeAttribute(AttrKey.USER_ID);
       session.removeAttribute(AttrKey.ROOM);
     }
     return response;
@@ -91,7 +94,9 @@ public class GameCenterEndpoint implements GameConstants, LoginHandler {
   public void afterSuccess(HttpServletRequest request, HttpServletResponse response, String username) {
     Optional<UserEntity> user = userService.getUserByUsername(username);
     if (user.isPresent()) {
-      roomRepo.findByPlayersUserId(user.get().getId()).ifPresent(e -> request.getSession()
+      int id = user.get().getId();
+      request.getSession().setAttribute(AttrKey.USER_ID, id);
+      roomRepo.findByPlayersUserId(id).ifPresent(e -> request.getSession()
           .setAttribute(AttrKey.ROOM, e.getRoom()));
     }
   }

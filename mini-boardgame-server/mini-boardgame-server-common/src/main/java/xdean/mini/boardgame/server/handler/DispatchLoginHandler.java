@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class DispatchLoginHandler extends SavedRequestAwareAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
   @Autowired(required = false)
-  List<LoginHandler> handlers = Collections.emptyList();
+  List<LoginSuccessHandler> handlers = Collections.emptyList();
 
   public void afterSuccess(HttpServletRequest request, HttpServletResponse response, String username) {
     handlers.forEach(h -> h.afterSuccess(request, response, username));
