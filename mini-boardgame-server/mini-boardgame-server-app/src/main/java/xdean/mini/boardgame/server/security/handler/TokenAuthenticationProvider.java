@@ -37,11 +37,14 @@ public class TokenAuthenticationProvider extends OncePerRequestFilter
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     String token = null;
-    Optional<Cookie> cookie = Arrays.stream(request.getCookies())
-        .filter(c -> c.getName().equals(ACCESS_TOKEN))
-        .findFirst();
-    if (cookie.isPresent()) {
-      token = cookie.get().getValue();
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      Optional<Cookie> cookie = Arrays.stream(cookies)
+          .filter(c -> c.getName().equals(ACCESS_TOKEN))
+          .findFirst();
+      if (cookie.isPresent()) {
+        token = cookie.get().getValue();
+      }
     }
     if (token == null) {
       token = request.getHeader(HttpHeaders.AUTHORIZATION);
