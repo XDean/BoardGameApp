@@ -4,9 +4,8 @@ logging:
 server:
   port: 8081 # https porta
   ssl:
-    key-store: classpath:mini-boardgame.keystore.p12
-    key-alias: mini-boardgame
-    key-store-password: ENC(kHTwtAi3oPbc3XUJM64j8P4G9Za2dwuH)
+    key-store: classpath:mini-boardgame.keystore.pfx
+    key-store-password: ENC(wHOeiAhHQhF9MrIWQc7L4Jc+UqB44zvF)
     key-store-type: PKCS12
   http:
     port: 8080
