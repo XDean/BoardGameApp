@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 import xdean.mini.boardgame.server.handler.LoginSuccessProvider;
 import xdean.mini.boardgame.server.model.GameConstants;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
@@ -47,7 +48,7 @@ public class GameCenterEndpoint implements GameConstants, LoginSuccessProvider {
 
   @PostMapping("/create")
   @ApiOperation("Create a new game room")
-  public CreateGameResponse createGame(@RequestBody CreateGameRequest request, HttpSession session) {
+  public CreateGameResponse createGame(@RequestBody CreateGameRequest request, @ApiIgnore HttpSession session) {
     CreateGameResponse response = service.createGame(request);
     if (response.getRoomId() != -1) {
       userService.getCurrentUser().ifPresent(e -> session.setAttribute(AttrKey.USER_ID, e.getId()));
@@ -58,7 +59,7 @@ public class GameCenterEndpoint implements GameConstants, LoginSuccessProvider {
 
   @PostMapping("/join")
   @ApiOperation("Join an exist game room")
-  public JoinGameResponse joinGame(@RequestBody JoinGameRequest request, HttpSession session) {
+  public JoinGameResponse joinGame(@RequestBody JoinGameRequest request, @ApiIgnore HttpSession session) {
     JoinGameResponse response = service.joinGame(request);
     if (response.getErrorCode() == 0) {
       userService.getCurrentUser().ifPresent(e -> session.setAttribute(AttrKey.USER_ID, e.getId()));
@@ -69,7 +70,7 @@ public class GameCenterEndpoint implements GameConstants, LoginSuccessProvider {
 
   @PostMapping("/exit")
   @ApiOperation("Exit game room")
-  public ExitGameResponse exitGame(@RequestBody ExitGameRequest request, HttpSession session) {
+  public ExitGameResponse exitGame(@RequestBody ExitGameRequest request, @ApiIgnore HttpSession session) {
     ExitGameResponse response = service.exitGame(request);
     if (response.getErrorCode() == 0) {
       session.removeAttribute(AttrKey.USER_ID);

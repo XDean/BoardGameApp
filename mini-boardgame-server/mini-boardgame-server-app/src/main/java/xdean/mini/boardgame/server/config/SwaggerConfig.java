@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 
 import com.google.common.collect.ImmutableSet;
 
+import springfox.documentation.annotations.ApiIgnore;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -22,6 +23,7 @@ public class SwaggerConfig {
   @Bean
   public Docket createRestApi() {
     return new Docket(DocumentationType.SWAGGER_2)
+        .ignoredParameterTypes(ApiIgnore.class)
         .produces(ImmutableSet.of(MediaType.APPLICATION_JSON.toString()))
         .consumes(ImmutableSet.of(MediaType.APPLICATION_JSON.toString()))
         .apiInfo(apiInfo())
