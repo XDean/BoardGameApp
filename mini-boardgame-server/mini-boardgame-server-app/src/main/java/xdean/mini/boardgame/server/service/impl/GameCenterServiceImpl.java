@@ -45,13 +45,13 @@ import xdean.mini.boardgame.server.service.GamePlayerRepo;
 import xdean.mini.boardgame.server.service.GameRoomRepo;
 import xdean.mini.boardgame.server.service.GameService;
 import xdean.mini.boardgame.server.service.UserService;
-import xdean.mini.boardgame.server.socket.GameSocketProvider;
+import xdean.mini.boardgame.server.socket.WebSocketProvider;
 import xdean.mini.boardgame.server.socket.WebSocketEvent;
 import xdean.mini.boardgame.server.socket.WebSocketSendType;
 import xdean.mini.boardgame.server.util.JpaUtil;
 
 @Service
-public class GameCenterServiceImpl implements GameCenterService, GameSocketProvider {
+public class GameCenterServiceImpl implements GameCenterService, WebSocketProvider {
 
   @Autowired(required = false)
   List<GameService> games = Collections.emptyList();

@@ -8,11 +8,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.reactivex.Observable;
 import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.service.GameService;
-import xdean.mini.boardgame.server.socket.GameSocketProvider;
+import xdean.mini.boardgame.server.socket.WebSocketProvider;
 import xdean.mini.boardgame.server.socket.WebSocketEvent;
 
 @Component
-public class GdjzjGame implements GameService, GameSocketProvider {
+public class GdjzjGame implements GameService, WebSocketProvider {
 
   @Override
   public String name() {
