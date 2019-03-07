@@ -39,5 +39,7 @@ public interface GameConstants {
 
     @Attrs(AttrKey.USER_ID)
     String PLAYER_DISCONNECT = "PLAYER_DISCONNECT";
+
+    String ROOM_CANCEL = "ROOM_CANCEL";
   }
 }

@@ -21,7 +21,6 @@ import org.springframework.web.socket.WebSocketSession;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.reactivex.Observable;
-import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import xdean.mini.boardgame.server.model.GameConstants;
@@ -45,8 +44,9 @@ import xdean.mini.boardgame.server.service.GamePlayerRepo;
 import xdean.mini.boardgame.server.service.GameRoomRepo;
 import xdean.mini.boardgame.server.service.GameService;
 import xdean.mini.boardgame.server.service.UserService;
-import xdean.mini.boardgame.server.socket.WebSocketProvider;
 import xdean.mini.boardgame.server.socket.WebSocketEvent;
+import xdean.mini.boardgame.server.socket.WebSocketEvent.WebSocketEventBuilder;
+import xdean.mini.boardgame.server.socket.WebSocketProvider;
 import xdean.mini.boardgame.server.socket.WebSocketSendType;
 import xdean.mini.boardgame.server.util.JpaUtil;
 
@@ -167,6 +167,9 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
           gameRoomRepo.save(room);
         }
         sendEvent(room.getId(), player.getUserId(), SocketTopic.PLAYER_EXIT);
+        if (room.getRoom().getCurrentPlayerCount() == 0) {
+          sendEvent(room.getId(), null, SocketTopic.ROOM_CANCEL);
+        }
         return ExitGameResponse.builder().build();
       }
     }
@@ -234,14 +237,16 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
     return subject;
   }
 
-  private void sendEvent(int roomId, int playerId, String topic) {
+  private void sendEvent(int roomId, Integer playerId, String topic) {
     Subject<WebSocketEvent<?>> subject = roomSubjects.get(roomId);
     if (subject != null) {
-      subject.onNext(WebSocketEvent.builder()
+      WebSocketEventBuilder<?> builder = WebSocketEvent.builder()
           .type(WebSocketSendType.SELF)
-          .topic(topic)
-          .attribute(GameConstants.AttrKey.USER_ID, playerId)
-          .build());
+          .topic(topic);
+      if (playerId != null) {
+        builder.attribute(GameConstants.AttrKey.USER_ID, playerId);
+      }
+      subject.onNext(builder.build());
     }
   }
 
