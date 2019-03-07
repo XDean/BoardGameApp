@@ -161,13 +161,13 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
         player.setRoom(null);
         gamePlayerRepo.save(player);
         room.removePlayer(player);
-        if (room.getRoom().getCurrentPlayerCount() == 0) {
+        if (room.getPlayers().isEmpty()) {
           gameRoomRepo.delete(room);
         } else {
           gameRoomRepo.save(room);
         }
         sendEvent(room.getId(), player.getUserId(), SocketTopic.PLAYER_EXIT);
-        if (room.getRoom().getCurrentPlayerCount() == 0) {
+        if (room.getPlayers().isEmpty()) {
           sendEvent(room.getId(), null, SocketTopic.ROOM_CANCEL);
         }
         return ExitGameResponse.builder().build();
