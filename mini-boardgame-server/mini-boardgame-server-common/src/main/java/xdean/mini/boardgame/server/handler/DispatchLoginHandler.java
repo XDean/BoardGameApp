@@ -22,7 +22,7 @@ public class DispatchLoginHandler extends SavedRequestAwareAuthenticationSuccess
   List<LoginSuccessProvider> handlers = Collections.emptyList();
 
   public void afterSuccess(HttpServletRequest request, HttpServletResponse response, String username) {
-    handlers.forEach(h -> h.afterSuccess(request, response, username));
+    handlers.forEach(h -> h.afterSuccessLogin(request, response, username));
   }
 
   @Override

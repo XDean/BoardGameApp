@@ -6,12 +6,10 @@ import lombok.Value;
 
 @Value
 @Builder
-public class LoginOpenIdResponse {
-  public static final int BAD_CREDENTIALS = 1;
-  public static final int PROVIDER_NOT_FOUND = 2;
-  public static final int PROVIDE_TOKEN_PROVIDER = 3;
-
-  boolean success;
+public class LoginResponse {
+  public static final int BAD_INPUT = 1;
+  public static final int BAD_CREDENTIALS = 2;
+  public static final int PROVIDER_NOT_FOUND = 3;
 
   @Default
   int errorCode = 0;

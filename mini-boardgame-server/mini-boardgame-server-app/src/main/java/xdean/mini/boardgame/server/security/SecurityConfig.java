@@ -62,7 +62,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .logout()
         .logoutSuccessHandler(logoutHandler)
-        .deleteCookies(JwtTokenHandler.JWT_TOKEN);
+        .deleteCookies(JwtTokenHandler.JWT_TOKEN)
+        .and();
   }
 
   @Override

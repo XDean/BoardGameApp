@@ -32,13 +32,15 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import xdean.mini.boardgame.server.handler.LoginSuccessProvider;
+import xdean.mini.boardgame.server.handler.LogoutSuccessProvider;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.security.model.JwtToken;
 import xdean.mini.boardgame.server.security.model.SecurityProperties;
 import xdean.mini.boardgame.server.service.UserEntityRepo;
 
 @Component
-public class JwtTokenHandler extends OncePerRequestFilter implements AuthenticationProvider, LoginSuccessProvider {
+public class JwtTokenHandler extends OncePerRequestFilter implements AuthenticationProvider,
+    LoginSuccessProvider, LogoutSuccessProvider {
 
   public static final String JWT_TOKEN = "jwt-token";
 
@@ -47,6 +49,9 @@ public class JwtTokenHandler extends OncePerRequestFilter implements Authenticat
 
   @Inject
   SecurityProperties properties;
+
+  @Inject
+  AccessTokenRepo tokenRepo;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -76,10 +81,14 @@ public class JwtTokenHandler extends OncePerRequestFilter implements Authenticat
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-    JwtToken token = (JwtToken) authentication;
+    String token = ((JwtToken) authentication).getToken();
+    if (!tokenRepo.existsById(token)) {
+
+    }
+
     DecodedJWT verify = JWT.require(Algorithm.HMAC512(properties.getSecretKey().getBytes()))
         .build()
-        .verify(token.getToken());
+        .verify(token);
     Date expiresAt = verify.getExpiresAt();
     if (expiresAt == null) {
       throw new BadCredentialsException("The token is invalid");
@@ -105,12 +114,16 @@ public class JwtTokenHandler extends OncePerRequestFilter implements Authenticat
   }
 
   @Override
-  public void afterSuccess(HttpServletRequest request, HttpServletResponse response, String username) {
+  public void afterSuccessLogin(HttpServletRequest request, HttpServletResponse response, String username) {
     String token = JWT.create()
         .withSubject(username)
         .withExpiresAt(new Date(System.currentTimeMillis() + properties.getExpirationTime()))
         .sign(Algorithm.HMAC512(properties.getSecretKey().getBytes()));
     response.addCookie(new Cookie(JWT_TOKEN, token));
     response.addHeader(HttpHeaders.AUTHORIZATION, JWT_TOKEN + " " + token);
+  }
+
+  @Override
+  public void afterSuccessLogout(HttpServletRequest request, HttpServletResponse response, String username) {
   }
 }

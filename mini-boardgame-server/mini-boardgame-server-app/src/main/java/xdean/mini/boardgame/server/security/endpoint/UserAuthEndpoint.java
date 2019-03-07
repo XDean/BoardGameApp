@@ -1,8 +1,5 @@
 package xdean.mini.boardgame.server.security.endpoint;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,7 +29,7 @@ import io.swagger.annotations.ApiOperation;
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.handler.DispatchLoginHandler;
 import xdean.mini.boardgame.server.security.OpenIdAuthProvider;
-import xdean.mini.boardgame.server.security.model.LoginOpenIdResponse;
+import xdean.mini.boardgame.server.security.model.LoginResponse;
 import xdean.mini.boardgame.server.security.model.SignUpResponse;
 
 @RestController
@@ -46,7 +43,7 @@ public class UserAuthEndpoint implements Logable {
   private @Autowired(required = false) List<OpenIdAuthProvider> providers = Collections.emptyList();
 
   @ApiOperation("Sign up a new user")
-  @RequestMapping(path = "/sign-up", method = { GET, POST })
+  @PostMapping(path = "/sign-up")
   public SignUpResponse signUp(
       HttpServletRequest request,
       HttpServletResponse response,
@@ -88,33 +85,57 @@ public class UserAuthEndpoint implements Logable {
         .authorities("USER")
         .build();
     userDetailsManager.createUser(u);
-    authenticateUserAndSetSession(u, password, request, response);
+    authenticateUserAndSetSession(username, password, request, response);
     return SignUpResponse.builder()
         .success(true)
         .message("Sign up success")
         .build();
   }
 
+  // @ApiOperation("Login with username and password")
+  // @PostMapping(path = "/login")
+  public LoginResponse login(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      @RequestParam(name = "username", required = false) String username,
+      @RequestParam(name = "password", required = false) String password) {
+    if (username == null || password == null) {
+      return LoginResponse.builder()
+          .errorCode(LoginResponse.BAD_INPUT)
+          .message("Please provide both username and password.")
+          .build();
+    }
+    try {
+      authenticateUserAndSetSession(username, password, request, response);
+      return LoginResponse.builder()
+          .message("Login Success")
+          .build();
+    } catch (AuthenticationException e) {
+      return LoginResponse.builder()
+          .errorCode(LoginResponse.BAD_CREDENTIALS)
+          .message("Bad Credentials")
+          .build();
+    }
+  }
+
   @ApiOperation("Login with openid")
-  @RequestMapping(path = "/login-openid", method = { GET, POST })
-  public LoginOpenIdResponse loginOpenId(
+  @PostMapping(path = "/login-openid")
+  public LoginResponse loginOpenId(
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestParam(name = "token", required = false) String token,
       @RequestParam(name = "provider", required = false) String provider) {
     if (token == null || provider == null) {
-      return LoginOpenIdResponse.builder()
-          .success(false)
-          .errorCode(LoginOpenIdResponse.PROVIDE_TOKEN_PROVIDER)
+      return LoginResponse.builder()
+          .errorCode(LoginResponse.BAD_INPUT)
           .message("Please provide both provider and token.")
           .build();
     }
     List<OpenIdAuthProvider> findProviders = providers.stream().filter(p -> p.name().equals(provider))
         .collect(Collectors.toList());
     if (findProviders.isEmpty()) {
-      return LoginOpenIdResponse.builder()
-          .success(false)
-          .errorCode(LoginOpenIdResponse.PROVIDER_NOT_FOUND)
+      return LoginResponse.builder()
+          .errorCode(LoginResponse.PROVIDER_NOT_FOUND)
           .message("There is no provider support: " + provider)
           .build();
     }
@@ -133,9 +154,8 @@ public class UserAuthEndpoint implements Logable {
           if (!userDetailsManager.userExists(u.getUsername())) {
             userDetailsManager.createUser(u);
           }
-          authenticateUserAndSetSession(u, result, request, response);
-          return LoginOpenIdResponse.builder()
-              .success(true)
+          authenticateUserAndSetSession(u.getUsername(), result, request, response);
+          return LoginResponse.builder()
               .message("Login Success")
               .build();
         }
@@ -145,16 +165,14 @@ public class UserAuthEndpoint implements Logable {
       }
     }
     SecurityContextHolder.clearContext();
-    return LoginOpenIdResponse.builder()
-        .success(false)
-        .errorCode(LoginOpenIdResponse.BAD_CREDENTIALS)
+    return LoginResponse.builder()
+        .errorCode(LoginResponse.BAD_CREDENTIALS)
         .message("Bad Credentials:\n" + errors.stream().map(e -> "- " + e.getMessage()).collect(Collectors.joining("\n")))
         .build();
   }
 
-  private void authenticateUserAndSetSession(UserDetails user, String rawPassword, HttpServletRequest request,
-      HttpServletResponse response) {
-    String username = user.getUsername();
+  private void authenticateUserAndSetSession(String username, String rawPassword, HttpServletRequest request,
+      HttpServletResponse response) throws AuthenticationException {
     UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, rawPassword);
 
     request.getSession();

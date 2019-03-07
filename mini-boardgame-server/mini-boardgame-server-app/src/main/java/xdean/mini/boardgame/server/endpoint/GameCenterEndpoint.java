@@ -91,7 +91,7 @@ public class GameCenterEndpoint implements GameConstants, LoginSuccessProvider {
   }
 
   @Override
-  public void afterSuccess(HttpServletRequest request, HttpServletResponse response, String username) {
+  public void afterSuccessLogin(HttpServletRequest request, HttpServletResponse response, String username) {
     Optional<UserEntity> user = userService.getUserByUsername(username);
     if (user.isPresent()) {
       int id = user.get().getId();
