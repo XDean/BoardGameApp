@@ -22,7 +22,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import xdean.mini.boardgame.server.handler.DispatchLoginHandler;
 import xdean.mini.boardgame.server.handler.DispatchLogoutHandler;
-import xdean.mini.boardgame.server.security.handler.JwtTokenHandler;
 import xdean.mini.boardgame.server.security.handler.TokenAuthenticationProvider;
 import xdean.mini.boardgame.server.security.model.SecurityProperties;
 
@@ -49,7 +48,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     loginHandler.setDefaultTargetUrl("/hello");
-    logoutHandler.setDefaultTargetUrl("/login?logout");
     http
         .csrf().disable()
         .addFilterBefore(tokenAuthProvider, UsernamePasswordAuthenticationFilter.class)
@@ -62,8 +60,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .successHandler(loginHandler)
         .and()
         .logout()
-        .logoutSuccessHandler(logoutHandler)
-        .deleteCookies(JwtTokenHandler.JWT_TOKEN)
+        .addLogoutHandler(logoutHandler)
+        .deleteCookies(TokenAuthenticationProvider.ACCESS_TOKEN)
         .and();
   }
 

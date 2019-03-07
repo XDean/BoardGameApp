@@ -28,7 +28,7 @@ import xdean.mini.boardgame.server.service.UserEntityRepo;
 @Component
 public class JwtTokenHandler implements TokenAuthProvider {
 
-  public static final String JWT_TOKEN = "jwt-token";
+  private static final String JWT_TOKEN = "jwt-token";
 
   @Inject
   UserEntityRepo userRepo;
@@ -63,7 +63,7 @@ public class JwtTokenHandler implements TokenAuthProvider {
 
   @Override
   public String generateToken(String username) {
-    return JWT_TOKEN + " " + JWT.create()
+    return JWT_TOKEN + "-" + JWT.create()
         .withSubject(username)
         .withExpiresAt(new Date(System.currentTimeMillis() + properties.getExpirationTime()))
         .sign(Algorithm.HMAC512(properties.getSecretKey().getBytes()));
