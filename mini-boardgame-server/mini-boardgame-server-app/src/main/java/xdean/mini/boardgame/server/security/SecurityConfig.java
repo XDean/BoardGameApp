@@ -4,6 +4,8 @@ import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,11 +18,15 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import xdean.mini.boardgame.server.handler.DispatchLoginHandler;
+import xdean.mini.boardgame.server.security.handler.JwtTokenHandler;
+import xdean.mini.boardgame.server.security.model.SecurityProperties;
 
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Inject
@@ -32,25 +38,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Inject
   DispatchLoginHandler loginHandler;
 
+  @Inject
+  JwtTokenHandler jwtTokenHandler;
+
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http
         .csrf().disable()
+        .addFilterBefore(jwtTokenHandler, UsernamePasswordAuthenticationFilter.class)
         .authorizeRequests()
         .antMatchers("/sign-up", "/login**").permitAll()
         .antMatchers("/**/favicon.ico", "/webjars/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .formLogin()
-        .defaultSuccessUrl("/hello")
+        .successForwardUrl("/hello")
         .successHandler(loginHandler)
-        .and().logout();
+        .and()
+        .logout()
+        .deleteCookies(JwtTokenHandler.JWT_TOKEN);
   }
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     JdbcUserDetailsManager m = userDetailsManager();
     auth
+        .authenticationProvider(jwtTokenHandler)
         .userDetailsService(m)
         .passwordEncoder(passwordEncoder());
     if (!m.userExists("admin")) {
@@ -79,5 +92,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  @ConfigurationProperties(prefix = "mini-boardgame.security")
+  public SecurityProperties securityProperties() {
+    return new SecurityProperties();
   }
 }
