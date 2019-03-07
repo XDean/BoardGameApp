@@ -31,14 +31,14 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-import xdean.mini.boardgame.server.handler.LoginSuccessHandler;
+import xdean.mini.boardgame.server.handler.LoginSuccessProvider;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.security.model.JwtToken;
 import xdean.mini.boardgame.server.security.model.SecurityProperties;
 import xdean.mini.boardgame.server.service.UserEntityRepo;
 
 @Component
-public class JwtTokenHandler extends OncePerRequestFilter implements AuthenticationProvider, LoginSuccessHandler {
+public class JwtTokenHandler extends OncePerRequestFilter implements AuthenticationProvider, LoginSuccessProvider {
 
   public static final String JWT_TOKEN = "jwt-token";
 

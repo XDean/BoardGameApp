@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import xdean.mini.boardgame.server.handler.LoginSuccessHandler;
+import xdean.mini.boardgame.server.handler.LoginSuccessProvider;
 import xdean.mini.boardgame.server.model.GameConstants;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.param.CreateGameRequest;
@@ -34,7 +34,7 @@ import xdean.mini.boardgame.server.service.UserService;
 @Api(tags = "Game/Game-Center")
 @RestController
 @RequestMapping("/game")
-public class GameCenterEndpoint implements GameConstants, LoginSuccessHandler {
+public class GameCenterEndpoint implements GameConstants, LoginSuccessProvider {
 
   @Inject
   UserService userService;
