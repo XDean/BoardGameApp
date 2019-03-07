@@ -114,7 +114,6 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
 
     void addSession(WebSocketSession session) {
       sessions.add(session);
-      initSession(session);
     }
 
     void initSession(WebSocketSession session) {
@@ -161,6 +160,7 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
             if (ue.isPresent()) {
               session.getAttributes().put(AttrKey.USER_ID, ue.get().getId());
               session.getAttributes().put(AttrKey.ACCESS_TOKEN, token);
+              initSession(session);
             } else {
               error("An authed user not in db: " + user.getUsername());
               sendMessage(session, WebSocketEvent.builder()
@@ -176,6 +176,8 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
                 .payload("The web socket should authenticate first")
                 .build());
           }
+        } else if (event.topic.equals(SocketTopic.AUTHENTICATION)) {
+          // TODO
         } else {
           Subject<WebSocketEvent<JsonNode>> subject = subjects.get(session);
           if (subject != null) {

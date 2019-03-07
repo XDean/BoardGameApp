@@ -75,6 +75,6 @@ public class TokenAuthenticationProvider extends OncePerRequestFilter
   }
 
   @Override
-  public void afterSuccessLogout(HttpServletRequest request, HttpServletResponse response, String username) {
+  public void afterSuccessLogout(HttpServletRequest request, HttpServletResponse response) {
   }
 }
