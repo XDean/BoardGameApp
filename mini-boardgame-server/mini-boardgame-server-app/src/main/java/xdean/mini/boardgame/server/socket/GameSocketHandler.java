@@ -7,12 +7,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -31,7 +35,10 @@ import io.reactivex.subjects.Subject;
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.GameConstants;
 import xdean.mini.boardgame.server.model.GameRoom;
+import xdean.mini.boardgame.server.model.entity.UserEntity;
+import xdean.mini.boardgame.server.security.TokenAuthProvider;
 import xdean.mini.boardgame.server.service.GameRoomRepo;
+import xdean.mini.boardgame.server.service.UserService;
 
 @Component
 public class GameSocketHandler extends TextWebSocketHandler implements Logable, GameConstants {
@@ -45,6 +52,12 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
 
   @Inject
   GameRoomRepo roomRepo;
+
+  @Inject
+  UserService userService;
+
+  @Inject
+  TokenAuthProvider tokenAuth;
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -101,6 +114,10 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
 
     void addSession(WebSocketSession session) {
       sessions.add(session);
+      initSession(session);
+    }
+
+    void initSession(WebSocketSession session) {
       Subject<WebSocketEvent<JsonNode>> messageSubject = PublishSubject.create();
       CompositeDisposable disposable = new CompositeDisposable();
       providers.forEach(p -> disposable.add(p.handle(session, room, messageSubject.observeOn(Schedulers.io()))
@@ -125,15 +142,51 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
       try {
         WebSocketEvent<JsonNode> event = objectMapper.readValue(message, new TypeReference<WebSocketEvent<JsonNode>>() {
         });
-        Subject<WebSocketEvent<JsonNode>> subject = subjects.get(session);
-        if (subject != null) {
-          subject.onNext(event);
+        if (session.getAttributes().get(AttrKey.ACCESS_TOKEN) == null) {
+          if (event.topic.equals(SocketTopic.AUTHENTICATION)) {
+            String token = event.attributes.getOrDefault(AttrKey.ACCESS_TOKEN, "").toString();
+            Authentication authenticate;
+            try {
+              authenticate = tokenAuth.authenticate(token);
+            } catch (AuthenticationException e) {
+              sendMessage(session, WebSocketEvent.builder()
+                  .type(WebSocketSendType.SELF)
+                  .topic(SocketTopic.BAD_CREDENTIAL)
+                  .payload("Bad Credential: " + e.getLocalizedMessage())
+                  .build());
+              return;
+            }
+            User user = (User) authenticate.getPrincipal();
+            Optional<UserEntity> ue = userService.getUserByUsername(user.getUsername());
+            if (ue.isPresent()) {
+              session.getAttributes().put(AttrKey.USER_ID, ue.get().getId());
+              session.getAttributes().put(AttrKey.ACCESS_TOKEN, token);
+            } else {
+              error("An authed user not in db: " + user.getUsername());
+              sendMessage(session, WebSocketEvent.builder()
+                  .type(WebSocketSendType.SELF)
+                  .topic(SocketTopic.ERROR_TOPIC)
+                  .payload("No such user, unexpected server error")
+                  .build());
+            }
+          } else {
+            sendMessage(session, WebSocketEvent.builder()
+                .type(WebSocketSendType.SELF)
+                .topic(SocketTopic.ERROR_TOPIC)
+                .payload("The web socket should authenticate first")
+                .build());
+          }
+        } else {
+          Subject<WebSocketEvent<JsonNode>> subject = subjects.get(session);
+          if (subject != null) {
+            subject.onNext(event);
+          }
         }
       } catch (IOException e) {
         sendMessage(session, WebSocketEvent.builder()
             .type(WebSocketSendType.SELF)
-            .topic(WebSocketEvent.ERROR_TOPIC)
-            .payload("All messages must be like this message.")
+            .topic(SocketTopic.ERROR_TOPIC)
+            .payload("Wrong format. All messages must be like this message.")
             .build());
         trace("Session send wrong message: " + session, e);
       }

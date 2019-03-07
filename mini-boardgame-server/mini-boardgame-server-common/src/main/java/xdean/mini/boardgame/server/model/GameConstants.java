@@ -21,6 +21,10 @@ public interface GameConstants {
 
   interface SocketTopic {
 
+    String ERROR_TOPIC = "ERROR";// an unexpected error happened
+
+    String BAD_CREDENTIAL = "BAD_CREDENTIAL";
+
     @Attrs(AttrKey.ACCESS_TOKEN)
     String AUTHENTICATION = "AUTHENTICATION";
 

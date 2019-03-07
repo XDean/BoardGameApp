@@ -13,8 +13,6 @@ import lombok.Singular;
 @Builder(toBuilder = true)
 public class WebSocketEvent<T> {
 
-  public static final String ERROR_TOPIC = "ERROR";
-
   @Default
   @JsonIgnore
   WebSocketSendType type = WebSocketSendType.ALL;
