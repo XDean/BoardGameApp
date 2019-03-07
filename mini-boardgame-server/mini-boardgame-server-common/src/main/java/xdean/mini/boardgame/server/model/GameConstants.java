@@ -17,6 +17,10 @@ public interface GameConstants {
 
     @BeanType(String.class)
     String ACCESS_TOKEN = "ACCESS_TOKEN";
+
+    String FROM_SEAT = "FROM_SEAT";
+
+    String TO_SEAT = "TO_SEAT";
   }
 
   interface SocketTopic {
@@ -41,5 +45,11 @@ public interface GameConstants {
     String PLAYER_DISCONNECT = "PLAYER_DISCONNECT";
 
     String ROOM_CANCEL = "ROOM_CANCEL";
+
+    @Attrs({ AttrKey.FROM_SEAT, AttrKey.TO_SEAT })
+    String CHANGE_SEAT_REQUEST = "CHANGE_SEAT_REQUEST";
+
+    @Attrs({ AttrKey.FROM_SEAT, AttrKey.TO_SEAT })
+    String CHANGE_SEAT = "CHANGE_SEAT";
   }
 }

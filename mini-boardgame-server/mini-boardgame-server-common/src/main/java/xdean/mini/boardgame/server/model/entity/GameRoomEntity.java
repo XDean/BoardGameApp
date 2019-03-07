@@ -7,6 +7,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -33,7 +34,7 @@ public class GameRoomEntity {
   GameRoom room;
 
   @Singular
-  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   List<GamePlayerEntity> players;
 
   public void addPlayer(GamePlayerEntity player) {

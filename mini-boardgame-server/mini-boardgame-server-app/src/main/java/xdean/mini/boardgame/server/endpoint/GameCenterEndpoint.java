@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +35,7 @@ import xdean.mini.boardgame.server.service.UserService;
 
 @Api(tags = "Game/Game-Center")
 @RestController
-@RequestMapping("/game")
+@RequestMapping("/game/room")
 public class GameCenterEndpoint implements GameConstants, LoginSuccessProvider {
 
   @Inject
@@ -48,7 +49,7 @@ public class GameCenterEndpoint implements GameConstants, LoginSuccessProvider {
 
   @PostMapping("/create")
   @ApiOperation("Create a new game room")
-  public CreateGameResponse createGame(@RequestBody CreateGameRequest request, @ApiIgnore HttpSession session) {
+  public CreateGameResponse createGame(@Valid @RequestBody CreateGameRequest request, @ApiIgnore HttpSession session) {
     CreateGameResponse response = service.createGame(request);
     if (response.getRoomId() != -1) {
       userService.getCurrentUser().ifPresent(e -> session.setAttribute(AttrKey.USER_ID, e.getId()));

@@ -23,5 +23,5 @@ public class GamePlayerEntity {
   @ManyToOne
   GameRoomEntity room;
 
-  int roomPosition;
+  int seat;
 }

@@ -12,4 +12,13 @@ public class CurrentGameResponse {
   int errorCode = 0;
 
   GameRoom room;
+
+
+
+  @Value
+  @Builder
+  public static class CurrentGamePlayer {
+    int id;
+    int position;
+  }
 }

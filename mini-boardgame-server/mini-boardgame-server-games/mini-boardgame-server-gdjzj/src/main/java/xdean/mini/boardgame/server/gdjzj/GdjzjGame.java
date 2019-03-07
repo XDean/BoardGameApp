@@ -27,9 +27,6 @@ public class GdjzjGame implements GameService, WebSocketProvider {
   @Override
   public Observable<WebSocketEvent<?>> handle(WebSocketSession session, GameRoom room,
       Observable<WebSocketEvent<JsonNode>> input) {
-    if (!room.getGameName().equals(name())) {
-      return Observable.empty();
-    }
-    return input.map(i -> i.toBuilder().topic("gdjzj + " + i.getTopic()).build());
+    return Observable.empty();
   }
 }

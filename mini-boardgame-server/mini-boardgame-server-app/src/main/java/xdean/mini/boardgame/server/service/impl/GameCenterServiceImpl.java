@@ -1,5 +1,6 @@
 package xdean.mini.boardgame.server.service.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,11 +20,16 @@ import org.springframework.util.Assert;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
+import xdean.jex.extra.collection.Pair;
+import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.GameConstants;
+import xdean.mini.boardgame.server.model.GameConstants.AttrKey;
 import xdean.mini.boardgame.server.model.GameConstants.SocketTopic;
 import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
@@ -45,13 +51,12 @@ import xdean.mini.boardgame.server.service.GameRoomRepo;
 import xdean.mini.boardgame.server.service.GameService;
 import xdean.mini.boardgame.server.service.UserService;
 import xdean.mini.boardgame.server.socket.WebSocketEvent;
-import xdean.mini.boardgame.server.socket.WebSocketEvent.WebSocketEventBuilder;
 import xdean.mini.boardgame.server.socket.WebSocketProvider;
 import xdean.mini.boardgame.server.socket.WebSocketSendType;
 import xdean.mini.boardgame.server.util.JpaUtil;
 
 @Service
-public class GameCenterServiceImpl implements GameCenterService, WebSocketProvider {
+public class GameCenterServiceImpl implements GameCenterService, WebSocketProvider, Logable {
 
   @Autowired(required = false)
   List<GameService> games = Collections.emptyList();
@@ -97,6 +102,7 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
           .player(player)
           .build();
       player.setRoom(room);
+      player.setSeat(0);
       room = gameRoomRepo.save(room);
       // gamePlayerRepo.save(player);
       return CreateGameResponse.builder()
@@ -129,11 +135,24 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
               .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
               .build();
         }
-        room.addPlayer(player);
+        if (room.getPlayers().size() == room.getRoom().getPlayerCount()) {
+          return JoinGameResponse.builder()
+              .errorCode(GameCenterErrorCode.ROOM_FULL)
+              .build();
+        }
         player.setRoom(room);
+        IntStream.range(0, room.getRoom().getPlayerCount())
+            .filter(i -> room.getPlayers().stream().noneMatch(e -> e.getSeat() == i))
+            .findFirst()
+            .ifPresent(player::setSeat);
+        room.addPlayer(player);
         gameRoomRepo.save(room);
-        gamePlayerRepo.save(player);
-        sendEvent(room.getId(), player.getUserId(), SocketTopic.PLAYER_JOIN);
+        // gamePlayerRepo.save(player);
+        int playerId = player.getUserId();
+        sendRoomEvent(playerId, WebSocketEvent.builder()
+            .topic(SocketTopic.PLAYER_JOIN)
+            .attribute(GameConstants.AttrKey.USER_ID, playerId)
+            .build());
         return JoinGameResponse.builder()
             .build();
       }
@@ -166,9 +185,15 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
         } else {
           gameRoomRepo.save(room);
         }
-        sendEvent(room.getId(), player.getUserId(), SocketTopic.PLAYER_EXIT);
+        int playerId = player.getUserId();
+        sendRoomEvent(playerId, WebSocketEvent.builder()
+            .topic(SocketTopic.PLAYER_EXIT)
+            .attribute(GameConstants.AttrKey.USER_ID, playerId)
+            .build());
         if (room.getPlayers().isEmpty()) {
-          sendEvent(room.getId(), null, SocketTopic.ROOM_CANCEL);
+          sendRoomEvent(player.getUserId(), WebSocketEvent.builder()
+              .topic(SocketTopic.ROOM_CANCEL)
+              .build());
         }
         return ExitGameResponse.builder().build();
       }
@@ -187,8 +212,6 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
         PageRequest.of(request.getPage(), request.getPageSize()));
     return SearchGameResponse.builder()
         .rooms(rooms.stream()
-            // .peek(e ->
-            // e.getRoom().setCurrentPlayerCount(e.getPlayers().size()))
             .map(e -> e.getRoom())
             .collect(Collectors.toList()))
         .build();
@@ -215,38 +238,95 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
     }
   }
 
-  Map<Integer, Subject<WebSocketEvent<?>>> roomSubjects = new HashMap<>();
+  Map<Integer, Subject<WebSocketEvent<?>>> playerSubjects = new HashMap<>();
+  Multimap<Integer, Pair<Integer, Integer>> changeSeatRequests = HashMultimap.create();
 
   @Override
   public Observable<WebSocketEvent<?>> handle(WebSocketSession session, GameRoom room,
       Observable<WebSocketEvent<JsonNode>> input) {
     Integer id = (Integer) session.getAttributes().get(GameConstants.AttrKey.USER_ID);
     Assert.notNull(id, "Authed user must have id");
-    Subject<WebSocketEvent<?>> subject = roomSubjects.computeIfAbsent(room.getId(), r -> PublishSubject.create());
-    subject.onNext(WebSocketEvent.builder()
-        .type(WebSocketSendType.SELF)
-        .topic(SocketTopic.PLAYER_CONNECT)
-        .attribute(GameConstants.AttrKey.USER_ID, id)
-        .build());
+    Subject<WebSocketEvent<?>> subject = playerSubjects.computeIfAbsent(id, r -> BehaviorSubject.createDefault(
+        WebSocketEvent.builder()
+            .type(WebSocketSendType.ALL)
+            .topic(SocketTopic.PLAYER_CONNECT)
+            .attribute(GameConstants.AttrKey.USER_ID, id)
+            .build()));
+
     input.subscribe(e -> {
-    }, e -> subject.onError(e), () -> subject.onNext(WebSocketEvent.builder()
-        .type(WebSocketSendType.SELF)
-        .topic(SocketTopic.PLAYER_DISCONNECT)
-        .attribute(GameConstants.AttrKey.USER_ID, id)
-        .build()));
+      try {
+        switch (e.getTopic()) {
+        case SocketTopic.CHANGE_SEAT_REQUEST:
+          changeSeat(room, id, subject, e);
+          break;
+        }
+      } catch (Exception ex) {
+        debug("Unexpected error happens.", ex);
+        subject.onNext(WebSocketEvent.builder()
+            .type(WebSocketSendType.SELF)
+            .topic(SocketTopic.ERROR_TOPIC)
+            .payload(ex.getMessage())
+            .build());
+      }
+    },
+        e -> subject.onError(e),
+        () -> {
+          subject.onNext(WebSocketEvent.builder()
+              .topic(SocketTopic.PLAYER_DISCONNECT)
+              .attribute(GameConstants.AttrKey.USER_ID, id)
+              .build());
+          playerSubjects.remove(id);
+        });
     return subject;
   }
 
-  private void sendEvent(int roomId, Integer playerId, String topic) {
-    Subject<WebSocketEvent<?>> subject = roomSubjects.get(roomId);
-    if (subject != null) {
-      WebSocketEventBuilder<?> builder = WebSocketEvent.builder()
-          .type(WebSocketSendType.SELF)
-          .topic(topic);
-      if (playerId != null) {
-        builder.attribute(GameConstants.AttrKey.USER_ID, playerId);
+  private void changeSeat(GameRoom room, int id, Subject<WebSocketEvent<?>> subject, WebSocketEvent<?> e) {
+    GameRoomEntity roomEntity = gameRoomRepo.findById(room.getId()).orElseThrow(IllegalStateException::new);
+    int toSeat = ((Number) e.getAttributes().get(AttrKey.TO_SEAT)).intValue();
+    synchronized (getLock(room.getId())) {
+      synchronized (getLock(id)) {
+        GamePlayerEntity fromUser = roomEntity.getPlayers().stream().filter(p -> p.getUserId() == id).findFirst()
+            .orElseThrow(IllegalStateException::new);
+        int fromSeat = fromUser.getSeat();
+        if (fromSeat == toSeat) {
+          return;
+        }
+        Optional<GamePlayerEntity> toUser = roomEntity.getPlayers().stream().filter(p -> p.getSeat() == toSeat).findFirst();
+        if (toUser.isPresent()) {
+          boolean reverseChange = changeSeatRequests.remove(room.getId(), Pair.of(toSeat, fromSeat));
+          if (reverseChange) {
+            fromUser.setSeat(toSeat);
+            toUser.get().setSeat(fromSeat);
+            gamePlayerRepo.saveAll(Arrays.asList(fromUser, toUser.get()));
+          } else {
+            Pair<Integer, Integer> changeSeat = Pair.of(fromSeat, toSeat);
+            changeSeatRequests.remove(room.getId(), changeSeat);
+            changeSeatRequests.put(room.getId(), changeSeat);
+            sendRoomEvent(toUser.get().getUserId(), WebSocketEvent.builder()
+                .type(WebSocketSendType.SELF)
+                .topic(SocketTopic.CHANGE_SEAT_REQUEST)
+                .attribute(AttrKey.FROM_SEAT, fromSeat)
+                .attribute(AttrKey.TO_SEAT, toSeat)
+                .build());
+            return;
+          }
+        } else {
+          fromUser.setSeat(toSeat);
+          gamePlayerRepo.save(fromUser);
+        }
+        sendRoomEvent(id, WebSocketEvent.builder()
+            .topic(SocketTopic.CHANGE_SEAT)
+            .attribute(AttrKey.FROM_SEAT, fromSeat)
+            .attribute(AttrKey.TO_SEAT, toSeat)
+            .build());
       }
-      subject.onNext(builder.build());
+    }
+  }
+
+  private void sendRoomEvent(int playerId, WebSocketEvent<?> event) {
+    Subject<WebSocketEvent<?>> subject = playerSubjects.get(playerId);
+    if (subject != null) {
+      subject.onNext(event);
     }
   }
 
