@@ -2,25 +2,28 @@ package xdean.mini.boardgame.server.model;
 
 import xdean.mini.boardgame.server.annotation.Attrs;
 import xdean.mini.boardgame.server.annotation.BeanType;
-import xdean.mini.boardgame.server.annotation.Tag;
 
 public interface GameConstants {
 
   interface TagKey {
-    String SOCKET_ATTR = "SOCKET_ATTR";
   }
 
   interface AttrKey {
-    @Tag(TagKey.SOCKET_ATTR)
     @BeanType(Integer.class)
     String USER_ID = "USER_ID";
 
-    @Tag(TagKey.SOCKET_ATTR)
     @BeanType(GameRoom.class)
     String ROOM = "ROOM";
+
+    @BeanType(String.class)
+    String ACCESS_TOKEN = "ACCESS_TOKEN";
   }
 
   interface SocketTopic {
+
+    @Attrs(AttrKey.ACCESS_TOKEN)
+    String AUTHENTICATION = "AUTHENTICATION";
+
     @Attrs(AttrKey.USER_ID)
     String PLAYER_JOIN = "PLAYER_JOIN";
 
