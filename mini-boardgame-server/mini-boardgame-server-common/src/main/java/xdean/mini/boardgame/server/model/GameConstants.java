@@ -2,6 +2,7 @@ package xdean.mini.boardgame.server.model;
 
 import xdean.mini.boardgame.server.annotation.Attrs;
 import xdean.mini.boardgame.server.annotation.BeanType;
+import xdean.mini.boardgame.server.annotation.Payload;
 
 public interface GameConstants {
 
@@ -29,6 +30,7 @@ public interface GameConstants {
 
   interface SocketTopic {
 
+    @Payload(String.class)
     String ERROR_TOPIC = "ERROR";// an unexpected error happened
 
     String BAD_CREDENTIAL = "BAD_CREDENTIAL";
