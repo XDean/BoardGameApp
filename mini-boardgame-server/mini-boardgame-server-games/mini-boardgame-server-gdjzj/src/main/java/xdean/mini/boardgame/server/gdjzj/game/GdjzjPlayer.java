@@ -62,7 +62,7 @@ public class GdjzjPlayer {
           .code(GdjzjErrorCode.PLAYER_ALREADY_DONE)
           .build();
     }
-    board.currentPlayer.set(index);
+    board.currentPlayer = index;
   }
 
   public GdjzjCheckCardResult checkCard(int index) {
@@ -124,7 +124,7 @@ public class GdjzjPlayer {
   }
 
   private void attacked() {
-    int turn = board.currentTurn.get();
+    int turn = board.currentTurn;
     if (turnInfos[turn].order != -1) {
       turn++;
     }
@@ -182,11 +182,11 @@ public class GdjzjPlayer {
   }
 
   private TurnInfo getTurnInfo() {
-    return turnInfos[board.currentTurn.get()];
+    return turnInfos[board.currentTurn];
   }
 
   private void assertCurrentPlayer() {
-    if (board.currentPlayer.get() != index) {
+    if (board.currentPlayer != index) {
       throw MiniBoardgameException.builder()
           .code(GdjzjErrorCode.ILLEGAL_PLAYER)
           .message("You are not the active player")
@@ -195,7 +195,7 @@ public class GdjzjPlayer {
   }
 
   private void assertCard(int index) {
-    if (index / 4 != board.currentTurn.get()) {
+    if (index / 4 != board.currentTurn) {
       throw MiniBoardgameException.builder()
           .code(GdjzjErrorCode.ILLEGAL_CARD)
           .message("This card can't be used in this turn")

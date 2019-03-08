@@ -1,39 +1,51 @@
 package xdean.mini.boardgame.server.gdjzj.game;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.google.common.collect.ImmutableList;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import xdean.jex.extra.collection.IntList;
 import xdean.mini.boardgame.server.gdjzj.model.GdjzjErrorCode;
+import xdean.mini.boardgame.server.model.GameBoard;
+import xdean.mini.boardgame.server.model.GameRoom;
+import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 
-public class GdjzjBoard {
-  ImmutableList<GdjzjCard> cards;
-  ImmutableList<GdjzjPlayer> players;
+public class GdjzjBoard extends GameBoard {
+  List<GdjzjCard> cards;
+  List<GdjzjPlayer> players;
 
-  IntegerProperty currentPlayer = new SimpleIntegerProperty(this, "currentPlayer");
-  IntegerProperty currentTurn = new SimpleIntegerProperty(this, "currentTurn");
+  int currentPlayer = 0;
+  int currentTurn = 0;
 
-  public GdjzjBoard(int[] playerIds) {
+  public GdjzjBoard(GameRoom room) {
+    super(room);
+  }
+
+  @Override
+  public void start(GamePlayerEntity[] players) {
+    checkState(WAITING);
+    Arrays.sort(players, Comparator.comparing(p -> p.getSeat()));
     this.cards = createCards();
-    List<GdjzjRole> roles = GdjzjRole.getRoles(playerIds.length);
-    this.players = ImmutableList.copyOf(IntStream.range(0, playerIds.length)
-        .mapToObj(i -> new GdjzjPlayer(playerIds[i], i, this, roles.get(i)))
+    List<GdjzjRole> roles = GdjzjRole.getRoles(players.length);
+    this.players = ImmutableList.copyOf(IntStream.range(0, players.length)
+        .mapToObj(i -> new GdjzjPlayer(players[i].getUserId(), i, this, roles.get(i)))
         .collect(Collectors.toList()));
+    this.currentPlayer = ThreadLocalRandom.current().nextInt(players.length);
+    this.currentTurn = 0;
+    state = START;
   }
 
   public void nextTurn() {
-    int turn = currentTurn.get();
-    if (turn < 2) {
-      this.currentTurn.set(turn + 1);
+    if (currentTurn < 2) {
+      currentTurn++;
     }
   }
 
@@ -97,8 +109,7 @@ public class GdjzjBoard {
   }
 
   public IntList getLeftPlayers() {
-    int turn = currentTurn.get();
-    return IntList.create(players.stream().filter(p -> p.turnInfos[turn].order < 0).mapToInt(p -> p.index).toArray());
+    return IntList.create(players.stream().filter(p -> p.turnInfos[currentTurn].order < 0).mapToInt(p -> p.index).toArray());
   }
 
   public Optional<GdjzjPlayer> getPlayer(GdjzjRole role) {

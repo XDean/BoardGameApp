@@ -1,7 +1,10 @@
 package xdean.mini.boardgame.server.service;
 
-public interface GameService {
+import xdean.mini.boardgame.server.model.GameBoard;
+import xdean.mini.boardgame.server.model.GameRoom;
+
+public interface GameService<T extends GameBoard> {
   String name();
 
-  void createGame(int roomId);
+  T createGame(GameRoom room) throws IllegalArgumentException;
 }
