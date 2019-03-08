@@ -8,6 +8,10 @@ public interface GameConstants {
   interface TagKey {
   }
 
+  interface ErrorCode {
+    int ILLEGAL_ARGUEMENT = -100;
+  }
+
   interface AttrKey {
     @BeanType(Integer.class)
     String USER_ID = "USER_ID";

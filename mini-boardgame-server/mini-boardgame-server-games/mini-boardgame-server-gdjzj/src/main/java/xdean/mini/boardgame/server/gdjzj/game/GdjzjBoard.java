@@ -1,6 +1,7 @@
 package xdean.mini.boardgame.server.gdjzj.game;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -9,6 +10,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
 import xdean.jex.extra.collection.IntList;
@@ -19,13 +22,14 @@ import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 
 public class GdjzjBoard extends GameBoard {
-  List<GdjzjCard> cards;
-  List<GdjzjPlayer> players;
+  List<GdjzjCard> cards = Collections.emptyList();
+  List<GdjzjPlayer> players = Collections.emptyList();
 
   int currentPlayer = 0;
   int currentTurn = 0;
 
-  public GdjzjBoard(GameRoom room) {
+  @JsonCreator
+  public GdjzjBoard(@JsonProperty("room") GameRoom room) {
     super(room);
   }
 

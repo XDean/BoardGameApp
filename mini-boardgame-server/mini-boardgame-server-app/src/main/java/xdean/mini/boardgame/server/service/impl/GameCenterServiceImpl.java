@@ -28,6 +28,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 import xdean.jex.extra.collection.Pair;
 import xdean.jex.log.Logable;
+import xdean.mini.boardgame.server.model.GameBoard;
 import xdean.mini.boardgame.server.model.GameConstants;
 import xdean.mini.boardgame.server.model.GameConstants.AttrKey;
 import xdean.mini.boardgame.server.model.GameConstants.SocketTopic;
@@ -59,7 +60,7 @@ import xdean.mini.boardgame.server.util.JpaUtil;
 public class GameCenterServiceImpl implements GameCenterService, WebSocketProvider, Logable {
 
   @Autowired(required = false)
-  List<GameService> games = Collections.emptyList();
+  List<GameService<?>> games = Collections.emptyList();
 
   private @Inject UserService userService;
   private @Inject GamePlayerRepo gamePlayerRepo;
@@ -69,7 +70,7 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
 
   @Override
   public CreateGameResponse createGame(CreateGameRequest request) {
-    Optional<GameService> game = findGame(request.getGameName());
+    Optional<GameService<?>> game = findGame(request.getGameName());
     if (!game.isPresent()) {
       return CreateGameResponse.builder()
           .errorCode(GameCenterErrorCode.NO_SUCH_GAME)
@@ -101,6 +102,9 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
               .build())
           .player(player)
           .build();
+      GameBoard board = game.get().createGame(room.getRoom());
+      room.setBoard(board);
+
       player.setRoom(room);
       player.setSeat(0);
       room = gameRoomRepo.save(room);
@@ -202,7 +206,7 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
 
   @Override
   public SearchGameResponse searchGame(SearchGameRequest request) {
-    Optional<GameService> game = findGame(request.getGameName());
+    Optional<GameService<?>> game = findGame(request.getGameName());
     if (!game.isPresent()) {
       return SearchGameResponse.builder()
           .errorCode(GameCenterErrorCode.NO_SUCH_GAME)
@@ -339,7 +343,7 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
     return id;
   }
 
-  private Optional<GameService> findGame(String name) {
+  private Optional<GameService<?>> findGame(String name) {
     return games.stream().filter(g -> g.name().equals(name)).findFirst();
   }
 

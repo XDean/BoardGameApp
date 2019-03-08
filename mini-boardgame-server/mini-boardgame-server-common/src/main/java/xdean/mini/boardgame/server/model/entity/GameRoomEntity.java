@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,7 +18,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
+import xdean.mini.boardgame.server.model.GameBoard;
 import xdean.mini.boardgame.server.model.GameRoom;
+import xdean.mini.boardgame.server.model.handler.GameBoardConverter;
 
 @Data
 @Entity
@@ -36,6 +39,10 @@ public class GameRoomEntity {
   @Singular
   @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   List<GamePlayerEntity> players;
+
+  @Column(columnDefinition = "TEXT")
+  @Convert(converter = GameBoardConverter.class)
+  GameBoard board;
 
   public void addPlayer(GamePlayerEntity player) {
     players.add(player);
