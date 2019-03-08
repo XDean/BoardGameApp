@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 
 @Retention(RUNTIME)
 @Target(ANNOTATION_TYPE)
-public @interface Payload {
-  Class<?> value() default void.class;
+public @interface Attr {
+  String[] value() default {};
 
   String desc() default "";
 }

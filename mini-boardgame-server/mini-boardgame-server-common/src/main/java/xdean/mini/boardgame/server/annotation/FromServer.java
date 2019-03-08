@@ -8,6 +8,8 @@ import java.lang.annotation.Target;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface Attrs {
-  String[] value();
+public @interface FromServer {
+  Attr attr() default @Attr;
+
+  Payload payload() default @Payload;
 }
