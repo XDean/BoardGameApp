@@ -29,9 +29,9 @@ import io.reactivex.subjects.Subject;
 import xdean.jex.extra.collection.Pair;
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.GameBoard;
-import xdean.mini.boardgame.server.model.GameConstants;
-import xdean.mini.boardgame.server.model.GameConstants.AttrKey;
-import xdean.mini.boardgame.server.model.GameConstants.SocketTopic;
+import xdean.mini.boardgame.server.model.GlobalConstants;
+import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
+import xdean.mini.boardgame.server.model.GlobalConstants.SocketTopic;
 import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
@@ -155,7 +155,7 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
         int playerId = player.getUserId();
         sendRoomEvent(playerId, WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_JOIN)
-            .attribute(GameConstants.AttrKey.USER_ID, playerId)
+            .attribute(GlobalConstants.AttrKey.USER_ID, playerId)
             .build());
         return JoinGameResponse.builder()
             .build();
@@ -192,7 +192,7 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
         int playerId = player.getUserId();
         sendRoomEvent(playerId, WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_EXIT)
-            .attribute(GameConstants.AttrKey.USER_ID, playerId)
+            .attribute(GlobalConstants.AttrKey.USER_ID, playerId)
             .build());
         if (room.getPlayers().isEmpty()) {
           sendRoomEvent(player.getUserId(), WebSocketEvent.builder()
@@ -248,13 +248,13 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
   @Override
   public Observable<WebSocketEvent<?>> handle(WebSocketSession session, GameRoom room,
       Observable<WebSocketEvent<JsonNode>> input) {
-    Integer id = (Integer) session.getAttributes().get(GameConstants.AttrKey.USER_ID);
+    Integer id = (Integer) session.getAttributes().get(GlobalConstants.AttrKey.USER_ID);
     Assert.notNull(id, "Authed user must have id");
     Subject<WebSocketEvent<?>> subject = playerSubjects.computeIfAbsent(id, r -> BehaviorSubject.createDefault(
         WebSocketEvent.builder()
             .type(WebSocketSendType.ALL)
             .topic(SocketTopic.PLAYER_CONNECT)
-            .attribute(GameConstants.AttrKey.USER_ID, id)
+            .attribute(GlobalConstants.AttrKey.USER_ID, id)
             .build()));
 
     input.subscribe(e -> {
@@ -277,7 +277,7 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
         () -> {
           subject.onNext(WebSocketEvent.builder()
               .topic(SocketTopic.PLAYER_DISCONNECT)
-              .attribute(GameConstants.AttrKey.USER_ID, id)
+              .attribute(GlobalConstants.AttrKey.USER_ID, id)
               .build());
           playerSubjects.remove(id);
         });

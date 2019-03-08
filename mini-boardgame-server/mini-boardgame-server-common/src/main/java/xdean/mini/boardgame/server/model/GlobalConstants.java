@@ -6,12 +6,13 @@ import xdean.mini.boardgame.server.annotation.FromClient;
 import xdean.mini.boardgame.server.annotation.FromServer;
 import xdean.mini.boardgame.server.annotation.Payload;
 
-public interface GameConstants {
+public interface GlobalConstants {
 
   interface TagKey {
   }
 
   interface ErrorCode {
+    int SUCCESS = 0;
     int ILLEGAL_ARGUEMENT = -100;
   }
 

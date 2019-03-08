@@ -7,11 +7,11 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
-import xdean.mini.boardgame.server.model.GameConstants;
+import xdean.mini.boardgame.server.model.GlobalConstants;
 
 @Configuration
 @EnableWebSocket
-public class SocketConfig implements WebSocketConfigurer, GameConstants {
+public class SocketConfig implements WebSocketConfigurer, GlobalConstants {
   @Inject
   TimeSocketHandler handler;
 

@@ -18,7 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 import xdean.mini.boardgame.server.handler.LoginSuccessProvider;
-import xdean.mini.boardgame.server.model.GameConstants;
+import xdean.mini.boardgame.server.model.GlobalConstants;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.param.CreateGameRequest;
 import xdean.mini.boardgame.server.model.param.CreateGameResponse;
@@ -36,7 +36,7 @@ import xdean.mini.boardgame.server.service.UserService;
 @Api(tags = "Game/Game-Center")
 @RestController
 @RequestMapping("/game/room")
-public class GameCenterEndpoint implements GameConstants, LoginSuccessProvider {
+public class GameCenterEndpoint implements GlobalConstants, LoginSuccessProvider {
 
   @Inject
   UserService userService;
