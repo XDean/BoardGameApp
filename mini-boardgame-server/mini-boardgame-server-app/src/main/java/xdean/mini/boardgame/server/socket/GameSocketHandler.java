@@ -38,7 +38,7 @@ import xdean.mini.boardgame.server.model.GlobalConstants;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.security.TokenAuthProvider;
-import xdean.mini.boardgame.server.service.UserService;
+import xdean.mini.boardgame.server.service.UserDataService;
 
 @Component
 public class GameSocketHandler extends TextWebSocketHandler implements Logable, GlobalConstants {
@@ -54,7 +54,7 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
   GameMapper gameMapper;
 
   @Inject
-  UserService userService;
+  UserDataService userService;
 
   @Inject
   TokenAuthProvider tokenAuth;
@@ -64,7 +64,7 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
     GameRoom room;
     try {
       int id = getRoomIdFromSession(session);
-      room = gameMapper.findById(id).get().getRoom();
+      room = gameMapper.findRoom(id).get().getRoom();
     } catch (Exception ex) {
       trace("Fail to find room: " + session, ex);
       session.close(CloseStatus.BAD_DATA.withReason("Can't find room id"));

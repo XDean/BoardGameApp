@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.mybatis.mapper.UserMapper;
-import xdean.mini.boardgame.server.service.UserService;
+import xdean.mini.boardgame.server.service.UserDataService;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserDataService {
 
   @Inject
   UserMapper userMapper;

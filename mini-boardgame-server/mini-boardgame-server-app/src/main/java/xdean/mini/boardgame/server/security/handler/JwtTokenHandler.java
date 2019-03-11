@@ -50,8 +50,8 @@ public class JwtTokenHandler implements TokenAuthProvider {
     Optional<UserEntity> e = userMapper.findByUsername(username);
     if (e.isPresent()) {
       UserEntity user = e.get();
-      List<SimpleGrantedAuthority> authorities = userMapper.findAllByUsername(username).stream()
-          .map(a -> new SimpleGrantedAuthority(a.getAuthority())).collect(Collectors.toList());
+      List<SimpleGrantedAuthority> authorities = user.getAuthorities().stream()
+          .map(a -> new SimpleGrantedAuthority(a)).collect(Collectors.toList());
       return new UsernamePasswordAuthenticationToken(
           new User(user.getUsername(), user.getPassword(), user.isEnabled(), true, true, true, authorities), null, authorities);
     }

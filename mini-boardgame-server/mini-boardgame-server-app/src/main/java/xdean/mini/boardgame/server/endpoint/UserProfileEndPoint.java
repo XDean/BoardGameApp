@@ -16,19 +16,20 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
 import xdean.mini.boardgame.server.model.UserProfile;
+import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.model.param.UserProfileResponse;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateResponse;
 import xdean.mini.boardgame.server.mybatis.mapper.UserMapper;
-import xdean.mini.boardgame.server.service.UserService;
+import xdean.mini.boardgame.server.service.UserDataService;
 
 @RestController
 @Api(tags = "User/Profile")
 public class UserProfileEndPoint {
 
   private @Inject UserMapper userMapper;
-  private @Inject UserService userService;
+  private @Inject UserDataService userService;
 
   @ApiOperation("Get user profile")
   @GetMapping(path = "/user/profile")
@@ -39,9 +40,9 @@ public class UserProfileEndPoint {
     if (username == null) {
       return UserProfileResponse.builder().errorCode(UserProfileResponse.INPUT_USER).build();
     }
-    Optional<UserProfileEntity> p = userMapper.findByUserUsername(username);
+    Optional<UserEntity> p = userMapper.findByUsername(username);
     if (p.isPresent()) {
-      UserProfileEntity profile = p.get();
+      UserProfileEntity profile = p.get().getProfile();
       if (profile == null) {
         return UserProfileResponse.builder()
             .errorCode(UserProfileResponse.PROFILE_NOT_FOUND)
@@ -65,14 +66,15 @@ public class UserProfileEndPoint {
     if (username == null) {
       return UserProfileUpdateResponse.builder().errorCode(UserProfileUpdateResponse.HAVE_NOT_LOGIN).build();
     }
-    Optional<UserProfileEntity> u = userMapper.findByUserUsername(username);
-    UserProfileEntity p = userMapper.save((u.isPresent() ? u.get().toBuilder() : UserProfileEntity.builder().userId(userId))
-        .profile(UserProfile.builder()
-            .male(request.getProfile().isMale())
-            .nickname(request.getProfile().getNickname())
-            .avatarUrl(request.getProfile().getAvatarUrl())
-            .build())
+    Optional<UserEntity> u = userMapper.findByUsername(username);
+    UserProfile p = UserProfile.builder()
+        .male(request.getProfile().isMale())
+        .nickname(request.getProfile().getNickname())
+        .avatarUrl(request.getProfile().getAvatarUrl())
+        .build();
+    userMapper.save((u.isPresent() ? u.get().getProfile().toBuilder() : UserProfileEntity.builder().userId(userId))
+        .profile(p)
         .build());
-    return UserProfileUpdateResponse.builder().profile(p.getProfile()).build();
+    return UserProfileUpdateResponse.builder().profile(p).build();
   }
 }

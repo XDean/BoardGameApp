@@ -1,5 +1,7 @@
 package xdean.mini.boardgame.server.model.entity;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +16,8 @@ public class UserEntity {
   String username;
   String password;
   boolean enabled;
+
+  List<String> authorities;
 
   UserProfileEntity profile;
 }

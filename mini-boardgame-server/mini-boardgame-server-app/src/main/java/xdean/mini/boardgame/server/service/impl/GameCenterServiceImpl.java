@@ -44,8 +44,9 @@ import xdean.mini.boardgame.server.model.param.SearchGameRequest;
 import xdean.mini.boardgame.server.model.param.SearchGameResponse;
 import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.service.GameCenterService;
-import xdean.mini.boardgame.server.service.GameService;
-import xdean.mini.boardgame.server.service.UserService;
+import xdean.mini.boardgame.server.service.GameDataService;
+import xdean.mini.boardgame.server.service.GameProvider;
+import xdean.mini.boardgame.server.service.UserDataService;
 import xdean.mini.boardgame.server.socket.AbstractGameSocketProvider;
 import xdean.mini.boardgame.server.socket.GameSocketProvider;
 import xdean.mini.boardgame.server.socket.WebSocketEvent;
@@ -55,16 +56,16 @@ import xdean.mini.boardgame.server.socket.WebSocketSendType;
 public class GameCenterServiceImpl extends AbstractGameSocketProvider implements GameCenterService, GameSocketProvider, Logable {
 
   @Autowired(required = false)
-  List<GameService<?>> games = Collections.emptyList();
+  List<GameProvider<?>> games = Collections.emptyList();
 
-  private @Inject UserService userService;
-  private @Inject GameMapper gameMapper;
+  private @Inject UserDataService userService;
+  private @Inject GameDataService gameMapper;
 
   private final Object[] locks = IntStream.range(0, 32).mapToObj(i -> new Object()).toArray();
 
   @Override
   public CreateGameResponse createGame(CreateGameRequest request) {
-    Optional<GameService<?>> game = findGame(request.getGameName());
+    Optional<GameProvider<?>> game = findGame(request.getGameName());
     if (!game.isPresent()) {
       return CreateGameResponse.builder()
           .errorCode(GameCenterErrorCode.NO_SUCH_GAME)
@@ -101,7 +102,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
 
       player.setRoom(room);
       player.setSeat(0);
-      room = gameMapper.save(room);
+      gameMapper.save(room);
       // gamePlayerRepo.save(player);
       return CreateGameResponse.builder()
           .roomId(roomId)
@@ -119,7 +120,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     }
     synchronized (getLock(user.get().getId())) {
       synchronized (getLock(request.getRoomId())) {
-        Optional<GameRoomEntity> oRoom = gameMapper.findById(request.getRoomId());
+        Optional<GameRoomEntity> oRoom = gameMapper.findRoom(request.getRoomId());
         if (!oRoom.isPresent()) {
           return JoinGameResponse.builder()
               .errorCode(GameCenterErrorCode.NO_SUCH_ROOM)
@@ -200,7 +201,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
 
   @Override
   public SearchGameResponse searchGame(SearchGameRequest request) {
-    Optional<GameService<?>> game = findGame(request.getGameName());
+    Optional<GameProvider<?>> game = findGame(request.getGameName());
     if (!game.isPresent()) {
       return SearchGameResponse.builder()
           .errorCode(GameCenterErrorCode.NO_SUCH_GAME)
@@ -267,7 +268,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   }
 
   private void changeSeat(SocketContext context, WebSocketEvent<?> e) {
-    GameRoomEntity roomEntity = gameMapper.findById(context.room.getId()).orElseThrow(IllegalStateException::new);
+    GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId()).orElseThrow(IllegalStateException::new);
     int toSeat = ((Number) e.getAttributes().get(AttrKey.TO_SEAT)).intValue();
     synchronized (getLock(context.room.getId())) {
       synchronized (getLock(context.userId)) {
@@ -318,7 +319,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     return id;
   }
 
-  private Optional<GameService<?>> findGame(String name) {
+  private Optional<GameProvider<?>> findGame(String name) {
     return games.stream().filter(g -> g.name().equals(name)).findFirst();
   }
 

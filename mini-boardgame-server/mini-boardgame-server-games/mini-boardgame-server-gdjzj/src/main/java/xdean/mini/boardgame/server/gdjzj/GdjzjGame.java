@@ -5,10 +5,10 @@ import org.springframework.util.Assert;
 
 import xdean.mini.boardgame.server.gdjzj.game.GdjzjBoard;
 import xdean.mini.boardgame.server.model.GameRoom;
-import xdean.mini.boardgame.server.service.GameService;
+import xdean.mini.boardgame.server.service.GameProvider;
 
 @Component
-public class GdjzjGame implements GameService<GdjzjBoard> {
+public class GdjzjGame implements GameProvider<GdjzjBoard> {
 
   @Override
   public String name() {

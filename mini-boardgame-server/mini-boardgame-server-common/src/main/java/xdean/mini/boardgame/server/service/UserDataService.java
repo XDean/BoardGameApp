@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 
-public interface UserService {
+public interface UserDataService {
   Optional<UserEntity> getCurrentUser();
 
   Optional<UserEntity> getUserByUsername(String username);

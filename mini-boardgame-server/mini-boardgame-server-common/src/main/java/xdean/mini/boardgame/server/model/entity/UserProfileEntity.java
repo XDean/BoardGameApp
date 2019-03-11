@@ -14,7 +14,5 @@ public class UserProfileEntity {
 
   int userId;
 
-  UserEntity user;
-
   UserProfile profile;
 }
