@@ -3,9 +3,7 @@ package xdean.mini.boardgame.server.service.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -16,8 +14,6 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.web.socket.WebSocketSession;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.HashMultimap;
@@ -29,10 +25,10 @@ import io.reactivex.subjects.Subject;
 import xdean.jex.extra.collection.Pair;
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.GameBoard;
+import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.GlobalConstants;
 import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
 import xdean.mini.boardgame.server.model.GlobalConstants.SocketTopic;
-import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
@@ -51,13 +47,14 @@ import xdean.mini.boardgame.server.service.GamePlayerRepo;
 import xdean.mini.boardgame.server.service.GameRoomRepo;
 import xdean.mini.boardgame.server.service.GameService;
 import xdean.mini.boardgame.server.service.UserService;
+import xdean.mini.boardgame.server.socket.AbstractGameSocketProvider;
+import xdean.mini.boardgame.server.socket.GameSocketProvider;
 import xdean.mini.boardgame.server.socket.WebSocketEvent;
-import xdean.mini.boardgame.server.socket.WebSocketProvider;
 import xdean.mini.boardgame.server.socket.WebSocketSendType;
 import xdean.mini.boardgame.server.util.JpaUtil;
 
 @Service
-public class GameCenterServiceImpl implements GameCenterService, WebSocketProvider, Logable {
+public class GameCenterServiceImpl extends AbstractGameSocketProvider implements GameCenterService, GameSocketProvider, Logable {
 
   @Autowired(required = false)
   List<GameService<?>> games = Collections.emptyList();
@@ -153,7 +150,7 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
         gameRoomRepo.save(room);
         // gamePlayerRepo.save(player);
         int playerId = player.getUserId();
-        sendRoomEvent(playerId, WebSocketEvent.builder()
+        sendEvent(playerId, WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_JOIN)
             .attribute(GlobalConstants.AttrKey.USER_ID, playerId)
             .build());
@@ -190,12 +187,12 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
           gameRoomRepo.save(room);
         }
         int playerId = player.getUserId();
-        sendRoomEvent(playerId, WebSocketEvent.builder()
+        sendEvent(playerId, WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_EXIT)
             .attribute(GlobalConstants.AttrKey.USER_ID, playerId)
             .build());
         if (room.getPlayers().isEmpty()) {
-          sendRoomEvent(player.getUserId(), WebSocketEvent.builder()
+          sendEvent(player.getUserId(), WebSocketEvent.builder()
               .topic(SocketTopic.ROOM_CANCEL)
               .build());
         }
@@ -242,54 +239,42 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
     }
   }
 
-  Map<Integer, Subject<WebSocketEvent<?>>> playerSubjects = new HashMap<>();
+  /**********
+   * SOCKET *
+   **********/
   Multimap<Integer, Pair<Integer, Integer>> changeSeatRequests = HashMultimap.create();
 
   @Override
-  public Observable<WebSocketEvent<?>> handle(WebSocketSession session, GameRoom room,
-      Observable<WebSocketEvent<JsonNode>> input) {
-    Integer id = (Integer) session.getAttributes().get(GlobalConstants.AttrKey.USER_ID);
-    Assert.notNull(id, "Authed user must have id");
-    Subject<WebSocketEvent<?>> subject = playerSubjects.computeIfAbsent(id, r -> BehaviorSubject.createDefault(
-        WebSocketEvent.builder()
-            .type(WebSocketSendType.ALL)
-            .topic(SocketTopic.PLAYER_CONNECT)
-            .attribute(GlobalConstants.AttrKey.USER_ID, id)
-            .build()));
-
-    input.subscribe(e -> {
-      try {
-        switch (e.getTopic()) {
-        case SocketTopic.CHANGE_SEAT_REQUEST:
-          changeSeat(room, id, subject, e);
-          break;
-        }
-      } catch (Exception ex) {
-        debug("Unexpected error happens.", ex);
-        subject.onNext(WebSocketEvent.builder()
-            .type(WebSocketSendType.SELF)
-            .topic(SocketTopic.ERROR_TOPIC)
-            .payload(ex.getMessage())
-            .build());
-      }
-    },
-        e -> subject.onError(e),
-        () -> {
-          subject.onNext(WebSocketEvent.builder()
-              .topic(SocketTopic.PLAYER_DISCONNECT)
-              .attribute(GlobalConstants.AttrKey.USER_ID, id)
-              .build());
-          playerSubjects.remove(id);
-        });
-    return subject;
+  protected Subject<WebSocketEvent<?>> createOutputFlow(SocketContext context) {
+    return BehaviorSubject.createDefault(WebSocketEvent.builder()
+        .type(WebSocketSendType.ALL)
+        .topic(SocketTopic.PLAYER_CONNECT)
+        .attribute(GlobalConstants.AttrKey.USER_ID, context.getUserId())
+        .build());
   }
 
-  private void changeSeat(GameRoom room, int id, Subject<WebSocketEvent<?>> subject, WebSocketEvent<?> e) {
-    GameRoomEntity roomEntity = gameRoomRepo.findById(room.getId()).orElseThrow(IllegalStateException::new);
+  @Override
+  protected Observable<WebSocketEvent<JsonNode>> processInputFlow(SocketContext context) {
+    return context.inputFlow
+        .doOnNext(e -> {
+          switch (e.getTopic()) {
+          case SocketTopic.CHANGE_SEAT_REQUEST:
+            changeSeat(context, e);
+            break;
+          }
+        })
+        .doOnComplete(() -> context.outputObserver.onNext(WebSocketEvent.builder()
+            .topic(SocketTopic.PLAYER_DISCONNECT)
+            .attribute(GlobalConstants.AttrKey.USER_ID, context.userId)
+            .build()));
+  }
+
+  private void changeSeat(SocketContext context, WebSocketEvent<?> e) {
+    GameRoomEntity roomEntity = gameRoomRepo.findById(context.room.getId()).orElseThrow(IllegalStateException::new);
     int toSeat = ((Number) e.getAttributes().get(AttrKey.TO_SEAT)).intValue();
-    synchronized (getLock(room.getId())) {
-      synchronized (getLock(id)) {
-        GamePlayerEntity fromUser = roomEntity.getPlayers().stream().filter(p -> p.getUserId() == id).findFirst()
+    synchronized (getLock(context.room.getId())) {
+      synchronized (getLock(context.userId)) {
+        GamePlayerEntity fromUser = roomEntity.getPlayers().stream().filter(p -> p.getUserId() == context.userId).findFirst()
             .orElseThrow(IllegalStateException::new);
         int fromSeat = fromUser.getSeat();
         if (fromSeat == toSeat) {
@@ -297,16 +282,16 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
         }
         Optional<GamePlayerEntity> toUser = roomEntity.getPlayers().stream().filter(p -> p.getSeat() == toSeat).findFirst();
         if (toUser.isPresent()) {
-          boolean reverseChange = changeSeatRequests.remove(room.getId(), Pair.of(toSeat, fromSeat));
+          boolean reverseChange = changeSeatRequests.remove(context.room.getId(), Pair.of(toSeat, fromSeat));
           if (reverseChange) {
             fromUser.setSeat(toSeat);
             toUser.get().setSeat(fromSeat);
             gamePlayerRepo.saveAll(Arrays.asList(fromUser, toUser.get()));
           } else {
             Pair<Integer, Integer> changeSeat = Pair.of(fromSeat, toSeat);
-            changeSeatRequests.remove(room.getId(), changeSeat);
-            changeSeatRequests.put(room.getId(), changeSeat);
-            sendRoomEvent(toUser.get().getUserId(), WebSocketEvent.builder()
+            changeSeatRequests.remove(context.room.getId(), changeSeat);
+            changeSeatRequests.put(context.room.getId(), changeSeat);
+            sendEvent(toUser.get().getUserId(), WebSocketEvent.builder()
                 .type(WebSocketSendType.SELF)
                 .topic(SocketTopic.CHANGE_SEAT_REQUEST)
                 .attribute(AttrKey.FROM_SEAT, fromSeat)
@@ -318,19 +303,12 @@ public class GameCenterServiceImpl implements GameCenterService, WebSocketProvid
           fromUser.setSeat(toSeat);
           gamePlayerRepo.save(fromUser);
         }
-        sendRoomEvent(id, WebSocketEvent.builder()
+        sendEvent(context.userId, WebSocketEvent.builder()
             .topic(SocketTopic.CHANGE_SEAT)
             .attribute(AttrKey.FROM_SEAT, fromSeat)
             .attribute(AttrKey.TO_SEAT, toSeat)
             .build());
       }
-    }
-  }
-
-  private void sendRoomEvent(int playerId, WebSocketEvent<?> event) {
-    Subject<WebSocketEvent<?>> subject = playerSubjects.get(playerId);
-    if (subject != null) {
-      subject.onNext(event);
     }
   }
 

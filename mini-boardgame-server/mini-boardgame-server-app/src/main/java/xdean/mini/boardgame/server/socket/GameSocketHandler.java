@@ -46,7 +46,7 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
   private final Map<Integer, GameRoomSocketHandler> rooms = new ConcurrentHashMap<>();
 
   @Autowired(required = false)
-  List<WebSocketProvider> providers = Collections.emptyList();
+  List<GameSocketProvider> providers = Collections.emptyList();
 
   ObjectMapper objectMapper = new ObjectMapper();
 
