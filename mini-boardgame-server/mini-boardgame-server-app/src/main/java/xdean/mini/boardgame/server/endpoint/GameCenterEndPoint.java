@@ -36,7 +36,7 @@ import xdean.mini.boardgame.server.service.UserService;
 @Api(tags = "Game/Game-Center")
 @RestController
 @RequestMapping("/game/room")
-public class GameCenterEndpoint implements GlobalConstants, LoginSuccessProvider {
+public class GameCenterEndPoint implements GlobalConstants, LoginSuccessProvider {
 
   @Inject
   UserService userService;
