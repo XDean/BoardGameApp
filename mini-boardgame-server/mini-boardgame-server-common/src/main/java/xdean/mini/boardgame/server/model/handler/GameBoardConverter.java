@@ -2,9 +2,6 @@ package xdean.mini.boardgame.server.model.handler;
 
 import java.io.IOException;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,9 +12,9 @@ import com.google.common.collect.ImmutableMap;
 
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.GameBoard;
+import xdean.mybatis.extension.resultmap.StringParseHandler;
 
-@Converter(autoApply = true)
-public class GameBoardConverter implements AttributeConverter<GameBoard, String>, Logable {
+public class GameBoardConverter implements StringParseHandler<GameBoard>, Logable {
   ObjectMapper objectMapper = new ObjectMapper();
 
   public GameBoardConverter() {
@@ -26,7 +23,7 @@ public class GameBoardConverter implements AttributeConverter<GameBoard, String>
   }
 
   @Override
-  public String convertToDatabaseColumn(GameBoard attribute) {
+  public String toString(GameBoard attribute) {
     if (attribute == null) {
       return "";
     }
@@ -44,7 +41,7 @@ public class GameBoardConverter implements AttributeConverter<GameBoard, String>
 
   @Override
   @SuppressWarnings("unchecked")
-  public GameBoard convertToEntityAttribute(String dbData) {
+  public GameBoard parse(String dbData) {
     if (Strings.isNullOrEmpty(dbData)) {
       return null;
     }

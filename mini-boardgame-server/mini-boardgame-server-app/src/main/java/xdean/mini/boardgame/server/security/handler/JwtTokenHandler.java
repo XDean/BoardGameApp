@@ -23,6 +23,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.security.TokenAuthProvider;
 import xdean.mini.boardgame.server.security.model.SecurityProperties;
+import xdean.mini.boardgame.server.service.UserAuthRepo;
 import xdean.mini.boardgame.server.service.UserEntityRepo;
 
 @Component
@@ -32,6 +33,9 @@ public class JwtTokenHandler implements TokenAuthProvider {
 
   @Inject
   UserEntityRepo userRepo;
+
+  @Inject
+  UserAuthRepo authRepo;
 
   @Inject
   SecurityProperties properties;
@@ -53,7 +57,7 @@ public class JwtTokenHandler implements TokenAuthProvider {
     Optional<UserEntity> e = userRepo.findByUsername(username);
     if (e.isPresent()) {
       UserEntity user = e.get();
-      List<SimpleGrantedAuthority> authorities = user.getAuthorities().stream()
+      List<SimpleGrantedAuthority> authorities = authRepo.findAllByUsername(username).stream()
           .map(a -> new SimpleGrantedAuthority(a.getAuthority())).collect(Collectors.toList());
       return new UsernamePasswordAuthenticationToken(
           new User(user.getUsername(), user.getPassword(), user.isEnabled(), true, true, true, authorities), null, authorities);

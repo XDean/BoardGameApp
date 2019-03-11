@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import xdean.mini.boardgame.server.model.UserProfile;
+import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.model.param.UserProfileResponse;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
@@ -41,26 +43,30 @@ public class UserProfileEndPoint {
     if (p.isPresent()) {
       UserProfileEntity profile = p.get();
       if (profile == null) {
-        return UserProfileResponse.builder().errorCode(UserProfileResponse.PROFILE_NOT_FOUND).build();
+        return UserProfileResponse.builder()
+            .errorCode(UserProfileResponse.PROFILE_NOT_FOUND)
+            .build();
       }
-      return UserProfileResponse.builder().profile(profile.getProfile()).build();
+      return UserProfileResponse.builder()
+          .profile(profile.getProfile())
+          .build();
     } else {
-      return UserProfileResponse.builder().errorCode(UserProfileResponse.USER_NOT_FOUND).build();
+      return UserProfileResponse.builder()
+          .errorCode(UserProfileResponse.USER_NOT_FOUND)
+          .build();
     }
   }
 
   @ApiOperation("Update user profile")
   @PostMapping(path = "/user/profile")
-  public UserProfileUpdateResponse updateUserProfile(@Validated @RequestBody UserProfileUpdateRequest request) {
+  public UserProfileUpdateResponse updateUserProfile(@SessionAttribute(AttrKey.USER_ID) int userId,
+      @Validated @RequestBody UserProfileUpdateRequest request) {
     String username = userService.getCurrentUser().map(u -> u.getUsername()).orElse(null);
     if (username == null) {
       return UserProfileUpdateResponse.builder().errorCode(UserProfileUpdateResponse.HAVE_NOT_LOGIN).build();
     }
     Optional<UserProfileEntity> u = userProfileRepo.findByUserUsername(username);
-    if (!u.isPresent()) {
-      throw new IllegalStateException("A user loged in but there is no record in DB");
-    }
-    UserProfileEntity p = userProfileRepo.save(u.get().toBuilder()
+    UserProfileEntity p = userProfileRepo.save((u.isPresent() ? u.get().toBuilder() : UserProfileEntity.builder().userId(userId))
         .profile(UserProfile.builder()
             .male(request.getProfile().isMale())
             .nickname(request.getProfile().getNickname())

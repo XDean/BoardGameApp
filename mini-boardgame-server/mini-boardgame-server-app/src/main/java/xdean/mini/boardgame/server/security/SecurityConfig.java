@@ -28,7 +28,7 @@ import xdean.mini.boardgame.server.security.model.SecurityProperties;
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Inject
   DataSource dataSource;

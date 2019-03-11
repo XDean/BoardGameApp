@@ -1,0 +1,29 @@
+logging:
+  level:
+    xdean: DEBUG
+server:
+  port: 8081 # https porta
+  ssl:
+    key-store: classpath:mini-boardgame.keystore.pfx
+    key-store-password: ENC(wHOeiAhHQhF9MrIWQc7L4Jc+UqB44zvF)
+    key-store-type: PKCS12
+  http:
+    port: 8080
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/mini_boardgame?createDatabaseIfNotExist=true
+    username: mini-boardgame
+    password: ENC(WDimEjwoPfGeLqyfXtds2+Xtat0jmwRn)
+    driver-class-name: com.mysql.jdbc.Driver
+    schema:
+    - classpath:sql/schema/security_schema.sql
+    #- classpath:sql/schema/users_schema.sql
+    initialization-mode: always
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+mini-boardgame:
+  security:
+    secret-key: ENC(T1unlh9EKSsyGq7ImbjTvcq2l59LGDk+)
