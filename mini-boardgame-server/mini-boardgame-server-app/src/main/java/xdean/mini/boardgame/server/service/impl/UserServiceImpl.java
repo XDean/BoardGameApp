@@ -10,14 +10,14 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
-import xdean.mini.boardgame.server.service.UserEntityRepo;
+import xdean.mini.boardgame.server.mybatis.mapper.UserMapper;
 import xdean.mini.boardgame.server.service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {
 
   @Inject
-  UserEntityRepo userEntityRepo;
+  UserMapper userMapper;
 
   @Override
   public Optional<UserEntity> getCurrentUser() {
@@ -34,6 +34,6 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public Optional<UserEntity> getUserByUsername(String username) {
-    return userEntityRepo.findByUsername(username);
+    return userMapper.findByUsername(username);
   }
 }

@@ -33,11 +33,11 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import xdean.jex.log.Logable;
-import xdean.mini.boardgame.server.model.GlobalConstants;
 import xdean.mini.boardgame.server.model.GameRoom;
+import xdean.mini.boardgame.server.model.GlobalConstants;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
+import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.security.TokenAuthProvider;
-import xdean.mini.boardgame.server.service.GameRoomRepo;
 import xdean.mini.boardgame.server.service.UserService;
 
 @Component
@@ -51,7 +51,7 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
   ObjectMapper objectMapper = new ObjectMapper();
 
   @Inject
-  GameRoomRepo roomRepo;
+  GameMapper gameMapper;
 
   @Inject
   UserService userService;
@@ -64,7 +64,7 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
     GameRoom room;
     try {
       int id = getRoomIdFromSession(session);
-      room = roomRepo.findById(id).get().getRoom();
+      room = gameMapper.findById(id).get().getRoom();
     } catch (Exception ex) {
       trace("Fail to find room: " + session, ex);
       session.close(CloseStatus.BAD_DATA.withReason("Can't find room id"));

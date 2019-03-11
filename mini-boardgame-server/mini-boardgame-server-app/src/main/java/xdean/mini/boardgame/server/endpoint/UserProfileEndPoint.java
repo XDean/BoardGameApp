@@ -14,20 +14,20 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import xdean.mini.boardgame.server.model.UserProfile;
 import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
+import xdean.mini.boardgame.server.model.UserProfile;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.model.param.UserProfileResponse;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateResponse;
-import xdean.mini.boardgame.server.service.UserProfileRepo;
+import xdean.mini.boardgame.server.mybatis.mapper.UserMapper;
 import xdean.mini.boardgame.server.service.UserService;
 
 @RestController
 @Api(tags = "User/Profile")
 public class UserProfileEndPoint {
 
-  private @Inject UserProfileRepo userProfileRepo;
+  private @Inject UserMapper userMapper;
   private @Inject UserService userService;
 
   @ApiOperation("Get user profile")
@@ -39,7 +39,7 @@ public class UserProfileEndPoint {
     if (username == null) {
       return UserProfileResponse.builder().errorCode(UserProfileResponse.INPUT_USER).build();
     }
-    Optional<UserProfileEntity> p = userProfileRepo.findByUserUsername(username);
+    Optional<UserProfileEntity> p = userMapper.findByUserUsername(username);
     if (p.isPresent()) {
       UserProfileEntity profile = p.get();
       if (profile == null) {
@@ -65,8 +65,8 @@ public class UserProfileEndPoint {
     if (username == null) {
       return UserProfileUpdateResponse.builder().errorCode(UserProfileUpdateResponse.HAVE_NOT_LOGIN).build();
     }
-    Optional<UserProfileEntity> u = userProfileRepo.findByUserUsername(username);
-    UserProfileEntity p = userProfileRepo.save((u.isPresent() ? u.get().toBuilder() : UserProfileEntity.builder().userId(userId))
+    Optional<UserProfileEntity> u = userMapper.findByUserUsername(username);
+    UserProfileEntity p = userMapper.save((u.isPresent() ? u.get().toBuilder() : UserProfileEntity.builder().userId(userId))
         .profile(UserProfile.builder()
             .male(request.getProfile().isMale())
             .nickname(request.getProfile().getNickname())

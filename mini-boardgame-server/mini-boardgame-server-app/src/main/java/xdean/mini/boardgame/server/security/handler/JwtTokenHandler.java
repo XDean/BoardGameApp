@@ -21,24 +21,17 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
+import xdean.mini.boardgame.server.mybatis.mapper.UserMapper;
 import xdean.mini.boardgame.server.security.TokenAuthProvider;
 import xdean.mini.boardgame.server.security.model.SecurityProperties;
-import xdean.mini.boardgame.server.service.UserAuthRepo;
-import xdean.mini.boardgame.server.service.UserEntityRepo;
 
 @Component
 public class JwtTokenHandler implements TokenAuthProvider {
 
   private static final String JWT_TOKEN = "jwt-token";
 
-  @Inject
-  UserEntityRepo userRepo;
-
-  @Inject
-  UserAuthRepo authRepo;
-
-  @Inject
-  SecurityProperties properties;
+  private @Inject UserMapper userMapper;
+  private @Inject SecurityProperties properties;
 
   @Override
   public Authentication authenticate(String token) throws AuthenticationException {
@@ -54,10 +47,10 @@ public class JwtTokenHandler implements TokenAuthProvider {
       throw new CredentialsExpiredException("The token is expired");
     }
     String username = verify.getSubject();
-    Optional<UserEntity> e = userRepo.findByUsername(username);
+    Optional<UserEntity> e = userMapper.findByUsername(username);
     if (e.isPresent()) {
       UserEntity user = e.get();
-      List<SimpleGrantedAuthority> authorities = authRepo.findAllByUsername(username).stream()
+      List<SimpleGrantedAuthority> authorities = userMapper.findAllByUsername(username).stream()
           .map(a -> new SimpleGrantedAuthority(a.getAuthority())).collect(Collectors.toList());
       return new UsernamePasswordAuthenticationToken(
           new User(user.getUsername(), user.getPassword(), user.isEnabled(), true, true, true, authorities), null, authorities);

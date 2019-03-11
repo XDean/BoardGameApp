@@ -29,8 +29,8 @@ import xdean.mini.boardgame.server.model.param.JoinGameRequest;
 import xdean.mini.boardgame.server.model.param.JoinGameResponse;
 import xdean.mini.boardgame.server.model.param.SearchGameRequest;
 import xdean.mini.boardgame.server.model.param.SearchGameResponse;
+import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.service.GameCenterService;
-import xdean.mini.boardgame.server.service.GameRoomRepo;
 import xdean.mini.boardgame.server.service.UserService;
 
 @Api(tags = "Game/Game-Center")
@@ -38,22 +38,16 @@ import xdean.mini.boardgame.server.service.UserService;
 @RequestMapping("/game/room")
 public class GameCenterEndPoint implements GlobalConstants, LoginSuccessProvider {
 
-  @Inject
-  UserService userService;
-
-  @Inject
-  GameCenterService service;
-
-  @Inject
-  GameRoomRepo roomRepo;
+  private @Inject UserService userService;
+  private @Inject GameCenterService service;
+  private @Inject GameMapper gameMapper;
 
   @PostMapping("/create")
   @ApiOperation("Create a new game room")
   public CreateGameResponse createGame(@Valid @RequestBody CreateGameRequest request, @ApiIgnore HttpSession session) {
     CreateGameResponse response = service.createGame(request);
     if (response.getRoomId() != -1) {
-      userService.getCurrentUser().ifPresent(e -> session.setAttribute(AttrKey.USER_ID, e.getId()));
-      roomRepo.findById(response.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e.getRoom()));
+      gameMapper.findById(response.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e.getRoom()));
     }
     return response;
   }
@@ -63,8 +57,7 @@ public class GameCenterEndPoint implements GlobalConstants, LoginSuccessProvider
   public JoinGameResponse joinGame(@RequestBody JoinGameRequest request, @ApiIgnore HttpSession session) {
     JoinGameResponse response = service.joinGame(request);
     if (response.getErrorCode() == 0) {
-      userService.getCurrentUser().ifPresent(e -> session.setAttribute(AttrKey.USER_ID, e.getId()));
-      roomRepo.findById(request.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e.getRoom()));
+      gameMapper.findById(request.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e.getRoom()));
     }
     return response;
   }
@@ -98,7 +91,7 @@ public class GameCenterEndPoint implements GlobalConstants, LoginSuccessProvider
     if (user.isPresent()) {
       int id = user.get().getId();
       request.getSession().setAttribute(AttrKey.USER_ID, id);
-      roomRepo.findByPlayersUserId(id).ifPresent(e -> request.getSession()
+      gameMapper.findByPlayersUserId(id).ifPresent(e -> request.getSession()
           .setAttribute(AttrKey.ROOM, e.getRoom()));
     }
   }

@@ -11,8 +11,8 @@ import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,16 +42,14 @@ import xdean.mini.boardgame.server.model.param.JoinGameRequest;
 import xdean.mini.boardgame.server.model.param.JoinGameResponse;
 import xdean.mini.boardgame.server.model.param.SearchGameRequest;
 import xdean.mini.boardgame.server.model.param.SearchGameResponse;
+import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.service.GameCenterService;
-import xdean.mini.boardgame.server.service.GamePlayerRepo;
-import xdean.mini.boardgame.server.service.GameRoomRepo;
 import xdean.mini.boardgame.server.service.GameService;
 import xdean.mini.boardgame.server.service.UserService;
 import xdean.mini.boardgame.server.socket.AbstractGameSocketProvider;
 import xdean.mini.boardgame.server.socket.GameSocketProvider;
 import xdean.mini.boardgame.server.socket.WebSocketEvent;
 import xdean.mini.boardgame.server.socket.WebSocketSendType;
-import xdean.mini.boardgame.server.util.JpaUtil;
 
 @Service
 public class GameCenterServiceImpl extends AbstractGameSocketProvider implements GameCenterService, GameSocketProvider, Logable {
@@ -60,8 +58,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   List<GameService<?>> games = Collections.emptyList();
 
   private @Inject UserService userService;
-  private @Inject GamePlayerRepo gamePlayerRepo;
-  private @Inject GameRoomRepo gameRoomRepo;
+  private @Inject GameMapper gameMapper;
 
   private final Object[] locks = IntStream.range(0, 32).mapToObj(i -> new Object()).toArray();
 
@@ -81,7 +78,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     }
     UserEntity e = user.get();
     synchronized (getLock(e.getId())) {
-      GamePlayerEntity player = JpaUtil.findOrCreate(gamePlayerRepo, e.getId(),
+      GamePlayerEntity player = gameMapper.findOrCreateById(e.getId(),
           id -> GamePlayerEntity.builder().userId(id).build());
       if (player.getRoom() != null) {
         return CreateGameResponse.builder()
@@ -104,7 +101,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
 
       player.setRoom(room);
       player.setSeat(0);
-      room = gameRoomRepo.save(room);
+      room = gameMapper.save(room);
       // gamePlayerRepo.save(player);
       return CreateGameResponse.builder()
           .roomId(roomId)
@@ -122,14 +119,14 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     }
     synchronized (getLock(user.get().getId())) {
       synchronized (getLock(request.getRoomId())) {
-        Optional<GameRoomEntity> oRoom = gameRoomRepo.findById(request.getRoomId());
+        Optional<GameRoomEntity> oRoom = gameMapper.findById(request.getRoomId());
         if (!oRoom.isPresent()) {
           return JoinGameResponse.builder()
               .errorCode(GameCenterErrorCode.NO_SUCH_ROOM)
               .build();
         }
         GameRoomEntity room = oRoom.get();
-        GamePlayerEntity player = JpaUtil.findOrCreate(gamePlayerRepo, user.get().getId(),
+        GamePlayerEntity player = gameMapper.findOrCreateById(user.get().getId(),
             id -> GamePlayerEntity.builder().userId(id).build());
         if (player.getRoom() != null) {
           return JoinGameResponse.builder()
@@ -147,7 +144,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
             .findFirst()
             .ifPresent(player::setSeat);
         room.addPlayer(player);
-        gameRoomRepo.save(room);
+        gameMapper.save(room);
         // gamePlayerRepo.save(player);
         int playerId = player.getUserId();
         sendEvent(playerId, WebSocketEvent.builder()
@@ -169,7 +166,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           .build();
     }
     synchronized (getLock(user.get().getId())) {
-      GamePlayerEntity player = JpaUtil.findOrCreate(gamePlayerRepo, user.get().getId(),
+      GamePlayerEntity player = gameMapper.findOrCreateById(user.get().getId(),
           id -> GamePlayerEntity.builder().userId(id).build());
       GameRoomEntity room = player.getRoom();
       if (room == null) {
@@ -179,12 +176,12 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
       }
       synchronized (getLock(room.getId())) {
         player.setRoom(null);
-        gamePlayerRepo.save(player);
+        gameMapper.save(player);
         room.removePlayer(player);
         if (room.getPlayers().isEmpty()) {
-          gameRoomRepo.delete(room);
+          gameMapper.delete(room);
         } else {
-          gameRoomRepo.save(room);
+          gameMapper.save(room);
         }
         int playerId = player.getUserId();
         sendEvent(playerId, WebSocketEvent.builder()
@@ -209,8 +206,8 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           .errorCode(GameCenterErrorCode.NO_SUCH_GAME)
           .build();
     }
-    List<GameRoomEntity> rooms = gameRoomRepo.findAllByRoomGameName(request.getGameName(),
-        PageRequest.of(request.getPage(), request.getPageSize()));
+    List<GameRoomEntity> rooms = gameMapper.findAllByRoomGameName(request.getGameName(),
+        new RowBounds(request.getPage() * request.getPageSize(), request.getPageSize()));
     return SearchGameResponse.builder()
         .rooms(rooms.stream()
             .map(e -> e.getRoom())
@@ -227,7 +224,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           .build();
     }
     synchronized (getLock(user.get().getId())) {
-      GamePlayerEntity player = JpaUtil.findOrCreate(gamePlayerRepo, user.get().getId(),
+      GamePlayerEntity player = gameMapper.findOrCreateById(user.get().getId(),
           id -> GamePlayerEntity.builder().userId(id).build());
       GameRoomEntity room = player.getRoom();
       if (room == null) {
@@ -270,7 +267,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   }
 
   private void changeSeat(SocketContext context, WebSocketEvent<?> e) {
-    GameRoomEntity roomEntity = gameRoomRepo.findById(context.room.getId()).orElseThrow(IllegalStateException::new);
+    GameRoomEntity roomEntity = gameMapper.findById(context.room.getId()).orElseThrow(IllegalStateException::new);
     int toSeat = ((Number) e.getAttributes().get(AttrKey.TO_SEAT)).intValue();
     synchronized (getLock(context.room.getId())) {
       synchronized (getLock(context.userId)) {
@@ -286,7 +283,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           if (reverseChange) {
             fromUser.setSeat(toSeat);
             toUser.get().setSeat(fromSeat);
-            gamePlayerRepo.saveAll(Arrays.asList(fromUser, toUser.get()));
+            gameMapper.saveAll(Arrays.asList(fromUser, toUser.get()));
           } else {
             Pair<Integer, Integer> changeSeat = Pair.of(fromSeat, toSeat);
             changeSeatRequests.remove(context.room.getId(), changeSeat);
@@ -301,7 +298,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           }
         } else {
           fromUser.setSeat(toSeat);
-          gamePlayerRepo.save(fromUser);
+          gameMapper.save(fromUser);
         }
         sendEvent(context.userId, WebSocketEvent.builder()
             .topic(SocketTopic.CHANGE_SEAT)
@@ -317,7 +314,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     Integer id;
     do {
       id = r.nextInt(1000000);
-    } while (gameRoomRepo.existsById(id));
+    } while (gameMapper.existsById(id));
     return id;
   }
 
