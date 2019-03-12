@@ -1,7 +1,5 @@
 package xdean.mini.boardgame.server.mybatis.mapper;
 
-import java.util.Optional;
-
 import org.apache.ibatis.annotations.Mapper;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
@@ -11,7 +9,7 @@ import xdean.mybatis.extension.annotation.DefaultBuilder;
 @Mapper
 @DefaultBuilder(UserMapperBuilder.class)
 public interface UserMapper {
-  void save(UserProfileEntity build);
+  void save(UserProfileEntity profile);
 
-  Optional<UserEntity> findByUsername(String username);
+  UserEntity findByUsername(String username);
 }

@@ -87,7 +87,7 @@ public class GameCenterEndPoint implements GlobalConstants, LoginSuccessProvider
 
   @Override
   public void afterSuccessLogin(HttpServletRequest request, HttpServletResponse response, String username) {
-    Optional<UserEntity> user = userService.getUserByUsername(username);
+    Optional<UserEntity> user = userService.findUserByUsername(username);
     if (user.isPresent()) {
       int id = user.get().getId();
       request.getSession().setAttribute(AttrKey.USER_ID, id);

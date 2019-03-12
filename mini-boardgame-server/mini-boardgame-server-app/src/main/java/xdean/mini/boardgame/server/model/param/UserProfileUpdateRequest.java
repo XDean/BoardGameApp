@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xdean.mini.boardgame.server.model.UserProfile;
+import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 
 @Data
 @Builder
@@ -14,5 +14,5 @@ import xdean.mini.boardgame.server.model.UserProfile;
 @AllArgsConstructor
 public class UserProfileUpdateRequest {
   @NotNull
-  UserProfile profile;
+  UserProfileEntity profile;
 }

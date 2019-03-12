@@ -21,16 +21,16 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
-import xdean.mini.boardgame.server.mybatis.mapper.UserMapper;
 import xdean.mini.boardgame.server.security.TokenAuthProvider;
 import xdean.mini.boardgame.server.security.model.SecurityProperties;
+import xdean.mini.boardgame.server.service.UserDataService;
 
 @Component
 public class JwtTokenHandler implements TokenAuthProvider {
 
   private static final String JWT_TOKEN = "jwt-token";
 
-  private @Inject UserMapper userMapper;
+  private @Inject UserDataService userService;
   private @Inject SecurityProperties properties;
 
   @Override
@@ -47,7 +47,7 @@ public class JwtTokenHandler implements TokenAuthProvider {
       throw new CredentialsExpiredException("The token is expired");
     }
     String username = verify.getSubject();
-    Optional<UserEntity> e = userMapper.findByUsername(username);
+    Optional<UserEntity> e = userService.findUserByUsername(username);
     if (e.isPresent()) {
       UserEntity user = e.get();
       List<SimpleGrantedAuthority> authorities = user.getAuthorities().stream()

@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import xdean.mini.boardgame.server.model.UserProfile;
 import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
+import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.model.param.SimpleResponse;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateResponse;
@@ -42,7 +42,7 @@ public class WechatEndPoint {
     if (loginResponse.getErrorCode() == 0) {
       Integer userId = (Integer) request.getSession().getAttribute(AttrKey.USER_ID);
       UserProfileUpdateResponse profileResponse = profileEndPoint.updateUserProfile(userId, UserProfileUpdateRequest.builder()
-          .profile(UserProfile.builder()
+          .profile(UserProfileEntity.builder()
               .nickname(nickname)
               .avatarUrl(avatarUrl)
               .build())

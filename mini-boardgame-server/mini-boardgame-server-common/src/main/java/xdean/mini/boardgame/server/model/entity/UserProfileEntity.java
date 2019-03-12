@@ -1,10 +1,11 @@
 package xdean.mini.boardgame.server.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xdean.mini.boardgame.server.model.UserProfile;
 
 @Data
 @NoArgsConstructor
@@ -12,7 +13,10 @@ import xdean.mini.boardgame.server.model.UserProfile;
 @Builder(toBuilder = true)
 public class UserProfileEntity {
 
+  @JsonIgnore
   int userId;
 
-  UserProfile profile;
+  String nickname;
+  boolean male;
+  String avatarUrl;
 }

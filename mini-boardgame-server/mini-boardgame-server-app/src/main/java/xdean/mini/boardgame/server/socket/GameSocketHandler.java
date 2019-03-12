@@ -156,7 +156,7 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
               return;
             }
             User user = (User) authenticate.getPrincipal();
-            Optional<UserEntity> ue = userService.getUserByUsername(user.getUsername());
+            Optional<UserEntity> ue = userService.findUserByUsername(user.getUsername());
             if (ue.isPresent()) {
               session.getAttributes().put(AttrKey.USER_ID, ue.get().getId());
               session.getAttributes().put(AttrKey.ACCESS_TOKEN, token);

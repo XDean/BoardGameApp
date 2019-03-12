@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
+import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.mybatis.mapper.UserMapper;
 import xdean.mini.boardgame.server.service.UserDataService;
 
@@ -26,14 +27,20 @@ public class UserServiceImpl implements UserDataService {
       Object p = a.getPrincipal();
       if (p instanceof User) {
         String username = ((User) p).getUsername();
-        return getUserByUsername(username);
+        return findUserByUsername(username);
       }
     }
     return Optional.empty();
   }
 
   @Override
-  public Optional<UserEntity> getUserByUsername(String username) {
-    return userMapper.findByUsername(username);
+  public Optional<UserEntity> findUserByUsername(String username) {
+    return Optional.ofNullable(userMapper.findByUsername(username));
+  }
+
+  @Override
+  public UserProfileEntity save(UserProfileEntity profile) {
+    userMapper.save(profile);
+    return profile;
   }
 }

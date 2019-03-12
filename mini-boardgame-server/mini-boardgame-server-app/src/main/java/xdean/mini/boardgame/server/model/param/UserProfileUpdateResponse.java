@@ -2,8 +2,8 @@ package xdean.mini.boardgame.server.model.param;
 
 import lombok.Builder;
 import lombok.Builder.Default;
-import xdean.mini.boardgame.server.model.UserProfile;
 import lombok.Value;
+import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 
 @Value
 @Builder
@@ -14,5 +14,5 @@ public class UserProfileUpdateResponse {
   @Default
   int errorCode = 0;
 
-  UserProfile profile;
+  UserProfileEntity profile;
 }
