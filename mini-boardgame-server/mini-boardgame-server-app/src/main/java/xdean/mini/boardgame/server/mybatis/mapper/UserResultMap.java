@@ -3,9 +3,9 @@ package xdean.mini.boardgame.server.mybatis.mapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import xdean.mini.boardgame.server.model.Tables;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
+import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.resultmap.InitResultMap;
 
 @Configuration

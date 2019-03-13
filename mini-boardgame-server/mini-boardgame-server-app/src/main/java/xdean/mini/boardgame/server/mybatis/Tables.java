@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.server.model;
+package xdean.mini.boardgame.server.mybatis;
 
 import org.apache.ibatis.type.JdbcType;
 

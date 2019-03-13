@@ -7,10 +7,10 @@ import java.sql.Timestamp;
 
 import org.apache.ibatis.session.RowBounds;
 
-import xdean.mini.boardgame.server.model.Tables;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.handler.GameBoardConverter;
+import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.MyBatisSQL;
 
 public class GameMapperBuilder implements Tables {

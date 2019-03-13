@@ -2,8 +2,8 @@ package xdean.mini.boardgame.server.mybatis.mapper;
 
 import static xdean.mybatis.extension.SqlUtil.equal;
 
-import xdean.mini.boardgame.server.model.Tables;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
+import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.MyBatisSQL;
 import xdean.mybatis.extension.SqlUtil;
 
