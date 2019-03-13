@@ -1,5 +1,7 @@
 package xdean.mini.boardgame.server.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class GamePlayerEntity {
   int userId;
 
+  @JsonIgnore
   GameRoomEntity room;
 
   int seat;

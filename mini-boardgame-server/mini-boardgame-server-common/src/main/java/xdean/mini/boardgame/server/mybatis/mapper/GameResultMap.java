@@ -4,15 +4,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import xdean.mini.boardgame.server.model.Tables;
+import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
-import xdean.mybatis.extension.ConfigurationInitializer;
+import xdean.mini.boardgame.server.model.handler.GameBoardConverter;
 import xdean.mybatis.extension.resultmap.InitResultMap;
 
 @Configuration
 public class GameResultMap implements Tables {
 
   @Bean
-  public ConfigurationInitializer gameRoomMapper() {
+  public InitResultMap<GameRoomEntity> gameRoomMapper() {
     return InitResultMap.create(GameRoomEntity.class)
         .namespace()
         .id(GameRoomEntity.class.getName())
@@ -22,7 +23,21 @@ public class GameResultMap implements Tables {
             .mapping(GameRoomTable.gameName, GameRoomEntity::setGameName)
             .mapping(GameRoomTable.roomName, GameRoomEntity::setRoomName)
             .mapping(GameRoomTable.createdTime, GameRoomEntity::setCreatedTime)
-            .mapping(GameRoomTable.playerCount, GameRoomEntity::setPlayerCount))
+            .mapping(GameRoomTable.playerCount, GameRoomEntity::setPlayerCount)
+            .mapping(d -> d.column(GameRoomTable.board).property(GameRoomEntity::setBoard).typeHandler(GameBoardConverter.class)))
+        .build();
+  }
+
+  @Bean
+  public InitResultMap<GamePlayerEntity> gamePlayerMapper() {
+    return InitResultMap.create(GamePlayerEntity.class)
+        .namespace()
+        .id(GamePlayerEntity.class.getName())
+        .resultMap(b -> b
+            .stringFree()
+            .mapping(GamePlayerTable.id, GamePlayerEntity::setUserId)
+            .mapping(GamePlayerTable.seat, GamePlayerEntity::setSeat)
+            .mapping(d -> d.column(GamePlayerTable.roomId).property(GamePlayerEntity::setRoom).nestMap(gameRoomMapper().getId())))
         .build();
   }
 }

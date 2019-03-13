@@ -3,6 +3,8 @@ package xdean.mini.boardgame.server.model.entity;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +30,7 @@ public class GameRoomEntity {
   @Singular
   List<GamePlayerEntity> players;
 
+  @JsonIgnore
   GameBoard board;
 
   public void addPlayer(GamePlayerEntity player) {
