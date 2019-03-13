@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.inject.Inject;
@@ -25,7 +24,6 @@ import io.reactivex.subjects.Subject;
 import xdean.jex.extra.collection.Pair;
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.GameBoard;
-import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.GlobalConstants;
 import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
 import xdean.mini.boardgame.server.model.GlobalConstants.SocketTopic;
@@ -42,7 +40,6 @@ import xdean.mini.boardgame.server.model.param.JoinGameRequest;
 import xdean.mini.boardgame.server.model.param.JoinGameResponse;
 import xdean.mini.boardgame.server.model.param.SearchGameRequest;
 import xdean.mini.boardgame.server.model.param.SearchGameResponse;
-import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.service.GameCenterService;
 import xdean.mini.boardgame.server.service.GameDataService;
 import xdean.mini.boardgame.server.service.GameProvider;
@@ -89,15 +86,13 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
       Integer roomId = generateId();
       GameRoomEntity room = GameRoomEntity.builder()
           .id(roomId)
-          .room(GameRoom.builder()
-              .gameName(request.getGameName())
-              .createdTime(new Date())
-              .playerCount(request.getPlayerCount())
-              .roomName(request.getRoomName().isEmpty() ? "Room " + roomId : request.getRoomName())
-              .build())
+          .gameName(request.getGameName())
+          .createdTime(new Date())
+          .playerCount(request.getPlayerCount())
+          .roomName(request.getRoomName().isEmpty() ? "Room " + roomId : request.getRoomName())
           .player(player)
           .build();
-      GameBoard board = game.get().createGame(room.getRoom());
+      GameBoard board = game.get().createGame(room);
       room.setBoard(board);
 
       player.setRoom(room);
@@ -134,13 +129,13 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
               .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
               .build();
         }
-        if (room.getPlayers().size() == room.getRoom().getPlayerCount()) {
+        if (room.getPlayers().size() == room.getPlayerCount()) {
           return JoinGameResponse.builder()
               .errorCode(GameCenterErrorCode.ROOM_FULL)
               .build();
         }
         player.setRoom(room);
-        IntStream.range(0, room.getRoom().getPlayerCount())
+        IntStream.range(0, room.getPlayerCount())
             .filter(i -> room.getPlayers().stream().noneMatch(e -> e.getSeat() == i))
             .findFirst()
             .ifPresent(player::setSeat);
@@ -210,9 +205,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     List<GameRoomEntity> rooms = gameMapper.findAllByRoomGameName(request.getGameName(),
         new RowBounds(request.getPage() * request.getPageSize(), request.getPageSize()));
     return SearchGameResponse.builder()
-        .rooms(rooms.stream()
-            .map(e -> e.getRoom())
-            .collect(Collectors.toList()))
+        .rooms(rooms)
         .build();
   }
 
@@ -233,7 +226,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
             .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
             .build();
       }
-      return CurrentGameResponse.builder().room(room.getRoom()).build();
+      return CurrentGameResponse.builder().room(room).build();
     }
   }
 

@@ -17,8 +17,8 @@ import com.google.common.collect.ImmutableList;
 import xdean.jex.extra.collection.IntList;
 import xdean.mini.boardgame.server.gdjzj.model.GdjzjErrorCode;
 import xdean.mini.boardgame.server.model.GameBoard;
-import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
+import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 
 public class GdjzjBoard extends GameBoard {
@@ -29,7 +29,7 @@ public class GdjzjBoard extends GameBoard {
   int currentTurn = 0;
 
   @JsonCreator
-  public GdjzjBoard(@JsonProperty("room") GameRoom room) {
+  public GdjzjBoard(@JsonProperty("room") GameRoomEntity room) {
     super(room);
   }
 

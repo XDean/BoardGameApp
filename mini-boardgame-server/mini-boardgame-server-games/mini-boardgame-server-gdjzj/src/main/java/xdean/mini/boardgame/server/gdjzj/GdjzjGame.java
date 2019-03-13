@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import xdean.mini.boardgame.server.gdjzj.game.GdjzjBoard;
-import xdean.mini.boardgame.server.model.GameRoom;
+import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.service.GameProvider;
 
 @Component
@@ -16,7 +16,7 @@ public class GdjzjGame implements GameProvider<GdjzjBoard> {
   }
 
   @Override
-  public GdjzjBoard createGame(GameRoom room) {
+  public GdjzjBoard createGame(GameRoomEntity room) {
     Assert.isTrue(room.getGameName().equals(name()), "Game must be gdjzj");
     Assert.isTrue(room.getPlayerCount() >= 6 && room.getPlayerCount() <= 8, "Gdjzj player count must be 6-8");
     return new GdjzjBoard(room);

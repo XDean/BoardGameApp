@@ -33,8 +33,8 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import xdean.jex.log.Logable;
-import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.GlobalConstants;
+import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.security.TokenAuthProvider;
@@ -61,10 +61,10 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-    GameRoom room;
+    GameRoomEntity room;
     try {
       int id = getRoomIdFromSession(session);
-      room = gameMapper.findRoom(id).get().getRoom();
+      room = gameMapper.findRoom(id);
     } catch (Exception ex) {
       trace("Fail to find room: " + session, ex);
       session.close(CloseStatus.BAD_DATA.withReason("Can't find room id"));
@@ -103,12 +103,12 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
   }
 
   private class GameRoomSocketHandler {
-    final GameRoom room;
+    final GameRoomEntity room;
     final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
     final Map<WebSocketSession, Subject<WebSocketEvent<JsonNode>>> subjects = new HashMap<>();
     final Map<WebSocketSession, Disposable> disposables = new HashMap<>();
 
-    GameRoomSocketHandler(GameRoom room) {
+    GameRoomSocketHandler(GameRoomEntity room) {
       this.room = room;
     }
 

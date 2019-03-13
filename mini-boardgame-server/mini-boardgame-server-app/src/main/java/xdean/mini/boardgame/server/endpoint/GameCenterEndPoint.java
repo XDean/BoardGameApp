@@ -29,8 +29,8 @@ import xdean.mini.boardgame.server.model.param.JoinGameRequest;
 import xdean.mini.boardgame.server.model.param.JoinGameResponse;
 import xdean.mini.boardgame.server.model.param.SearchGameRequest;
 import xdean.mini.boardgame.server.model.param.SearchGameResponse;
-import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.service.GameCenterService;
+import xdean.mini.boardgame.server.service.GameDataService;
 import xdean.mini.boardgame.server.service.UserDataService;
 
 @Api(tags = "Game/Game-Center")
@@ -40,14 +40,14 @@ public class GameCenterEndPoint implements GlobalConstants, LoginSuccessProvider
 
   private @Inject UserDataService userService;
   private @Inject GameCenterService service;
-  private @Inject GameMapper gameMapper;
+  private @Inject GameDataService gameMapper;
 
   @PostMapping("/create")
   @ApiOperation("Create a new game room")
   public CreateGameResponse createGame(@Valid @RequestBody CreateGameRequest request, @ApiIgnore HttpSession session) {
     CreateGameResponse response = service.createGame(request);
     if (response.getRoomId() != -1) {
-      gameMapper.findRoom(response.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e.getRoom()));
+      gameMapper.findRoom(response.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e));
     }
     return response;
   }
@@ -57,7 +57,7 @@ public class GameCenterEndPoint implements GlobalConstants, LoginSuccessProvider
   public JoinGameResponse joinGame(@RequestBody JoinGameRequest request, @ApiIgnore HttpSession session) {
     JoinGameResponse response = service.joinGame(request);
     if (response.getErrorCode() == 0) {
-      gameMapper.findRoom(request.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e.getRoom()));
+      gameMapper.findRoom(request.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e));
     }
     return response;
   }

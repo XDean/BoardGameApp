@@ -5,6 +5,7 @@ import xdean.mini.boardgame.server.annotation.BeanType;
 import xdean.mini.boardgame.server.annotation.FromClient;
 import xdean.mini.boardgame.server.annotation.FromServer;
 import xdean.mini.boardgame.server.annotation.Payload;
+import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 public interface GlobalConstants {
 
@@ -20,7 +21,7 @@ public interface GlobalConstants {
     @BeanType(Integer.class)
     String USER_ID = "USER_ID";
 
-    @BeanType(GameRoom.class)
+    @BeanType(GameRoomEntity.class)
     String ROOM = "ROOM";
 
     @BeanType(String.class)

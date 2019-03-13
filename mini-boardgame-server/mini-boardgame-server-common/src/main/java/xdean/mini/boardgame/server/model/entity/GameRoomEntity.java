@@ -1,5 +1,6 @@
 package xdean.mini.boardgame.server.model.entity;
 
+import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
 import xdean.mini.boardgame.server.model.GameBoard;
-import xdean.mini.boardgame.server.model.GameRoom;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +17,13 @@ import xdean.mini.boardgame.server.model.GameRoom;
 public class GameRoomEntity {
   int id;
 
-  GameRoom room;
+  String gameName;
+
+  int playerCount;
+
+  String roomName;
+
+  Date createdTime;
 
   @Singular
   List<GamePlayerEntity> players;

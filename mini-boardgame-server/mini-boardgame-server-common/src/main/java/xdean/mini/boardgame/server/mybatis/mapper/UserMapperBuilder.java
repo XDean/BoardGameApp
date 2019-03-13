@@ -4,7 +4,6 @@ import xdean.mini.boardgame.server.model.Tables;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mybatis.extension.MyBatisSQL;
 import xdean.mybatis.extension.SqlUtil;
-import xdean.mybatis.extension.model.Column;
 
 public class UserMapperBuilder implements Tables {
   String save(UserProfileEntity e) {
@@ -14,7 +13,7 @@ public class UserMapperBuilder implements Tables {
         .VALUES(ProfileTable.avatarUrl.fullName, e.getAvatarUrl())
         .VALUES(ProfileTable.nickname.fullName, e.getNickname())
         .VALUES(ProfileTable.male.fullName, Boolean.toString(e.isMale()))
-        .ON_DUPLICATE_KEY_UPDATE(ProfileTable.table.columns.stream().toArray(Column[]::new))
+        .ON_DUPLICATE_KEY_UPDATE(ProfileTable.avatarUrl, ProfileTable.nickname, ProfileTable.male)
         .toString();
   }
 

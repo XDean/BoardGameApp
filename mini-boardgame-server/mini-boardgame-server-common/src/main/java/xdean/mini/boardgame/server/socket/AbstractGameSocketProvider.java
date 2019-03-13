@@ -18,9 +18,9 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
 import xdean.jex.log.Logable;
-import xdean.mini.boardgame.server.model.GameRoom;
 import xdean.mini.boardgame.server.model.GlobalConstants;
 import xdean.mini.boardgame.server.model.GlobalConstants.SocketTopic;
+import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 public abstract class AbstractGameSocketProvider implements GameSocketProvider, Logable {
 
@@ -29,7 +29,7 @@ public abstract class AbstractGameSocketProvider implements GameSocketProvider, 
   @Builder(toBuilder = true)
   public static class SocketContext {
     WebSocketSession session;
-    GameRoom room;
+    GameRoomEntity room;
     int userId;
     Observable<WebSocketEvent<JsonNode>> inputFlow;
     Observable<WebSocketEvent<?>> outputFlow;
@@ -46,7 +46,7 @@ public abstract class AbstractGameSocketProvider implements GameSocketProvider, 
   }
 
   @Override
-  public Observable<WebSocketEvent<?>> handle(WebSocketSession session, GameRoom room,
+  public Observable<WebSocketEvent<?>> handle(WebSocketSession session, GameRoomEntity room,
       Observable<WebSocketEvent<JsonNode>> input) {
     Integer id = (Integer) session.getAttributes().get(GlobalConstants.AttrKey.USER_ID);
     Assert.notNull(id, "Authed user must have id");

@@ -3,10 +3,10 @@ package xdean.mini.boardgame.server.model.param;
 import java.util.List;
 
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Singular;
 import lombok.Value;
-import lombok.Builder.Default;
-import xdean.mini.boardgame.server.model.GameRoom;
+import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 @Value
 @Builder
@@ -15,5 +15,5 @@ public class SearchGameResponse {
   int errorCode = 0;
 
   @Singular
-  List<GameRoom> rooms;
+  List<GameRoomEntity> rooms;
 }

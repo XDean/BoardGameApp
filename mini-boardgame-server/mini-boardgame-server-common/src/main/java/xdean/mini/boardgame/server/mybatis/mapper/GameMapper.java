@@ -1,7 +1,6 @@
 package xdean.mini.boardgame.server.mybatis.mapper;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.RowBounds;
@@ -12,9 +11,9 @@ import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 @Mapper
 public interface GameMapper {
 
-  Optional<GamePlayerEntity> findPlayer(int id);
+  GamePlayerEntity findPlayer(int id);
 
-  Optional<GameRoomEntity> findRoom(int roomId);
+  GameRoomEntity findRoom(int roomId);
 
   void save(GamePlayerEntity player);
 

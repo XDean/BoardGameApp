@@ -3,16 +3,17 @@ package xdean.mini.boardgame.server.model;
 import org.springframework.util.Assert;
 
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
+import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 public abstract class GameBoard {
   public static final int OVER = -100;
   public static final int WAITING = -101;
   public static final int START = -102;
 
-  protected final GameRoom room;
+  protected final GameRoomEntity room;
   protected int state = 0;
 
-  public GameBoard(GameRoom room) {
+  public GameBoard(GameRoomEntity room) {
     this.room = room;
   }
 
