@@ -47,7 +47,7 @@ public interface Tables {
     Column gameName = ColumnBuilder.create().table(table).column("game_name").jdbcType(JdbcType.VARCHAR).index().build();
     Column roomName = ColumnBuilder.create().table(table).column("room_name").jdbcType(JdbcType.VARCHAR).build();
     Column playerCount = ColumnBuilder.create().table(table).column("player_count").jdbcType(JdbcType.INTEGER).build();
-    Column createdTime = ColumnBuilder.create().table(table).column("board_time").jdbcType(JdbcType.TIMESTAMP).build();
+    Column createdTime = ColumnBuilder.create().table(table).column("created_time").jdbcType(JdbcType.TIMESTAMP).build();
     Column board = ColumnBuilder.create().table(table).column("board").jdbcType(JdbcType.VARCHAR).build();
   }
 }
