@@ -18,7 +18,7 @@ public class UserResultMap implements Tables {
         .id(UserProfileEntity.class.getName())
         .resultMap(b -> b
             .stringFree()
-            .mapping(ProfileTable.id, UserProfileEntity::setUserId)
+            .mapping(ProfileTable.id, UserProfileEntity::setId)
             .mapping(ProfileTable.nickname, UserProfileEntity::setNickname)
             .mapping(ProfileTable.male, UserProfileEntity::setMale)
             .mapping(ProfileTable.avatarUrl, UserProfileEntity::setAvatarUrl))

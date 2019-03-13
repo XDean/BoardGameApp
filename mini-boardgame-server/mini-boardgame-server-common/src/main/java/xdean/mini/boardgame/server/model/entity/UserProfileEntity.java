@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class UserProfileEntity {
 
   @JsonIgnore
-  int userId;
+  int id;
 
   String nickname;
   boolean male;

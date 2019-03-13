@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GamePlayerEntity {
-  int userId;
+  int id;
 
   @JsonIgnore
   GameRoomEntity room;

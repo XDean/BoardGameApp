@@ -40,7 +40,7 @@ public class GdjzjBoard extends GameBoard {
     this.cards = createCards();
     List<GdjzjRole> roles = GdjzjRole.getRoles(players.length);
     this.players = ImmutableList.copyOf(IntStream.range(0, players.length)
-        .mapToObj(i -> new GdjzjPlayer(players[i].getUserId(), i, this, roles.get(i)))
+        .mapToObj(i -> new GdjzjPlayer(players[i].getId(), i, this, roles.get(i)))
         .collect(Collectors.toList()));
     this.currentPlayer = ThreadLocalRandom.current().nextInt(players.length);
     this.currentTurn = 0;

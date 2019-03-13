@@ -11,7 +11,7 @@ public class UserMapperBuilder implements Tables {
   String save(UserProfileEntity e) {
     return MyBatisSQL.create()
         .INSERT_INTO(ProfileTable.table)
-        .VALUES(ProfileTable.id.fullName, Integer.toString(e.getUserId()))
+        .VALUES(ProfileTable.id.fullName, Integer.toString(e.getId()))
         .VALUES(ProfileTable.avatarUrl.fullName, e.getAvatarUrl())
         .VALUES(ProfileTable.nickname.fullName, e.getNickname())
         .VALUES(ProfileTable.male.fullName, Boolean.toString(e.isMale()))

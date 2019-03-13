@@ -65,7 +65,7 @@ public class UserProfileEndPoint {
     }
     Optional<UserEntity> u = userService.findUserByUsername(username);
     UserProfileEntity save = userService
-        .save((u.isPresent() ? u.get().getProfile().toBuilder() : request.getProfile().toBuilder().userId(userId))
+        .save((u.isPresent() ? u.get().getProfile().toBuilder() : request.getProfile().toBuilder().id(userId))
             .build());
     return UserProfileUpdateResponse.builder().profile(save).build();
   }

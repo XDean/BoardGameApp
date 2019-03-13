@@ -35,7 +35,7 @@ public class GameResultMap implements Tables {
         .id(GamePlayerEntity.class.getName())
         .resultMap(b -> b
             .stringFree()
-            .mapping(GamePlayerTable.id, GamePlayerEntity::setUserId)
+            .mapping(GamePlayerTable.id, GamePlayerEntity::setId)
             .mapping(GamePlayerTable.seat, GamePlayerEntity::setSeat))
         .build();
   }

@@ -33,7 +33,7 @@ public class GameMapperBuilder implements Tables {
   String save(GamePlayerEntity e) {
     return MyBatisSQL.create()
         .INSERT_INTO(GamePlayerTable.table)
-        .VALUES(GamePlayerTable.id.fullName, Integer.toString(e.getUserId()))
+        .VALUES(GamePlayerTable.id.fullName, Integer.toString(e.getId()))
         .VALUES(GamePlayerTable.roomId.fullName, Integer.toString(e.getRoom().getId()))
         .VALUES(GamePlayerTable.seat.fullName, Integer.toString(e.getSeat()))
         .ON_DUPLICATE_KEY_UPDATE(GamePlayerTable.roomId, GamePlayerTable.seat)
