@@ -19,7 +19,7 @@ public interface Tables {
   interface AuthorityTable {
     Table table = Table.create("t_authorities");
 
-    Column id = ColumnBuilder.create().table(table).column("id").jdbcType(JdbcType.INTEGER).id().build();
+    Column id = ColumnBuilder.create().table(table).column("id").jdbcType(JdbcType.INTEGER).build();
     Column authority = ColumnBuilder.create().table(table).column("authority").jdbcType(JdbcType.VARCHAR).build();
   }
 

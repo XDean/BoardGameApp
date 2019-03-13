@@ -1,5 +1,7 @@
 package xdean.mini.boardgame.server.mybatis.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
@@ -12,4 +14,6 @@ public interface UserMapper {
   void save(UserProfileEntity profile);
 
   UserEntity findByUsername(String username);
+
+  List<String> findAuthorities(int id);
 }

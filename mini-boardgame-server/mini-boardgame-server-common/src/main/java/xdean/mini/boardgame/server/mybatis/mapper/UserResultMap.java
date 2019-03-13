@@ -6,14 +6,13 @@ import org.springframework.context.annotation.Configuration;
 import xdean.mini.boardgame.server.model.Tables;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
-import xdean.mybatis.extension.ConfigurationInitializer;
 import xdean.mybatis.extension.resultmap.InitResultMap;
 
 @Configuration
 public class UserResultMap implements Tables {
 
   @Bean
-  public ConfigurationInitializer userProfileMapper() {
+  public InitResultMap<UserProfileEntity> userProfileMapper() {
     return InitResultMap.create(UserProfileEntity.class)
         .namespace()
         .id(UserProfileEntity.class.getName())
@@ -27,7 +26,7 @@ public class UserResultMap implements Tables {
   }
 
   @Bean
-  public ConfigurationInitializer userEntityMapper() {
+  public InitResultMap<UserEntity> userEntityMapper() {
     return InitResultMap.create(UserEntity.class)
         .namespace()
         .id(UserEntity.class.getName())
@@ -36,7 +35,8 @@ public class UserResultMap implements Tables {
             .mapping(UserTable.id, UserEntity::setId)
             .mapping(UserTable.username, UserEntity::setUsername)
             .mapping(UserTable.password, UserEntity::setPassword)
-            .mapping(UserTable.enabled, UserEntity::setEnabled))
+            .mapping(UserTable.enabled, UserEntity::setEnabled)
+            .mapping(d -> d.property(UserEntity::setProfile).nestMap(userProfileMapper().getId())))
         .build();
   }
 }

@@ -1,4 +1,4 @@
-package xdean.mini.boardgame.server.service.impl;
+package xdean.mini.boardgame.server.mybatis.service.impl;
 
 import java.util.Optional;
 
@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
@@ -15,7 +16,7 @@ import xdean.mini.boardgame.server.mybatis.mapper.UserMapper;
 import xdean.mini.boardgame.server.service.UserDataService;
 
 @Service
-public class UserServiceImpl implements UserDataService {
+public class UserDataDBService implements UserDataService {
 
   @Inject
   UserMapper userMapper;
@@ -34,8 +35,13 @@ public class UserServiceImpl implements UserDataService {
   }
 
   @Override
+  @Transactional
   public Optional<UserEntity> findUserByUsername(String username) {
-    return Optional.ofNullable(userMapper.findByUsername(username));
+    UserEntity user = userMapper.findByUsername(username);
+    if (user != null) {
+      user.setAuthorities(userMapper.findAuthorities(user.getId()));
+    }
+    return Optional.ofNullable(user);
   }
 
   @Override

@@ -1,5 +1,7 @@
 package xdean.mini.boardgame.server.mybatis.mapper;
 
+import static xdean.mybatis.extension.SqlUtil.equal;
+
 import xdean.mini.boardgame.server.model.Tables;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mybatis.extension.MyBatisSQL;
@@ -19,8 +21,19 @@ public class UserMapperBuilder implements Tables {
 
   String findByUsername(String username) {
     return MyBatisSQL.create()
-        .SELECT_FROM(UserTable.table)
+        .SELECT_ALL(UserTable.table)
+        .SELECT_ALL(ProfileTable.table)
+        .FROM(UserTable.table)
+        .INNER_JOIN(ProfileTable.table, equal(UserTable.id, ProfileTable.id))
         .WHERE(SqlUtil.equal(UserTable.username.fullName, username))
+        .toString();
+  }
+
+  String findAuthorities(int id) {
+    return MyBatisSQL.create()
+        .SELECT(AuthorityTable.authority)
+        .FROM(AuthorityTable.table)
+        .WHERE(equal(AuthorityTable.id.fullName, id))
         .toString();
   }
 }

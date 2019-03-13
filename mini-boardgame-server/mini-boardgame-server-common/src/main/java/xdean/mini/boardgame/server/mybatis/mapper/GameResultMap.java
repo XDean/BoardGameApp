@@ -36,8 +36,7 @@ public class GameResultMap implements Tables {
         .resultMap(b -> b
             .stringFree()
             .mapping(GamePlayerTable.id, GamePlayerEntity::setUserId)
-            .mapping(GamePlayerTable.seat, GamePlayerEntity::setSeat)
-            .mapping(d -> d.column(GamePlayerTable.roomId).property(GamePlayerEntity::setRoom).nestMap(gameRoomMapper().getId())))
+            .mapping(GamePlayerTable.seat, GamePlayerEntity::setSeat))
         .build();
   }
 }
