@@ -24,7 +24,7 @@ public interface Tables {
   }
 
   interface ProfileTable {
-    Table table = Table.create("t_user_profile");
+    Table table = Table.create("t_user_profiles");
 
     Column id = ColumnBuilder.create().table(table).column("id").jdbcType(JdbcType.INTEGER).id().build();
     Column avatarUrl = ColumnBuilder.create().table(table).column("avatar_url").jdbcType(JdbcType.VARCHAR).build();
