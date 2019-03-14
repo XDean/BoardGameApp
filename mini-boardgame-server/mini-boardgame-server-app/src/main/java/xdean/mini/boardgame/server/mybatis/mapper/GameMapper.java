@@ -21,9 +21,9 @@ public interface GameMapper extends BaseMapper {
 
   List<GamePlayerEntity> findAllPlayersInRoom(int roomId);
 
-  void save(GamePlayerEntity player);
+  void savePlayer(GamePlayerEntity player);
 
-  void save(GameRoomEntity room);
+  void saveRoom(GameRoomEntity room);
 
   void delete(GameRoomEntity room);
 

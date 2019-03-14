@@ -46,12 +46,17 @@ public class UserDataDBService implements UserDataService {
 
   @Override
   public void save(UserProfileEntity profile) {
-    userMapper.save(profile);
+    userMapper.saveProfile(profile);
   }
 
   @Override
   public void save(UserEntity user) {
-    userMapper.save(user);
+    if (user.getId() == -1) {
+      int id = userMapper.createUser(user);
+      userMapper.saveProfile(user.getProfile().toBuilder().id(id).build());
+    } else {
+      userMapper.updateUser(user);
+    }
   }
 
   @Override

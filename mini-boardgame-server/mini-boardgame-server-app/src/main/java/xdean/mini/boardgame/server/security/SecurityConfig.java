@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import xdean.mini.boardgame.server.handler.DispatchLoginHandler;
 import xdean.mini.boardgame.server.handler.DispatchLogoutHandler;
 import xdean.mini.boardgame.server.security.handler.TokenAuthenticationProvider;
+import xdean.mini.boardgame.server.security.handler.UserDetailsManagerImpl;
 import xdean.mini.boardgame.server.security.model.SecurityProperties;
 
 @Configuration
@@ -44,9 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Inject
   TokenAuthenticationProvider tokenAuthProvider;
-
-  @Inject
-  UserDetailsManager userDetailsManager;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -72,10 +70,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     auth
         .authenticationProvider(tokenAuthProvider)
-        .userDetailsService(userDetailsManager)
+        .userDetailsService(userDetailsManager())
         .passwordEncoder(passwordEncoder());
-    if (!userDetailsManager.userExists("admin")) {
-      userDetailsManager.createUser(User.builder()
+    if (!userDetailsManager().userExists("admin")) {
+      userDetailsManager().createUser(User.builder()
           .username("admin")
           .password(dataSourceProperties.getPassword())
           .passwordEncoder(passwordEncoder()::encode)
@@ -88,6 +86,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected AuthenticationManager authenticationManager() throws Exception {
     return super.authenticationManager();
+  }
+
+  @Bean
+  public UserDetailsManager userDetailsManager() {
+    return new UserDetailsManagerImpl();
   }
 
   @Bean

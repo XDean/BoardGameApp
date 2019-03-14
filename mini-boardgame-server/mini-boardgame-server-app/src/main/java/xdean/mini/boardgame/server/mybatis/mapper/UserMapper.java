@@ -19,9 +19,11 @@ public interface UserMapper extends BaseMapper, Tables {
 
   List<String> findAuthorities(int id);
 
-  void save(UserProfileEntity profile);
+  void saveProfile(UserProfileEntity profile);
 
-  void save(UserEntity user);
+  int createUser(UserEntity user);
+
+  void updateUser(UserEntity user);
 
   void delete(String username);
 

@@ -52,14 +52,14 @@ public class GameDataDBService implements GameDataService {
 
   @Override
   public void save(GamePlayerEntity player) {
-    gameMapper.save(player);
+    gameMapper.savePlayer(player);
     player.getRoom().ifPresent(this::save);
   }
 
   @Override
   public void save(GameRoomEntity room) {
-    gameMapper.save(room);
-    room.getPlayers().forEach(e -> gameMapper.save(e));
+    gameMapper.saveRoom(room);
+    room.getPlayers().forEach(e -> gameMapper.savePlayer(e));
   }
 
   @Override
@@ -74,7 +74,7 @@ public class GameDataDBService implements GameDataService {
 
   @Override
   public void saveAll(List<GamePlayerEntity> players) {
-    players.forEach(e -> gameMapper.save(e));
+    players.forEach(e -> gameMapper.savePlayer(e));
   }
 
   @Override

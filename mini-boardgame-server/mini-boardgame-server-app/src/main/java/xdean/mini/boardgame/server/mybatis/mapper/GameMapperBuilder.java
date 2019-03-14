@@ -46,7 +46,7 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
         .toString();
   }
 
-  public String save(GamePlayerEntity e) {
+  public String savePlayer(GamePlayerEntity e) {
     if (e.getRoom().isPresent()) {
       return MyBatisSQL.create()
           .INSERT_INTO(GamePlayerTable.table)
@@ -63,7 +63,7 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
     }
   }
 
-  public String save(GameRoomEntity e) {
+  public String saveRoom(GameRoomEntity e) {
     return MyBatisSQL.create()
         .INSERT_INTO(GameRoomTable.table)
         .VALUES(GameRoomTable.id.fullName, Integer.toString(e.getId()))

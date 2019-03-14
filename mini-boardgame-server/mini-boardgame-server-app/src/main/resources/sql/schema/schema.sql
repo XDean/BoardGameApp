@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `t_authorities` (
 CREATE TABLE IF NOT EXISTS `t_user_profiles`(  
   `id` INT PRIMARY KEY,
   `nickname` VARCHAR(127) CHARACTER SET utf8,
-  `gender` TINYINT(1),
+  `male` TINYINT(1),
   `avatar_url` TEXT,
   CONSTRAINT `fk_profile_user_id` FOREIGN KEY (`id`) REFERENCES `t_users`(`id`)
 ) DEFAULT CHARSET=latin1;

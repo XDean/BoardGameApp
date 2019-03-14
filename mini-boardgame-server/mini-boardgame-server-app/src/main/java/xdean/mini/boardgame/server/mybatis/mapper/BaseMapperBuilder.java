@@ -3,6 +3,7 @@ package xdean.mini.boardgame.server.mybatis.mapper;
 import static xdean.mybatis.extension.SqlUtil.count;
 import static xdean.mybatis.extension.SqlUtil.distinct;
 import static xdean.mybatis.extension.SqlUtil.equal;
+import static xdean.mybatis.extension.SqlUtil.wrapAlias;
 
 import xdean.mybatis.extension.MyBatisSQL;
 import xdean.mybatis.extension.model.Column;
@@ -19,12 +20,12 @@ public class BaseMapperBuilder {
   public String exist(Column column, String value) {
     return MyBatisSQL.create()
         .SELECT(count())
-        .FROM(MyBatisSQL.create()
+        .FROM(wrapAlias(MyBatisSQL.create()
             .SELECT(column)
             .FROM(column.table)
             .WHERE(equal(column.fullName, value))
             .LIMIT(1)
-            .toString())
+            .toString(), "t_count"))
         .toString();
   }
 }

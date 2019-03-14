@@ -14,12 +14,10 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
-import org.springframework.stereotype.Component;
 
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.service.UserDataService;
 
-@Component
 public class UserDetailsManagerImpl implements UserDetailsManager {
   @Inject
   UserDataService userDataService;
@@ -48,7 +46,7 @@ public class UserDetailsManagerImpl implements UserDetailsManager {
     if (userDataService.userExist(user.getUsername())) {
       throw new IllegalArgumentException("Username exist: " + user.getUsername());
     }
-    updateUser(user);
+    saveUser(user);
   }
 
   @Override
