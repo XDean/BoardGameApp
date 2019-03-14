@@ -10,5 +10,15 @@ public interface UserDataService {
 
   Optional<UserEntity> findUserByUsername(String username);
 
-  UserProfileEntity save(UserProfileEntity profile);
+  void save(UserEntity user);
+
+  void save(UserProfileEntity profile);
+
+  void delete(String username);
+
+  void changePassword(String username, String password);
+
+  boolean userExist(int id);
+
+  boolean userExist(String username);
 }

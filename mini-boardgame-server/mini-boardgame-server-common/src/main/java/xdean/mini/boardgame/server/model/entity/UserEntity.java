@@ -6,18 +6,21 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Builder.Default;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class UserEntity {
-  int id;
+  @Default
+  int id = -1;
   String username;
   String password;
   boolean enabled;
 
   List<String> authorities;
 
-  UserProfileEntity profile;
+  @Default
+  UserProfileEntity profile = UserProfileEntity.builder().build();
 }

@@ -7,6 +7,7 @@ import org.apache.ibatis.session.RowBounds;
 
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
+import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.annotation.DefaultBuilder;
 
 @Mapper
@@ -27,4 +28,8 @@ public interface GameMapper extends BaseMapper {
   void delete(GameRoomEntity room);
 
   List<GameRoomEntity> findAllRoom(String gameName, RowBounds page);
+
+  default boolean roomExist(int id) {
+    return exist(Tables.GameRoomTable.id, Integer.toString(id));
+  }
 }

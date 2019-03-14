@@ -64,9 +64,9 @@ public class UserProfileEndPoint {
       return UserProfileUpdateResponse.builder().errorCode(UserProfileUpdateResponse.HAVE_NOT_LOGIN).build();
     }
     Optional<UserEntity> u = userService.findUserByUsername(username);
-    UserProfileEntity save = userService
-        .save((u.isPresent() ? u.get().getProfile().toBuilder() : request.getProfile().toBuilder().id(userId))
-            .build());
-    return UserProfileUpdateResponse.builder().profile(save).build();
+    UserProfileEntity p = (u.isPresent() ? u.get().getProfile().toBuilder() : request.getProfile().toBuilder().id(userId))
+        .build();
+    userService.save(p);
+    return UserProfileUpdateResponse.builder().profile(p).build();
   }
 }

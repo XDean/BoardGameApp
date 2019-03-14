@@ -45,8 +45,32 @@ public class UserDataDBService implements UserDataService {
   }
 
   @Override
-  public UserProfileEntity save(UserProfileEntity profile) {
+  public void save(UserProfileEntity profile) {
     userMapper.save(profile);
-    return profile;
+  }
+
+  @Override
+  public void save(UserEntity user) {
+    userMapper.save(user);
+  }
+
+  @Override
+  public void delete(String username) {
+    userMapper.delete(username);
+  }
+
+  @Override
+  public void changePassword(String username, String password) {
+    userMapper.changePassword(username, password);
+  }
+
+  @Override
+  public boolean userExist(int id) {
+    return userMapper.userExist(id);
+  }
+
+  @Override
+  public boolean userExist(String username) {
+    return userMapper.userExist(username);
   }
 }

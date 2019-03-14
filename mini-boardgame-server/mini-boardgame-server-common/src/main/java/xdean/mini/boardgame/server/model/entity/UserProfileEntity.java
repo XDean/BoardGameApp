@@ -17,6 +17,8 @@ public class UserProfileEntity {
   int id;
 
   String nickname;
+
   boolean male;
+
   String avatarUrl;
 }

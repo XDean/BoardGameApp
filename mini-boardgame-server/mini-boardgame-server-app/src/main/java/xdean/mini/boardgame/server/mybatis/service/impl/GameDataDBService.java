@@ -79,6 +79,6 @@ public class GameDataDBService implements GameDataService {
 
   @Override
   public boolean roomExist(int id) {
-    return gameMapper.exist(Tables.GameRoomTable.id, Integer.toString(id));
+    return gameMapper.roomExist(id);
   }
 }

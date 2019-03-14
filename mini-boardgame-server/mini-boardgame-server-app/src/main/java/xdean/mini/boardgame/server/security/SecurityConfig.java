@@ -17,7 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import xdean.mini.boardgame.server.handler.DispatchLoginHandler;
@@ -45,6 +45,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Inject
   TokenAuthenticationProvider tokenAuthProvider;
 
+  @Inject
+  UserDetailsManager userDetailsManager;
+
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     loginHandler.setDefaultTargetUrl("/hello");
@@ -67,13 +70,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    JdbcUserDetailsManager m = userDetailsManager();
     auth
         .authenticationProvider(tokenAuthProvider)
-        .userDetailsService(m)
+        .userDetailsService(userDetailsManager)
         .passwordEncoder(passwordEncoder());
-    if (!m.userExists("admin")) {
-      m.createUser(User.builder()
+    if (!userDetailsManager.userExists("admin")) {
+      userDetailsManager.createUser(User.builder()
           .username("admin")
           .password(dataSourceProperties.getPassword())
           .passwordEncoder(passwordEncoder()::encode)
@@ -86,13 +88,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected AuthenticationManager authenticationManager() throws Exception {
     return super.authenticationManager();
-  }
-
-  @Bean
-  public JdbcUserDetailsManager userDetailsManager() {
-    JdbcUserDetailsManager manager = new JdbcUserDetailsManager();
-    manager.setDataSource(dataSource);
-    return manager;
   }
 
   @Bean
