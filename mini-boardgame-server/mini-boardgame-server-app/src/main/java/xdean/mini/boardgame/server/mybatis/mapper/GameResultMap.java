@@ -15,8 +15,8 @@ public class GameResultMap implements Tables {
   @Bean
   public InitResultMap<GameRoomEntity> gameRoomMapper() {
     return InitResultMap.create(GameRoomEntity.class)
-        .namespace()
-        .id(GameRoomEntity.class.getName())
+        .namespace(GameResultMap.class.getName())
+        .id(GameRoomEntity.class.getSimpleName())
         .resultMap(b -> b
             .stringFree()
             .mapping(GameRoomTable.id, GameRoomEntity::setId)
@@ -31,8 +31,8 @@ public class GameResultMap implements Tables {
   @Bean
   public InitResultMap<GamePlayerEntity> gamePlayerMapper() {
     return InitResultMap.create(GamePlayerEntity.class)
-        .namespace()
-        .id(GamePlayerEntity.class.getName())
+        .namespace(GameResultMap.class.getName())
+        .id(GamePlayerEntity.class.getSimpleName())
         .resultMap(b -> b
             .stringFree()
             .mapping(GamePlayerTable.id, GamePlayerEntity::setId)

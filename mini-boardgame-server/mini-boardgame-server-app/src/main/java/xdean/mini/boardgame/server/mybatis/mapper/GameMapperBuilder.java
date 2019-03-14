@@ -17,21 +17,36 @@ import xdean.mybatis.extension.MyBatisSQL;
 public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
   private GameBoardConverter gameBoardConverter = new GameBoardConverter();
 
-  String findPlayer(int id) {
+  public String findPlayer(int id) {
     return MyBatisSQL.create()
         .SELECT_FROM(GamePlayerTable.table)
         .WHERE(equal(GamePlayerTable.id.fullName, id))
         .toString();
   }
 
-  String findRoom(int roomId) {
+  public String findRoom(int roomId) {
     return MyBatisSQL.create()
         .SELECT_FROM(GameRoomTable.table)
         .WHERE(equal(GameRoomTable.id.fullName, roomId))
         .toString();
   }
 
-  String save(GamePlayerEntity e) {
+  public String findRoomByPlayer(int playerId) {
+    return MyBatisSQL.create()
+        .SELECT_FROM(GameRoomTable.table)
+        .INNER_JOIN(equal(GamePlayerTable.roomId, GameRoomTable.id))
+        .WHERE(equal(GamePlayerTable.id.fullName, playerId))
+        .toString();
+  }
+
+  public String findAllPlayersInRoom(int roomId) {
+    return MyBatisSQL.create()
+        .SELECT_FROM(GamePlayerTable.table)
+        .WHERE(equal(GamePlayerTable.roomId.fullName, roomId))
+        .toString();
+  }
+
+  public String save(GamePlayerEntity e) {
     if (e.getRoom().isPresent()) {
       return MyBatisSQL.create()
           .INSERT_INTO(GamePlayerTable.table)
@@ -48,7 +63,7 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
     }
   }
 
-  String save(GameRoomEntity e) {
+  public String save(GameRoomEntity e) {
     return MyBatisSQL.create()
         .INSERT_INTO(GameRoomTable.table)
         .VALUES(GameRoomTable.id.fullName, Integer.toString(e.getId()))
@@ -62,7 +77,7 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
         .toString();
   }
 
-  String delete(int roomId) {
+  public String delete(int roomId) {
     return together(
         MyBatisSQL.create()
             .DELETE_FROM(GamePlayerTable.table.name)
@@ -74,7 +89,7 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
             .toString());
   }
 
-  String findAllRoom(String gameName, RowBounds page) {
+  public String findAllRoom(String gameName, RowBounds page) {
     return MyBatisSQL.create()
         .SELECT_FROM(GameRoomTable.table)
         .WHERE(equal(GameRoomTable.gameName.fullName, wrapString(gameName)))

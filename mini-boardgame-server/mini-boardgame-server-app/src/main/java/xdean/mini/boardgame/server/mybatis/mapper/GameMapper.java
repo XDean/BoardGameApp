@@ -7,10 +7,11 @@ import org.apache.ibatis.session.RowBounds;
 
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
+import xdean.mybatis.extension.annotation.DefaultBuilder;
 
 @Mapper
+@DefaultBuilder(GameMapperBuilder.class)
 public interface GameMapper extends BaseMapper {
-
   GamePlayerEntity findPlayer(int id);
 
   GameRoomEntity findRoom(int roomId);
