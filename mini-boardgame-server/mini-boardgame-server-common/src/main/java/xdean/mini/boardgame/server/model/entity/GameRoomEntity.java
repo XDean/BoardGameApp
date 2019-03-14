@@ -33,6 +33,11 @@ public class GameRoomEntity {
   @JsonIgnore
   GameBoard board;
 
+  public void setPlayers(List<GamePlayerEntity> players) {
+    this.players.clear();
+    this.players.addAll(players);
+  }
+
   public void addPlayer(GamePlayerEntity player) {
     players.add(player);
   }

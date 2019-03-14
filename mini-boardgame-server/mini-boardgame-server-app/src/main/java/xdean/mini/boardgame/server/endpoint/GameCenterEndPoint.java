@@ -91,7 +91,7 @@ public class GameCenterEndPoint implements GlobalConstants, LoginSuccessProvider
     if (user.isPresent()) {
       int id = user.get().getId();
       request.getSession().setAttribute(AttrKey.USER_ID, id);
-      gameMapper.findPlayer(id).ifPresent(e -> request.getSession().setAttribute(AttrKey.ROOM, e.getRoom()));
+      gameMapper.findPlayer(id).getRoom().ifPresent(e -> request.getSession().setAttribute(AttrKey.ROOM, e));
     }
   }
 }

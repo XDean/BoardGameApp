@@ -1,6 +1,7 @@
 package xdean.mini.boardgame.server.mybatis.mapper;
 
 import static xdean.mybatis.extension.SqlUtil.equal;
+import static xdean.mybatis.extension.SqlUtil.together;
 import static xdean.mybatis.extension.SqlUtil.wrapString;
 
 import java.sql.Timestamp;
@@ -13,7 +14,7 @@ import xdean.mini.boardgame.server.model.handler.GameBoardConverter;
 import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.MyBatisSQL;
 
-public class GameMapperBuilder implements Tables {
+public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
   private GameBoardConverter gameBoardConverter = new GameBoardConverter();
 
   String findPlayer(int id) {
@@ -31,13 +32,20 @@ public class GameMapperBuilder implements Tables {
   }
 
   String save(GamePlayerEntity e) {
-    return MyBatisSQL.create()
-        .INSERT_INTO(GamePlayerTable.table)
-        .VALUES(GamePlayerTable.id.fullName, Integer.toString(e.getId()))
-        .VALUES(GamePlayerTable.roomId.fullName, Integer.toString(e.getRoom().getId()))
-        .VALUES(GamePlayerTable.seat.fullName, Integer.toString(e.getSeat()))
-        .ON_DUPLICATE_KEY_UPDATE(GamePlayerTable.roomId, GamePlayerTable.seat)
-        .toString();
+    if (e.getRoom().isPresent()) {
+      return MyBatisSQL.create()
+          .INSERT_INTO(GamePlayerTable.table)
+          .VALUES(GamePlayerTable.id.fullName, Integer.toString(e.getId()))
+          .VALUES(GamePlayerTable.roomId.fullName, Integer.toString(e.getRoom().get().getId()))
+          .VALUES(GamePlayerTable.seat.fullName, Integer.toString(e.getSeat()))
+          .ON_DUPLICATE_KEY_UPDATE(GamePlayerTable.roomId, GamePlayerTable.seat)
+          .toString();
+    } else {
+      return MyBatisSQL.create()
+          .DELETE_FROM(GamePlayerTable.table.name)
+          .WHERE(equal(GamePlayerTable.id.fullName, e.getId()))
+          .toString();
+    }
   }
 
   String save(GameRoomEntity e) {
@@ -55,10 +63,15 @@ public class GameMapperBuilder implements Tables {
   }
 
   String delete(int roomId) {
-    return MyBatisSQL.create()
-        .DELETE_FROM(GameRoomTable.table.name)
-        .WHERE(equal(GameRoomTable.id.fullName, roomId))
-        .toString();
+    return together(
+        MyBatisSQL.create()
+            .DELETE_FROM(GamePlayerTable.table.name)
+            .WHERE(equal(GamePlayerTable.roomId.fullName, roomId))
+            .toString(),
+        MyBatisSQL.create()
+            .DELETE_FROM(GameRoomTable.table.name)
+            .WHERE(equal(GameRoomTable.id.fullName, roomId))
+            .toString());
   }
 
   String findAllRoom(String gameName, RowBounds page) {

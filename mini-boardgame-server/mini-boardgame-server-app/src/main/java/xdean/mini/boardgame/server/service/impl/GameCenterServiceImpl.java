@@ -76,8 +76,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     }
     UserEntity e = user.get();
     synchronized (getLock(e.getId())) {
-      GamePlayerEntity player = gameMapper.findOrCreateById(e.getId(),
-          id -> GamePlayerEntity.builder().id(id).build());
+      GamePlayerEntity player = gameMapper.findPlayer(e.getId());
       if (player.getRoom() != null) {
         return CreateGameResponse.builder()
             .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
@@ -122,8 +121,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
               .build();
         }
         GameRoomEntity room = oRoom.get();
-        GamePlayerEntity player = gameMapper.findOrCreateById(user.get().getId(),
-            id -> GamePlayerEntity.builder().id(id).build());
+        GamePlayerEntity player = gameMapper.findPlayer(user.get().getId());
         if (player.getRoom() != null) {
           return JoinGameResponse.builder()
               .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
@@ -162,14 +160,14 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           .build();
     }
     synchronized (getLock(user.get().getId())) {
-      GamePlayerEntity player = gameMapper.findOrCreateById(user.get().getId(),
-          id -> GamePlayerEntity.builder().id(id).build());
-      GameRoomEntity room = player.getRoom();
-      if (room == null) {
+      GamePlayerEntity player = gameMapper.findPlayer(user.get().getId());
+      Optional<GameRoomEntity> oRoom = player.getRoom();
+      if (!oRoom.isPresent()) {
         return ExitGameResponse.builder()
             .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
             .build();
       }
+      GameRoomEntity room = oRoom.get();
       synchronized (getLock(room.getId())) {
         player.setRoom(null);
         gameMapper.save(player);
@@ -218,14 +216,14 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           .build();
     }
     synchronized (getLock(user.get().getId())) {
-      GamePlayerEntity player = gameMapper.findOrCreateById(user.get().getId(),
-          id -> GamePlayerEntity.builder().id(id).build());
-      GameRoomEntity room = player.getRoom();
-      if (room == null) {
+      GamePlayerEntity player = gameMapper.findPlayer(user.get().getId());
+      Optional<GameRoomEntity> oRoom = player.getRoom();
+      if (!oRoom.isPresent()) {
         return CurrentGameResponse.builder()
             .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
             .build();
       }
+      GameRoomEntity room = oRoom.get();
       return CurrentGameResponse.builder().room(room).build();
     }
   }
@@ -308,7 +306,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     Integer id;
     do {
       id = r.nextInt(1000000);
-    } while (gameMapper.existsById(id));
+    } while (gameMapper.roomExist(id));
     return id;
   }
 

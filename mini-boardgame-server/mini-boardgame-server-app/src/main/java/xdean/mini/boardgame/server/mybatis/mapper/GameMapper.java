@@ -9,11 +9,15 @@ import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 @Mapper
-public interface GameMapper {
+public interface GameMapper extends BaseMapper {
 
   GamePlayerEntity findPlayer(int id);
 
   GameRoomEntity findRoom(int roomId);
+
+  GameRoomEntity findRoomByPlayer(int playerId);
+
+  List<GamePlayerEntity> findAllPlayersInRoom(int roomId);
 
   void save(GamePlayerEntity player);
 
