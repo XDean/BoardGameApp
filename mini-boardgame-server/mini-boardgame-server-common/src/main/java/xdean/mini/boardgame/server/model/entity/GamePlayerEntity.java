@@ -17,8 +17,9 @@ import lombok.Builder.Default;
 public class GamePlayerEntity {
   int id;
 
+  @Default
   @JsonIgnore
-  Optional<GameRoomEntity> room;
+  Optional<GameRoomEntity> room = Optional.empty();
 
   @Default
   int seat = -1;

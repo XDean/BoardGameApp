@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `t_users`(
 ) DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `t_authorities` (
-  `id` INT PRIMARY KEY,
+  `id` INT,
   `authority` VARCHAR(63) NOT NULL,
   UNIQUE INDEX ix_auth_id(`id`, `authority`),
   CONSTRAINT fk_authorities_users FOREIGN KEY(id) REFERENCES t_users(id)
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `t_game_rooms`(
   `room_name` VARCHAR(127),
   `player_count` INT,
   `created_time` TIMESTAMP,
-  `board` TINYINT(1)
+  `board` TEXT
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `t_game_players`(  

@@ -22,12 +22,25 @@ public class UserMapperBuilder extends BaseMapperBuilder implements Tables {
         .toString();
   }
 
-  public String findAuthorities(int id) {
+  public String findAuthorities(Integer id) {
     return MyBatisSQL.create()
         .SELECT(AuthorityTable.authority)
         .FROM(AuthorityTable.table)
         .WHERE(equal(AuthorityTable.id.fullName, id))
         .toString();
+  }
+
+  public String saveAuthorities(UserEntity user) {
+    return together(
+        MyBatisSQL.create()
+            .DELETE_FROM(AuthorityTable.table.name)
+            .WHERE(equal(AuthorityTable.id.fullName, user.getId()))
+            .toString(),
+        MyBatisSQL.create()
+            .INSERT_INTO(AuthorityTable.table)
+            .INTO_COLUMNS(AuthorityTable.id.fullName, AuthorityTable.authority.fullName)
+            .COMPOSE(s -> user.getAuthorities().forEach(a -> s.INTO_VALUES(Integer.toString(user.getId()), wrapString(a))))
+            .toString());
   }
 
   public String saveProfile(UserProfileEntity e) {

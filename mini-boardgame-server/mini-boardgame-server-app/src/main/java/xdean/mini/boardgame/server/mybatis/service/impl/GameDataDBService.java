@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
-import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.service.GameDataService;
 

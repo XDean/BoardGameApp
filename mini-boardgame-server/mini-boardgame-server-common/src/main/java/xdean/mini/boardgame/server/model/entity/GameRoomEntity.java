@@ -1,5 +1,6 @@
 package xdean.mini.boardgame.server.model.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +15,6 @@ import xdean.mini.boardgame.server.model.GameBoard;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder(toBuilder = true)
 public class GameRoomEntity {
   int id;
@@ -32,6 +32,10 @@ public class GameRoomEntity {
 
   @JsonIgnore
   GameBoard board;
+
+  public GameRoomEntity() {
+    players = new ArrayList<>();
+  }
 
   public void setPlayers(List<GamePlayerEntity> players) {
     this.players.clear();

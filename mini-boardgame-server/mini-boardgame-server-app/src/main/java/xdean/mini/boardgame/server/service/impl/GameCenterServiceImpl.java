@@ -77,7 +77,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     UserEntity e = user.get();
     synchronized (getLock(e.getId())) {
       GamePlayerEntity player = gameMapper.findPlayer(e.getId());
-      if (player.getRoom() != null) {
+      if (player.getRoom().isPresent()) {
         return CreateGameResponse.builder()
             .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
             .build();
@@ -122,7 +122,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
         }
         GameRoomEntity room = oRoom.get();
         GamePlayerEntity player = gameMapper.findPlayer(user.get().getId());
-        if (player.getRoom() != null) {
+        if (player.getRoom().isPresent()) {
           return JoinGameResponse.builder()
               .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
               .build();

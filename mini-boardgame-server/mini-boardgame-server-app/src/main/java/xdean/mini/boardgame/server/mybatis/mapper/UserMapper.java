@@ -10,14 +10,18 @@ import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.annotation.DefaultBuilder;
+import xdean.mybatis.extension.annotation.ResultMapType;
 
 @Mapper
 @DefaultBuilder(UserMapperBuilder.class)
 public interface UserMapper extends BaseMapper, Tables {
 
+  @ResultMapType(UserEntity.class)
   UserEntity findByUsername(String username);
 
-  List<String> findAuthorities(int id);
+  List<String> findAuthorities(Integer id);
+
+  void saveAuthorities(UserEntity user);
 
   void saveProfile(UserProfileEntity profile);
 

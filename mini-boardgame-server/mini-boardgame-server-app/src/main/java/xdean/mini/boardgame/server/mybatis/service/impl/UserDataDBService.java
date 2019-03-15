@@ -53,7 +53,10 @@ public class UserDataDBService implements UserDataService {
   public void save(UserEntity user) {
     if (user.getId() == -1) {
       int id = userMapper.createUser(user);
-      userMapper.saveProfile(user.getProfile().toBuilder().id(id).build());
+      user.setId(id);
+      user.getProfile().setId(id);
+      userMapper.saveAuthorities(user);
+      userMapper.saveProfile(user.getProfile());
     } else {
       userMapper.updateUser(user);
     }

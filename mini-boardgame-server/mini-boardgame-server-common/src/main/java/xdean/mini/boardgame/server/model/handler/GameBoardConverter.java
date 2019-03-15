@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.BufferRecyclers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
@@ -30,6 +31,7 @@ public class GameBoardConverter implements StringParseHandler<GameBoard>, Logabl
     try {
       String clz = attribute.getClass().getName();
       String value = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(attribute);
+      value = new String(BufferRecyclers.quoteAsJsonUTF8(value));
       return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(ImmutableMap.of(
           "class", clz,
           "value", value));

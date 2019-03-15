@@ -9,17 +9,22 @@ import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.annotation.DefaultBuilder;
+import xdean.mybatis.extension.annotation.ResultMapType;
 
 @Mapper
 @DefaultBuilder(GameMapperBuilder.class)
 public interface GameMapper extends BaseMapper {
-  GamePlayerEntity findPlayer(int id);
+  @ResultMapType(GamePlayerEntity.class)
+  GamePlayerEntity findPlayer(Integer id);
 
-  GameRoomEntity findRoom(int roomId);
+  @ResultMapType(GameRoomEntity.class)
+  GameRoomEntity findRoom(Integer roomId);
 
-  GameRoomEntity findRoomByPlayer(int playerId);
+  @ResultMapType(GameRoomEntity.class)
+  GameRoomEntity findRoomByPlayer(Integer playerId);
 
-  List<GamePlayerEntity> findAllPlayersInRoom(int roomId);
+  @ResultMapType(GamePlayerEntity.class)
+  List<GamePlayerEntity> findAllPlayersInRoom(Integer roomId);
 
   void savePlayer(GamePlayerEntity player);
 
@@ -27,6 +32,7 @@ public interface GameMapper extends BaseMapper {
 
   void delete(GameRoomEntity room);
 
+  @ResultMapType(GameRoomEntity.class)
   List<GameRoomEntity> findAllRoom(String gameName, RowBounds page);
 
   default boolean roomExist(int id) {

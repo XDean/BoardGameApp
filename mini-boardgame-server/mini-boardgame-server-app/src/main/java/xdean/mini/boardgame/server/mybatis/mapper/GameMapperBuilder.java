@@ -17,29 +17,29 @@ import xdean.mybatis.extension.MyBatisSQL;
 public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
   private GameBoardConverter gameBoardConverter = new GameBoardConverter();
 
-  public String findPlayer(int id) {
+  public String findPlayer(Integer id) {
     return MyBatisSQL.create()
         .SELECT_FROM(GamePlayerTable.table)
         .WHERE(equal(GamePlayerTable.id.fullName, id))
         .toString();
   }
 
-  public String findRoom(int roomId) {
+  public String findRoom(Integer roomId) {
     return MyBatisSQL.create()
         .SELECT_FROM(GameRoomTable.table)
         .WHERE(equal(GameRoomTable.id.fullName, roomId))
         .toString();
   }
 
-  public String findRoomByPlayer(int playerId) {
+  public String findRoomByPlayer(Integer playerId) {
     return MyBatisSQL.create()
         .SELECT_FROM(GameRoomTable.table)
-        .INNER_JOIN(equal(GamePlayerTable.roomId, GameRoomTable.id))
+        .INNER_JOIN(GamePlayerTable.table, equal(GamePlayerTable.roomId, GameRoomTable.id))
         .WHERE(equal(GamePlayerTable.id.fullName, playerId))
         .toString();
   }
 
-  public String findAllPlayersInRoom(int roomId) {
+  public String findAllPlayersInRoom(Integer roomId) {
     return MyBatisSQL.create()
         .SELECT_FROM(GamePlayerTable.table)
         .WHERE(equal(GamePlayerTable.roomId.fullName, roomId))
@@ -67,17 +67,17 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
     return MyBatisSQL.create()
         .INSERT_INTO(GameRoomTable.table)
         .VALUES(GameRoomTable.id.fullName, Integer.toString(e.getId()))
-        .VALUES(GameRoomTable.gameName.fullName, e.getGameName())
-        .VALUES(GameRoomTable.roomName.fullName, e.getRoomName())
-        .VALUES(GameRoomTable.createdTime.fullName, new Timestamp(e.getCreatedTime().getTime()).toString())
+        .VALUES(GameRoomTable.gameName.fullName, wrapString(e.getGameName()))
+        .VALUES(GameRoomTable.roomName.fullName, wrapString(e.getRoomName()))
+        .VALUES(GameRoomTable.createdTime.fullName, wrapString(new Timestamp(e.getCreatedTime().getTime()).toString()))
         .VALUES(GameRoomTable.playerCount.fullName, Integer.toString(e.getPlayerCount()))
-        .VALUES(GameRoomTable.board.fullName, gameBoardConverter.toString(e.getBoard()))
+        .VALUES(GameRoomTable.board.fullName, wrapString(gameBoardConverter.toString(e.getBoard())))
         .ON_DUPLICATE_KEY_UPDATE(GameRoomTable.gameName, GameRoomTable.roomName, GameRoomTable.createdTime,
             GameRoomTable.playerCount, GameRoomTable.board)
         .toString();
   }
 
-  public String delete(int roomId) {
+  public String delete(Integer roomId) {
     return together(
         MyBatisSQL.create()
             .DELETE_FROM(GamePlayerTable.table.name)

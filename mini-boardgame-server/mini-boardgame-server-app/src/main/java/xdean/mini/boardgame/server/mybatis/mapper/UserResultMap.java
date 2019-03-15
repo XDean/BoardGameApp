@@ -14,8 +14,7 @@ public class UserResultMap implements Tables {
   @Bean
   public InitResultMap<UserProfileEntity> userProfileMapper() {
     return InitResultMap.create(UserProfileEntity.class)
-        .namespace()
-        .id(UserProfileEntity.class.getSimpleName())
+        .namespaceIdByType()
         .resultMap(b -> b
             .stringFree()
             .mapping(ProfileTable.id, UserProfileEntity::setId)
@@ -28,8 +27,7 @@ public class UserResultMap implements Tables {
   @Bean
   public InitResultMap<UserEntity> userEntityMapper() {
     return InitResultMap.create(UserEntity.class)
-        .namespace()
-        .id(UserEntity.class.getSimpleName())
+        .namespaceIdByType()
         .resultMap(b -> b
             .stringFree()
             .mapping(UserTable.id, UserEntity::setId)
