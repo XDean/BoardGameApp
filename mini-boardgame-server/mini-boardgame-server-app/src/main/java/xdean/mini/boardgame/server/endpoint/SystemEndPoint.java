@@ -17,7 +17,7 @@ import io.swagger.annotations.Authorization;
 import xdean.mini.boardgame.server.security.annotation.AdminAuth;
 
 @RestController
-@Api(tags = "Admin", authorizations = @Authorization(value = "ADMIN"))
+@Api(tags = "Admin", authorizations = @Authorization(value = "ROLE_ADMIN"))
 public class SystemEndPoint {
 
   private @Inject ApplicationContext applicationContext;

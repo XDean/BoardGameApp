@@ -82,7 +82,7 @@ public class UserAuthEndpoint implements Logable {
         .username(username)
         .password(password)
         .passwordEncoder(passwordEncoder::encode)
-        .authorities("USER")
+        .authorities("ROLE_USER")
         .build();
     userDetailsManager.createUser(u);
     authenticateUserAndSetSession(username, password, request, response);

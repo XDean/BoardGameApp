@@ -13,7 +13,7 @@ import org.springframework.security.access.annotation.Secured;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@Secured("ADMIN")
+@Secured("ROLE_ADMIN")
 public @interface AdminAuth {
 
 }
