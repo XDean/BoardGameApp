@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
@@ -57,7 +58,7 @@ public class UserProfileEndPoint {
 
   @ApiOperation("Update user profile")
   @PostMapping(path = "/user/profile")
-  public UserProfileUpdateResponse updateUserProfile(@SessionAttribute(AttrKey.USER_ID) int userId,
+  public UserProfileUpdateResponse updateUserProfile(@ApiIgnore @SessionAttribute(AttrKey.USER_ID) int userId,
       @Validated @RequestBody UserProfileUpdateRequest request) {
     String username = userService.getCurrentUser().map(u -> u.getUsername()).orElse(null);
     if (username == null) {
