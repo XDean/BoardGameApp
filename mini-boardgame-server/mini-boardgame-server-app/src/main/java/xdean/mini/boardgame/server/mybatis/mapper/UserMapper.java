@@ -16,7 +16,7 @@ import xdean.mybatis.extension.annotation.ResultMapType;
 @DefaultBuilder(UserMapperBuilder.class)
 public interface UserMapper extends BaseMapper, Tables {
 
-  @ResultMapType(UserEntity.class)
+  @ResultMapType
   UserEntity findByUsername(String username);
 
   List<String> findAuthorities(Integer id);

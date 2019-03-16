@@ -14,16 +14,16 @@ import xdean.mybatis.extension.annotation.ResultMapType;
 @Mapper
 @DefaultBuilder(GameMapperBuilder.class)
 public interface GameMapper extends BaseMapper {
-  @ResultMapType(GamePlayerEntity.class)
+  @ResultMapType
   GamePlayerEntity findPlayer(Integer id);
 
-  @ResultMapType(GameRoomEntity.class)
+  @ResultMapType
   GameRoomEntity findRoom(Integer roomId);
 
-  @ResultMapType(GameRoomEntity.class)
+  @ResultMapType
   GameRoomEntity findRoomByPlayer(Integer playerId);
 
-  @ResultMapType(GamePlayerEntity.class)
+  @ResultMapType
   List<GamePlayerEntity> findAllPlayersInRoom(Integer roomId);
 
   void savePlayer(GamePlayerEntity player);
@@ -32,7 +32,7 @@ public interface GameMapper extends BaseMapper {
 
   void delete(GameRoomEntity room);
 
-  @ResultMapType(GameRoomEntity.class)
+  @ResultMapType
   List<GameRoomEntity> findAllRoom(String gameName, RowBounds page);
 
   default boolean roomExist(int id) {
