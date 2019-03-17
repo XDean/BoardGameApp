@@ -173,7 +173,7 @@ public class GameSocketHandler extends TextWebSocketHandler implements Logable, 
             sendMessage(session, WebSocketEvent.builder()
                 .type(WebSocketSendType.SELF)
                 .topic(SocketTopic.ERROR_TOPIC)
-                .payload("The web socket should authenticate first")
+                .payload("The web socket should AUTHENTICATION first")
                 .build());
           }
         } else if (event.topic.equals(SocketTopic.AUTHENTICATION)) {

@@ -12,4 +12,6 @@ public @interface FromServer {
   Attr attr() default @Attr;
 
   Payload payload() default @Payload;
+
+  String desc() default "";
 }
