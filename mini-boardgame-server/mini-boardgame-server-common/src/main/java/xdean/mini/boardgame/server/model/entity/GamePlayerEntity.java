@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import lombok.Builder.Default;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GamePlayerEntity {
+  @ApiModelProperty(position = 0, example = "1021")
   int id;
 
   @Default
@@ -22,6 +24,7 @@ public class GamePlayerEntity {
   Optional<GameRoomEntity> room = Optional.empty();
 
   @Default
+  @ApiModelProperty(position = 1, example = "0")
   int seat = -1;
 
   public void setRoom(GameRoomEntity e) {
