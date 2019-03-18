@@ -12,6 +12,7 @@ import javax.inject.Inject;
 
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,12 +31,12 @@ import xdean.mini.boardgame.server.model.GlobalConstants.SocketTopic;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
+import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 import xdean.mini.boardgame.server.model.param.CreateGameRequest;
 import xdean.mini.boardgame.server.model.param.CreateGameResponse;
 import xdean.mini.boardgame.server.model.param.CurrentGameResponse;
 import xdean.mini.boardgame.server.model.param.ExitGameRequest;
 import xdean.mini.boardgame.server.model.param.ExitGameResponse;
-import xdean.mini.boardgame.server.model.param.GameCenterErrorCode;
 import xdean.mini.boardgame.server.model.param.JoinGameRequest;
 import xdean.mini.boardgame.server.model.param.JoinGameResponse;
 import xdean.mini.boardgame.server.model.param.SearchGameRequest;
@@ -64,22 +65,25 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   public CreateGameResponse createGame(CreateGameRequest request) {
     Optional<GameProvider<?>> game = findGame(request.getGameName());
     if (!game.isPresent()) {
-      return CreateGameResponse.builder()
-          .errorCode(GameCenterErrorCode.NO_SUCH_GAME)
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.NOT_FOUND)
+          .message("No such game")
           .build();
     }
     Optional<UserEntity> user = userService.getCurrentUser();
     if (!user.isPresent()) {
-      return CreateGameResponse.builder()
-          .errorCode(GameCenterErrorCode.NO_USER)
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.UNAUTHORIZED)
+          .message("No authorized user")
           .build();
     }
     UserEntity e = user.get();
     synchronized (getLock(e.getId())) {
       GamePlayerEntity player = gameMapper.findPlayer(e.getId());
       if (player.getRoom().isPresent()) {
-        return CreateGameResponse.builder()
-            .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
+        throw MiniBoardgameException.builder()
+            .code(HttpStatus.BAD_REQUEST)
+            .message("Not in a game room")
             .build();
       }
       Integer roomId = generateId();
@@ -108,28 +112,32 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   public JoinGameResponse joinGame(JoinGameRequest request) {
     Optional<UserEntity> user = userService.getCurrentUser();
     if (!user.isPresent()) {
-      return JoinGameResponse.builder()
-          .errorCode(GameCenterErrorCode.NO_USER)
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.UNAUTHORIZED)
+          .message("No authorized user")
           .build();
     }
     synchronized (getLock(user.get().getId())) {
       synchronized (getLock(request.getRoomId())) {
         Optional<GameRoomEntity> oRoom = gameMapper.findRoom(request.getRoomId());
         if (!oRoom.isPresent()) {
-          return JoinGameResponse.builder()
-              .errorCode(GameCenterErrorCode.NO_SUCH_ROOM)
+          throw MiniBoardgameException.builder()
+              .code(HttpStatus.NOT_FOUND)
+              .message("No such room")
               .build();
         }
         GameRoomEntity room = oRoom.get();
         GamePlayerEntity player = gameMapper.findPlayer(user.get().getId());
         if (player.getRoom().isPresent()) {
-          return JoinGameResponse.builder()
-              .errorCode(GameCenterErrorCode.ALREADY_IN_ROOM)
+          throw MiniBoardgameException.builder()
+              .code(HttpStatus.BAD_REQUEST)
+              .message("Already in a game room")
               .build();
         }
         if (room.getPlayers().size() == room.getPlayerCount()) {
-          return JoinGameResponse.builder()
-              .errorCode(GameCenterErrorCode.ROOM_FULL)
+          throw MiniBoardgameException.builder()
+              .code(HttpStatus.BAD_REQUEST)
+              .message("The room is full")
               .build();
         }
         player.setRoom(room);
@@ -155,16 +163,18 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   public ExitGameResponse exitGame(ExitGameRequest request) {
     Optional<UserEntity> user = userService.getCurrentUser();
     if (!user.isPresent()) {
-      return ExitGameResponse.builder()
-          .errorCode(GameCenterErrorCode.NO_USER)
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.UNAUTHORIZED)
+          .message("No authorized user")
           .build();
     }
     synchronized (getLock(user.get().getId())) {
       GamePlayerEntity player = gameMapper.findPlayer(user.get().getId());
       Optional<GameRoomEntity> oRoom = player.getRoom();
       if (!oRoom.isPresent()) {
-        return ExitGameResponse.builder()
-            .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
+        throw MiniBoardgameException.builder()
+            .code(HttpStatus.BAD_REQUEST)
+            .message("Not in game room")
             .build();
       }
       GameRoomEntity room = oRoom.get();
@@ -196,8 +206,9 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   public SearchGameResponse searchGame(SearchGameRequest request) {
     Optional<GameProvider<?>> game = findGame(request.getGameName());
     if (!game.isPresent()) {
-      return SearchGameResponse.builder()
-          .errorCode(GameCenterErrorCode.NO_SUCH_GAME)
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.NOT_FOUND)
+          .message("Not such game")
           .build();
     }
     List<GameRoomEntity> rooms = gameMapper.findAllByRoomGameName(request.getGameName(),
@@ -211,16 +222,18 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   public CurrentGameResponse currentGame() {
     Optional<UserEntity> user = userService.getCurrentUser();
     if (!user.isPresent()) {
-      return CurrentGameResponse.builder()
-          .errorCode(GameCenterErrorCode.NO_USER)
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.UNAUTHORIZED)
+          .message("No authorized user")
           .build();
     }
     synchronized (getLock(user.get().getId())) {
       GamePlayerEntity player = gameMapper.findPlayer(user.get().getId());
       Optional<GameRoomEntity> oRoom = player.getRoom();
       if (!oRoom.isPresent()) {
-        return CurrentGameResponse.builder()
-            .errorCode(GameCenterErrorCode.NOT_IN_ROOM)
+        throw MiniBoardgameException.builder()
+            .code(HttpStatus.BAD_REQUEST)
+            .message("Not in game room")
             .build();
       }
       GameRoomEntity room = oRoom.get();
