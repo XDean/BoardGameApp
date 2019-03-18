@@ -7,12 +7,16 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.commonmark.Extension;
+import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -33,7 +37,11 @@ public class MarkdownView extends AbstractTemplateView {
       HttpServletResponse response) throws Exception {
 
     PrintWriter writer = response.getWriter();
-    writer.append("<html><body>");
+    writer.append("<html>\n" +
+        "<head>\n" +
+        "  <meta charset=\"utf-8\"/>\n" +
+        "  <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/markdown.css\"/>\n" +
+        "</head><body>");
     writer.append(getHtmlFromMarkdown());
     writer.append("</body></html>");
   }
@@ -45,9 +53,10 @@ public class MarkdownView extends AbstractTemplateView {
 
     String markdown = new String(Files.readAllBytes(path));
 
-    Parser parser = Parser.builder().build();
+    List<Extension> extensions = Arrays.asList(TablesExtension.create());
+    Parser parser = Parser.builder().extensions(extensions).build();
     Node document = parser.parse(markdown);
-    HtmlRenderer renderer = HtmlRenderer.builder().build();
+    HtmlRenderer renderer = HtmlRenderer.builder().extensions(extensions).build();
     return renderer.render(document);
   }
 }

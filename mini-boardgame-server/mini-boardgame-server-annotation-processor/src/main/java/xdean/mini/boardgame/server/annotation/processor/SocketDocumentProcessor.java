@@ -170,7 +170,9 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     if (side.getPayload() != null) {
       table.addRow(new BoldText("Payload"), side.getPayload().getType(), side.getPayload().getDesc());
     }
-    sb.append(table.build()).append("\n\n");
+    if (!side.getAttrs().isEmpty() || side.getPayload() != null) {
+      sb.append(table.build()).append("\n\n");
+    }
     return sb.toString();
   }
 
