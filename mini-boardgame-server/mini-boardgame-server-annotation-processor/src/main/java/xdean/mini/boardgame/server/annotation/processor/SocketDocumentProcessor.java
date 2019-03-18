@@ -1,10 +1,7 @@
 package xdean.mini.boardgame.server.annotation.processor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,7 +18,6 @@ import com.google.auto.service.AutoService;
 
 import xdean.annotation.processor.toolkit.AssertException;
 import xdean.annotation.processor.toolkit.ElementUtil;
-import xdean.annotation.processor.toolkit.TypeUtil;
 import xdean.annotation.processor.toolkit.XAbstractProcessor;
 import xdean.annotation.processor.toolkit.annotation.SupportedAnnotation;
 import xdean.mini.boardgame.server.annotation.Attr;
@@ -29,11 +25,10 @@ import xdean.mini.boardgame.server.annotation.FromClient;
 import xdean.mini.boardgame.server.annotation.FromServer;
 import xdean.mini.boardgame.server.annotation.Payload;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketAttr;
-import xdean.mini.boardgame.server.annotation.processor.model.SocketDescription;
-import xdean.mini.boardgame.server.annotation.processor.model.SocketSide;
-import xdean.mini.boardgame.server.annotation.processor.model.SocketSide.SocketSideBuilder;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketDescription.SocketDescriptionBuilder;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketPayload;
+import xdean.mini.boardgame.server.annotation.processor.model.SocketSide;
+import xdean.mini.boardgame.server.annotation.processor.model.SocketSide.SocketSideBuilder;
 
 @AutoService(Processor.class)
 @SupportedAnnotation({ FromServer.class, FromClient.class, Attr.class })
@@ -69,7 +64,8 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
       }
     }
     String desc = description(anno.desc());
-    if (anno.type() == void.class) {// it's a reference
+    // it's a reference
+    if (ElementUtil.getAnnotationClassValue(elements, anno, a -> a.type()).toString().equals(void.class.toString())) {
       SocketAttr cache = attrs.get(id);
       assertNonNull(cache).log("No such @Attr to reference", e);
       if (anno.desc().isEmpty()) {
