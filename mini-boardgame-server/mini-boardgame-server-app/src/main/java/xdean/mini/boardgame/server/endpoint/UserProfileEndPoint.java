@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
+import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 import xdean.mini.boardgame.server.model.param.UserProfileResponse;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateResponse;
@@ -35,23 +38,20 @@ public class UserProfileEndPoint {
     if (username == null) {
       username = userService.getCurrentUser().map(u -> u.getUsername()).orElse(null);
     }
-    if (username == null) {
-      return UserProfileResponse.builder().errorCode(UserProfileResponse.INPUT_USER).build();
-    }
+    Assert.notNull(username, "Please specify username parameter");
     Optional<UserEntity> p = userService.findUserByUsername(username);
     if (p.isPresent()) {
       UserProfileEntity profile = p.get().getProfile();
       if (profile == null) {
-        return UserProfileResponse.builder()
-            .errorCode(UserProfileResponse.PROFILE_NOT_FOUND)
-            .build();
+        profile = UserProfileEntity.builder().build();
       }
       return UserProfileResponse.builder()
           .profile(profile)
           .build();
     } else {
-      return UserProfileResponse.builder()
-          .errorCode(UserProfileResponse.USER_NOT_FOUND)
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.NOT_FOUND)
+          .message("No such user")
           .build();
     }
   }
@@ -62,7 +62,10 @@ public class UserProfileEndPoint {
       @Validated @RequestBody UserProfileUpdateRequest request) {
     String username = userService.getCurrentUser().map(u -> u.getUsername()).orElse(null);
     if (username == null) {
-      return UserProfileUpdateResponse.builder().errorCode(UserProfileUpdateResponse.HAVE_NOT_LOGIN).build();
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.UNAUTHORIZED)
+          .message("No authorized user")
+          .build();
     }
     UserProfileEntity p = request.getProfile().toBuilder().id(userId).build();
     userService.save(p);

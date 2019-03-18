@@ -23,6 +23,7 @@ public class SwaggerConfig {
   @Bean
   public Docket createRestApi() {
     return new Docket(DocumentationType.SWAGGER_2)
+        .useDefaultResponseMessages(false)
         .ignoredParameterTypes(ApiIgnore.class)
         .produces(ImmutableSet.of(MediaType.APPLICATION_JSON.toString()))
         .consumes(ImmutableSet.of(MediaType.APPLICATION_JSON.toString()))

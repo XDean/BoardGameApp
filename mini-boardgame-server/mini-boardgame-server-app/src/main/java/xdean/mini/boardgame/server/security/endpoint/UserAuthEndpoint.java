@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +30,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.handler.DispatchLoginHandler;
+import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 import xdean.mini.boardgame.server.security.OpenIdAuthProvider;
 import xdean.mini.boardgame.server.security.model.LoginResponse;
 import xdean.mini.boardgame.server.security.model.SignUpResponse;
@@ -47,37 +50,13 @@ public class UserAuthEndpoint implements Logable {
   public SignUpResponse signUp(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestParam(name = "username", required = false) String username,
-      @RequestParam(name = "password", required = false) String password) {
-    if (username == null || password == null) {
-      return SignUpResponse.builder()
-          .success(false)
-          .message("Please input username and password")
-          .errorCode(SignUpResponse.INPUT_USERNAME_PASSWORD)
-          .build();
-    }
-    if (!username.matches("^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$")) {
-      return SignUpResponse.builder()
-          .success(false)
-          .message("Username should be letter and/or number")
-          .errorCode(SignUpResponse.ILLEGAL_USERNAME)
-          .build();
-    }
-    if (!password.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$")) {
-      return SignUpResponse.builder()
-          .success(false)
-          .message("Password should be letter and number")
-          .errorCode(SignUpResponse.ILLEGAL_PASSWORD)
-          .build();
-    }
-    boolean exist = userDetailsManager.userExists(username);
-    if (exist) {
-      return SignUpResponse.builder()
-          .success(false)
-          .message("User name exist")
-          .errorCode(SignUpResponse.USERNAME_EXIST)
-          .build();
-    }
+      @RequestParam("username") String username,
+      @RequestParam("password") String password) {
+    Assert.isTrue(username.matches("^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$"),
+        "Username must be letter and/or number");
+    Assert.isTrue(password.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$"),
+        "Password must be letter and number");
+    Assert.isTrue(!userDetailsManager.userExists(username), "User name exist");
     UserDetails u = User.builder()
         .username(username)
         .password(password)
@@ -86,10 +65,7 @@ public class UserAuthEndpoint implements Logable {
         .build();
     userDetailsManager.createUser(u);
     authenticateUserAndSetSession(username, password, request, response);
-    return SignUpResponse.builder()
-        .success(true)
-        .message("Sign up success")
-        .build();
+    return SignUpResponse.builder().build();
   }
 
   // @ApiOperation("Login with username and password")
@@ -97,23 +73,16 @@ public class UserAuthEndpoint implements Logable {
   public LoginResponse login(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestParam(name = "username", required = false) String username,
-      @RequestParam(name = "password", required = false) String password) {
-    if (username == null || password == null) {
-      return LoginResponse.builder()
-          .errorCode(LoginResponse.BAD_INPUT)
-          .message("Please provide both username and password.")
-          .build();
-    }
+      @RequestParam(name = "username") String username,
+      @RequestParam(name = "password") String password) {
     try {
       authenticateUserAndSetSession(username, password, request, response);
-      return LoginResponse.builder()
-          .message("Login Success")
-          .build();
+      return LoginResponse.builder().build();
     } catch (AuthenticationException e) {
-      return LoginResponse.builder()
-          .errorCode(LoginResponse.BAD_CREDENTIALS)
-          .message("Bad Credentials")
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.BAD_REQUEST)
+          .message("Bad Credentials: " + e.getMessage())
+          .details(e)
           .build();
     }
   }
@@ -123,20 +92,14 @@ public class UserAuthEndpoint implements Logable {
   public LoginResponse loginOpenId(
       HttpServletRequest request,
       HttpServletResponse response,
-      @RequestParam(name = "token", required = false) String token,
-      @RequestParam(name = "provider", required = false) String provider) {
-    if (token == null || provider == null) {
-      return LoginResponse.builder()
-          .errorCode(LoginResponse.BAD_INPUT)
-          .message("Please provide both provider and token.")
-          .build();
-    }
+      @RequestParam(name = "token") String token,
+      @RequestParam(name = "provider") String provider) {
     List<OpenIdAuthProvider> findProviders = providers.stream().filter(p -> p.name().equals(provider))
         .collect(Collectors.toList());
     if (findProviders.isEmpty()) {
-      return LoginResponse.builder()
-          .errorCode(LoginResponse.PROVIDER_NOT_FOUND)
-          .message("There is no provider support: " + provider)
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.NOT_FOUND)
+          .message("There is no provider: " + provider)
           .build();
     }
     List<AuthenticationException> errors = new ArrayList<>();
@@ -155,9 +118,7 @@ public class UserAuthEndpoint implements Logable {
             userDetailsManager.createUser(u);
           }
           authenticateUserAndSetSession(u.getUsername(), result, request, response);
-          return LoginResponse.builder()
-              .message("Login Success")
-              .build();
+          return LoginResponse.builder().build();
         }
       } catch (AuthenticationException e) {
         trace("Fail to authenticate: " + token, e);
@@ -165,9 +126,10 @@ public class UserAuthEndpoint implements Logable {
       }
     }
     SecurityContextHolder.clearContext();
-    return LoginResponse.builder()
-        .errorCode(LoginResponse.BAD_CREDENTIALS)
-        .message("Bad Credentials:\n" + errors.stream().map(e -> "- " + e.getMessage()).collect(Collectors.joining("\n")))
+    throw MiniBoardgameException.builder()
+        .code(HttpStatus.BAD_REQUEST)
+        .message("Bad Credentials: " + errors.stream().map(e -> "- " + e.getMessage()).collect(Collectors.joining("\n")))
+        .details(errors)
         .build();
   }
 

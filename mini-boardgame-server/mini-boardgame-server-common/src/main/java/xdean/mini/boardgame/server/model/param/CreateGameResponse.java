@@ -9,7 +9,4 @@ import lombok.Builder.Default;
 public class CreateGameResponse {
   @Default
   int roomId = -1;
-
-  @Default
-  int errorCode = 0;
 }

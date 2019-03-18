@@ -1,5 +1,7 @@
 package xdean.mini.boardgame.server.model.entity;
 
+import javax.annotation.CheckForNull;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -18,7 +20,8 @@ public class UserProfileEntity {
 
   String nickname;
 
-  boolean male;
+  @CheckForNull
+  Boolean male;
 
   String avatarUrl;
 }

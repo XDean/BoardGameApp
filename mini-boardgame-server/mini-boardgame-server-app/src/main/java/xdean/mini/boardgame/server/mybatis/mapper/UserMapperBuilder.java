@@ -49,7 +49,7 @@ public class UserMapperBuilder extends BaseMapperBuilder implements Tables {
         .VALUES(ProfileTable.id.fullName, Integer.toString(e.getId()))
         .VALUES(ProfileTable.avatarUrl.fullName, wrapString(e.getAvatarUrl()))
         .VALUES(ProfileTable.nickname.fullName, wrapString(e.getNickname()))
-        .VALUES(ProfileTable.male.fullName, Boolean.toString(e.isMale()))
+        .VALUES(ProfileTable.male.fullName, e.getMale().toString())
         .ON_DUPLICATE_KEY_UPDATE(ProfileTable.avatarUrl, ProfileTable.nickname, ProfileTable.male)
         .toString();
   }

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import reactor.core.publisher.Flux;
-import xdean.mini.boardgame.server.security.model.LoginResponse;
 
 @RestController
 @Api(tags = "Test")
@@ -49,12 +48,12 @@ public class TestEndPoint {
   }
 
   @GetMapping("/flux/ints")
-  public Flux<ServerSentEvent<LoginResponse>> ints() {
+  public Flux<ServerSentEvent<?>> ints() {
     return Flux.interval(Duration.ofSeconds(1))
-        .map(seq -> ServerSentEvent.<LoginResponse> builder()
+        .map(seq -> ServerSentEvent.<Integer> builder()
             .event("random")
             .id(seq.toString())
-            .data(LoginResponse.builder().errorCode(ThreadLocalRandom.current().nextInt()).build())
+            .data(ThreadLocalRandom.current().nextInt())
             .build());
   }
 }

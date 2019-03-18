@@ -14,4 +14,6 @@ import lombok.Value;
 public class MiniBoardgameException extends RuntimeException {
   HttpStatus code;
   String message;
+  String errorKey;
+  Object details;
 }

@@ -48,9 +48,7 @@ public class GameCenterEndPoint implements GlobalConstants {
   @ApiOperation("Join an exist game room")
   public JoinGameResponse joinGame(@RequestBody JoinGameRequest request, @ApiIgnore HttpSession session) {
     JoinGameResponse response = service.joinGame(request);
-    if (response.getErrorCode() == 0) {
-      gameService.findRoom(request.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e));
-    }
+    gameService.findRoom(request.getRoomId()).ifPresent(e -> session.setAttribute(AttrKey.ROOM, e));
     return response;
   }
 
@@ -58,10 +56,8 @@ public class GameCenterEndPoint implements GlobalConstants {
   @ApiOperation("Exit game room")
   public ExitGameResponse exitGame(@RequestBody ExitGameRequest request, @ApiIgnore HttpSession session) {
     ExitGameResponse response = service.exitGame(request);
-    if (response.getErrorCode() == 0) {
-      session.removeAttribute(AttrKey.USER_ID);
-      session.removeAttribute(AttrKey.ROOM);
-    }
+    session.removeAttribute(AttrKey.USER_ID);
+    session.removeAttribute(AttrKey.ROOM);
     return response;
   }
 

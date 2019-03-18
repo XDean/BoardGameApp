@@ -15,25 +15,25 @@ CREATE TABLE IF NOT EXISTS `t_authorities` (
 
 CREATE TABLE IF NOT EXISTS `t_user_profiles`(  
   `id` INT PRIMARY KEY,
-  `nickname` VARCHAR(127) CHARACTER SET utf8,
-  `male` TINYINT(1),
-  `avatar_url` TEXT,
+  `nickname` VARCHAR(127) DEFAULT '' NOT NULL CHARACTER SET utf8,
+  `male` TINYINT(1) DEFAULT NULL,
+  `avatar_url` TEXT DEFAULT '' NOT NULL,
   CONSTRAINT `fk_profile_user_id` FOREIGN KEY (`id`) REFERENCES `t_users`(`id`)
 ) DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `t_game_rooms`(  
   `id` INT PRIMARY KEY,
-  `game_name` VARCHAR(127),
-  `room_name` VARCHAR(127),
-  `player_count` INT,
-  `created_time` TIMESTAMP,
-  `board` TEXT
+  `game_name` VARCHAR(127) NOT NULL,
+  `room_name` VARCHAR(127) DEFAULT '',
+  `player_count` INT NOT NULL,
+  `created_time` TIMESTAMP NOT NULL,
+  `board` TEXT NOT NULL
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `t_game_players`(  
   `id` INT PRIMARY KEY,
-  `room_id` INT,
-  `seat` INT DEFAULT -1,
+  `room_id` INT NOT NULL,
+  `seat` INT DEFAULT -1 NOT NULL,
   CONSTRAINT `fk_player_user_id` FOREIGN KEY (`id`) REFERENCES `t_users`(`id`),
   CONSTRAINT `fk_player_room_id` FOREIGN KEY (`room_id`) REFERENCES `t_game_rooms`(`id`)
 ) DEFAULT CHARSET=latin1;

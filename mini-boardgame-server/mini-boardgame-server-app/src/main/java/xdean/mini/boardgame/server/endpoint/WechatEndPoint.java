@@ -13,11 +13,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
-import xdean.mini.boardgame.server.model.param.SimpleResponse;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateResponse;
 import xdean.mini.boardgame.server.security.endpoint.UserAuthEndpoint;
-import xdean.mini.boardgame.server.security.model.LoginResponse;
 
 @Api(tags = "WeChat")
 @RestController
@@ -31,31 +29,20 @@ public class WechatEndPoint {
 
   @GetMapping("login-profile")
   @ApiOperation("login and update profile")
-  public SimpleResponse loginAndUpdateProfile(
+  public UserProfileUpdateResponse loginAndUpdateProfile(
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestParam("token") String token,
       @RequestParam("provider") String provider,
       @RequestParam("nickname") String nickname,
       @RequestParam("avatarUrl") String avatarUrl) {
-    LoginResponse loginResponse = authEndPoint.loginOpenId(request, response, token, provider);
-    if (loginResponse.getErrorCode() == 0) {
-      Integer userId = (Integer) request.getSession().getAttribute(AttrKey.USER_ID);
-      UserProfileUpdateResponse profileResponse = profileEndPoint.updateUserProfile(userId, UserProfileUpdateRequest.builder()
-          .profile(UserProfileEntity.builder()
-              .nickname(nickname)
-              .avatarUrl(avatarUrl)
-              .build())
-          .build());
-      return SimpleResponse.builder()
-          .errorCode(profileResponse.getErrorCode())
-          .errorMessage("Fail to update profile")
-          .build();
-    } else {
-      return SimpleResponse.builder()
-          .errorCode(loginResponse.getErrorCode())
-          .errorMessage(loginResponse.getMessage())
-          .build();
-    }
+    authEndPoint.loginOpenId(request, response, token, provider);
+    Integer userId = (Integer) request.getSession().getAttribute(AttrKey.USER_ID);
+    return profileEndPoint.updateUserProfile(userId, UserProfileUpdateRequest.builder()
+        .profile(UserProfileEntity.builder()
+            .nickname(nickname)
+            .avatarUrl(avatarUrl)
+            .build())
+        .build());
   }
 }
