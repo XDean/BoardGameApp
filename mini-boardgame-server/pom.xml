@@ -12,5 +12,7 @@
   	<module>mini-boardgame-server-app</module>
   	<module>mini-boardgame-server-common</module>
   	<module>mini-boardgame-server-wechat</module>
+  	<module>mini-boardgame-server-annotation</module>
+  	<module>mini-boardgame-server-annotation-processor</module>
   </modules>
 </project>
