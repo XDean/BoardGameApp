@@ -3,8 +3,8 @@ package xdean.mini.boardgame.server.mybatis;
 import org.apache.ibatis.type.JdbcType;
 
 import xdean.mybatis.extension.model.Column;
-import xdean.mybatis.extension.model.Table;
 import xdean.mybatis.extension.model.Column.ColumnBuilder;
+import xdean.mybatis.extension.model.Table;
 
 public interface Tables {
   interface UserTable {

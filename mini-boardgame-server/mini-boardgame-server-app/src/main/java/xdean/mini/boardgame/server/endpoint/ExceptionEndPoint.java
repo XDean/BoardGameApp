@@ -1,6 +1,7 @@
 package xdean.mini.boardgame.server.endpoint;
 
-import org.springframework.boot.configurationprocessor.json.JSONObject;
+import java.util.HashMap;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,12 +13,17 @@ import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 public class ExceptionEndPoint {
 
   @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<String> handle(IllegalArgumentException e) {
+  public ResponseEntity<?> handle(IllegalArgumentException e) {
     return handle(MiniBoardgameException.builder().code(HttpStatus.BAD_REQUEST).message(e.getMessage()).build());
   }
 
   @ExceptionHandler(MiniBoardgameException.class)
-  public ResponseEntity<String> handle(MiniBoardgameException e) {
-    return ResponseEntity.status(e.getCode()).body(JSONObject.quote(e.getMessage()));
+  public ResponseEntity<?> handle(MiniBoardgameException e) {
+    HashMap<Object, Object> map = new HashMap<>();
+    map.put("code", e.getCode().value());
+    map.put("message", e.getMessage());
+    map.put("key", e.getErrorKey());
+    map.put("details", e.getDetails());
+    return ResponseEntity.status(e.getCode()).body(map);
   }
 }
