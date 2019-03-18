@@ -7,15 +7,25 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.pegdown.PegDownProcessor;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
 public class MarkdownView extends AbstractTemplateView {
+  @Override
+  public boolean checkResource(Locale locale) throws Exception {
+    String templatePath = "static/" + getUrl();
+    URL templateUrl = MarkdownView.class.getClassLoader().getResource(templatePath);
+    return templateUrl != null;
+  }
+
   @Override
   protected void renderMergedTemplateModel(
       Map<String, Object> model,
@@ -35,6 +45,9 @@ public class MarkdownView extends AbstractTemplateView {
 
     String markdown = new String(Files.readAllBytes(path));
 
-    return new PegDownProcessor().markdownToHtml(markdown);
+    Parser parser = Parser.builder().build();
+    Node document = parser.parse(markdown);
+    HtmlRenderer renderer = HtmlRenderer.builder().build();
+    return renderer.render(document);
   }
 }

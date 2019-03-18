@@ -18,7 +18,9 @@ import xdean.deannotation.checker.CheckType;
     type = @CheckType(String.class),
     modifier = @CheckModifier(require = { Modifier.STATIC, Modifier.FINAL }))
 public @interface FromClient {
-  Attr attr() default @Attr;
+  Attr[] attr() default {};
 
   Payload payload() default @Payload;
+
+  String desc() default "";
 }

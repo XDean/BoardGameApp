@@ -8,7 +8,7 @@ import lombok.Value;
 @Value
 @Builder(toBuilder = true)
 public class SocketAttr {
-  String id;
+  String key;
   TypeMirror type;
   String desc;
 }

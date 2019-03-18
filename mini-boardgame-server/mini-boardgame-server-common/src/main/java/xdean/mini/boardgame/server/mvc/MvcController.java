@@ -8,7 +8,7 @@ import org.springframework.web.servlet.HandlerMapping;
 @Controller
 public class MvcController {
 
-  @RequestMapping({ "/**.md", "/**.json" })
+  @RequestMapping({ "/**/*.md", "/**/*.json" })
   public String mvc(HttpServletRequest request) {
     return request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString();
   }

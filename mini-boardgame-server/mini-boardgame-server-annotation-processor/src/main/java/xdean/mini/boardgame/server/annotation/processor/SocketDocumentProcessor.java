@@ -1,5 +1,7 @@
 package xdean.mini.boardgame.server.annotation.processor;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,10 +14,17 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
 
 import com.google.auto.service.AutoService;
 
+import net.steppschuh.markdowngenerator.table.Table;
+import net.steppschuh.markdowngenerator.table.Table.Builder;
+import net.steppschuh.markdowngenerator.text.emphasis.BoldText;
+import net.steppschuh.markdowngenerator.text.heading.Heading;
 import xdean.annotation.processor.toolkit.AssertException;
 import xdean.annotation.processor.toolkit.ElementUtil;
 import xdean.annotation.processor.toolkit.XAbstractProcessor;
@@ -25,6 +34,7 @@ import xdean.mini.boardgame.server.annotation.FromClient;
 import xdean.mini.boardgame.server.annotation.FromServer;
 import xdean.mini.boardgame.server.annotation.Payload;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketAttr;
+import xdean.mini.boardgame.server.annotation.processor.model.SocketDescription;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketDescription.SocketDescriptionBuilder;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketPayload;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketSide;
@@ -41,6 +51,16 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
   @Override
   public boolean processActual(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws AssertException {
     if (roundEnv.processingOver()) {
+      String document = generateDocument();
+      try {
+        FileObject file = filer.createResource(StandardLocation.CLASS_OUTPUT, "", "static/doc/socket.md");
+        PrintStream ps = new PrintStream(file.openOutputStream());
+        ps.print(document);
+        ps.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw new Error(e);
+      }
       return false;
     }
     Set<VariableElement> attrs = ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(Attr.class));
@@ -48,6 +68,7 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     Set<VariableElement> fromServers = ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(FromServer.class));
     Set<VariableElement> fromClients = ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(FromClient.class));
     fromServers.forEach(e -> processFromServerEvent(e));
+    fromClients.forEach(e -> processFromClientEvent(e));
     return true;
   }
 
@@ -57,11 +78,7 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
       id = anno.value();
     } else {
       assertNonNull(e).log("@Attr ref must have `value`:" + anno);
-      if (e.getConstantValue() != null) {
-        id = e.getConstantValue().toString();
-      } else {
-        id = e.getSimpleName().toString();
-      }
+      id = e.getConstantValue().toString();
     }
     String desc = description(anno.desc());
     // it's a reference
@@ -75,7 +92,7 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
       }
     }
     SocketAttr attr = SocketAttr.builder()
-        .id(id)
+        .key(id)
         .desc(desc)
         .type(ElementUtil.getAnnotationClassValue(elements, anno, a -> a.type()))
         .build();
@@ -93,16 +110,75 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     sideBuilder.fromServer(true);
     sideBuilder.payload(processPayload(anno.payload()));
     SocketSide side = sideBuilder.build();
+
+    String topic = e.getConstantValue().toString();
+    descBuilders.computeIfAbsent(topic, t -> SocketDescription.builder().topic(t))
+        .fromServer(side);
+  }
+
+  private void processFromClientEvent(VariableElement e) {
+    assertNonNull(e.getConstantValue());
+
+    FromClient anno = e.getAnnotation(FromClient.class);
+    SocketSideBuilder sideBuilder = SocketSide.builder()
+        .desc(description(anno.desc()));
+    Arrays.stream(anno.attr()).forEach(attr -> sideBuilder.attr(processAttr(null, attr)));
+    sideBuilder.fromServer(false);
+    sideBuilder.payload(processPayload(anno.payload()));
+    SocketSide side = sideBuilder.build();
+
+    String topic = e.getConstantValue().toString();
+    descBuilders.computeIfAbsent(topic, t -> SocketDescription.builder().topic(t))
+        .fromClient(side);
   }
 
   private SocketPayload processPayload(Payload payload) {
-    return SocketPayload.builder()
-        .desc(description(payload.desc()))
-        .type(ElementUtil.getAnnotationClassValue(elements, payload, p -> p.value()))
-        .build();
+    TypeMirror type = ElementUtil.getAnnotationClassValue(elements, payload, p -> p.value());
+    if (type.toString().equals(void.class.getName()) && payload.desc().isEmpty()) {
+      return null;
+    } else {
+      return SocketPayload.builder()
+          .type(type)
+          .desc(description(payload.desc()))
+          .build();
+    }
+  }
+
+  private String generateDocument() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(new Heading("Socket Topics", 1)).append("\n\n");
+    descBuilders.values().forEach(builder -> {
+      SocketDescription desc = builder.build();
+      sb.append(new Heading(desc.getTopic(), 3)).append("\n\n");
+      sb.append(formatSide(desc.getFromServer()));
+      sb.append(formatSide(desc.getFromClient()));
+    });
+    return sb.toString();
+  }
+
+  private String formatSide(SocketSide side) {
+    if (side == null) {
+      return "";
+    }
+    StringBuilder sb = new StringBuilder();
+    sb.append(new Heading(side.isFromServer() ? "From Server" : "From Client", 4)).append("\n\n");
+    sb.append(side.getDesc()).append("\n\n");
+    Table.Builder table = new Builder()
+        .withAlignments(Table.ALIGN_CENTER)
+        .addRow("Name", "Type", "Description");
+    side.getAttrs().forEach(attr -> table.addRow(attr.getKey(), code(attr.getType().toString()), attr.getDesc()));
+    if (side.getPayload() != null) {
+      table.addRow(new BoldText("Payload"), side.getPayload().getType(), side.getPayload().getDesc());
+    }
+    sb.append(table.build()).append("\n\n");
+    return sb.toString();
   }
 
   private String description(String desc) {
     return desc.isEmpty() ? "No Description" : desc;
+  }
+
+  private String code(String code) {
+    return "`" + code + "`";
   }
 }
