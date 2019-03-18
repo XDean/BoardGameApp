@@ -133,7 +133,7 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
   }
 
   private SocketPayload processPayload(Payload payload) {
-    TypeMirror type = ElementUtil.getAnnotationClassValue(elements, payload, p -> p.value());
+    TypeMirror type = ElementUtil.getAnnotationClassValue(elements, payload, p -> p.type());
     if (type.toString().equals(void.class.getName()) && payload.desc().isEmpty()) {
       return null;
     } else {

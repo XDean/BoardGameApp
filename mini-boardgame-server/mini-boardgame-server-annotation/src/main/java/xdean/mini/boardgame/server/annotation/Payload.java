@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(ANNOTATION_TYPE)
 public @interface Payload {
-  Class<?> value() default void.class;
+  Class<?> type() default void.class;
 
   String desc() default "";
 }

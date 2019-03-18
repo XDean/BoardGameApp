@@ -35,41 +35,66 @@ public interface GlobalConstants {
 
   interface SocketTopic {
 
-    @FromServer(payload = @Payload(String.class))
-    String ERROR_TOPIC = "ERROR";// an unexpected error happened
+    @FromServer(
+        desc = "An error happened",
+        payload = @Payload(type = String.class, desc = "Error message"))
+    String ERROR_TOPIC = "ERROR";
 
-    @FromServer
-    String BAD_CREDENTIAL = "BAD_CREDENTIAL";
-
-    @FromClient(attr = @Attr(AttrKey.ACCESS_TOKEN))
+    @FromClient(
+        desc = "Authenticate current socket connection.",
+        attr = @Attr(desc = "Access token, can be find in cookie", value = AttrKey.ACCESS_TOKEN))
     String AUTHENTICATION = "AUTHENTICATION";
 
-    @FromServer(attr = @Attr(AttrKey.USER_ID))
-    String PLAYER_JOIN = "PLAYER_JOIN";
+    @FromServer(desc = "The AUTHENTICATION is not valid")
+    String BAD_CREDENTIAL = "BAD_CREDENTIAL";
 
-    @FromServer(attr = @Attr(AttrKey.USER_ID))
-    String PLAYER_EXIT = "PLAYER_EXIT";
-
-    @FromServer(attr = @Attr(AttrKey.USER_ID))
+    @FromServer(
+        desc = "A player connect(after authentication) to this room",
+        attr = @Attr(desc = "The connected player id", value = AttrKey.USER_ID))
     String PLAYER_CONNECT = "PLAYER_CONNECT";
 
-    @FromServer(attr = @Attr(AttrKey.USER_ID))
+    @FromServer(
+        desc = "A player disconnect from this room",
+        attr = @Attr(desc = "The disconnected player id", value = AttrKey.USER_ID))
     String PLAYER_DISCONNECT = "PLAYER_DISCONNECT";
 
-    @FromServer
+    @FromServer(
+        desc = "A player join into this room",
+        attr = @Attr(desc = "The joined player id", value = AttrKey.USER_ID))
+    String PLAYER_JOIN = "PLAYER_JOIN";
+
+    @FromServer(
+        desc = "A player exit this room",
+        attr = @Attr(desc = "The exited player id", value = AttrKey.USER_ID))
+    String PLAYER_EXIT = "PLAYER_EXIT";
+
+    @FromServer(desc = "This room is canceled (all players exited)")
     String ROOM_CANCEL = "ROOM_CANCEL";
 
-    @FromClient(attr = @Attr(AttrKey.TO_SEAT))
-    @FromServer(attr = @Attr(AttrKey.FROM_SEAT))
+    @FromClient(
+        desc = "To request change seat to specific seat. Server will forward the request to target player",
+        attr = @Attr(desc = "The target seat number", value = AttrKey.TO_SEAT))
+    @FromServer(
+        desc = "A player is requesting to change seat with you",
+        attr = @Attr(desc = "The seat of player who requst to change seat with you ", value = AttrKey.FROM_SEAT))
     String CHANGE_SEAT_REQUEST = "CHANGE_SEAT_REQUEST";
 
-    @FromServer(attr = { @Attr(AttrKey.FROM_SEAT), @Attr(AttrKey.TO_SEAT) })
+    @FromServer(
+        desc = "A change seat request be accepted. There are 2 situations:\n"
+            + "- Seat 1 player request to empty seat 2\n"
+            + "- Seat 1 player request to seat 2 and seat 2 player accepted(send a request that change to 1)",
+        attr = {
+            @Attr(desc = "One of the changed seats", value = AttrKey.FROM_SEAT),
+            @Attr(desc = "The other one of the changed seats", value = AttrKey.TO_SEAT) })
     String CHANGE_SEAT = "CHANGE_SEAT";
 
-    @FromServer
+    @FromServer(desc = "Game Start!")
     String GAME_START = "GAME_START";
 
-    @FromServer(payload = @Payload(desc = "The game's information"))
+    @FromClient(desc = "To request this room's fully information")
+    @FromServer(
+        desc = "Response GAME_INFO request",
+        payload = @Payload(desc = "The game's information. Different game has different info"))
     String GAME_INFO = "GAME_INFO";
   }
 }
