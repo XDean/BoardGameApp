@@ -146,10 +146,12 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
 
   private String generateDocument() {
     StringBuilder sb = new StringBuilder();
-    sb.append(new Heading("Socket Topics", 1)).append("\n\n");
+    sb.append(new Heading("Socket Topics", 1)).append("\n");
+    sb.append("---\n\n");
     descBuilders.values().forEach(builder -> {
       SocketDescription desc = builder.build();
-      sb.append(new Heading(desc.getTopic(), 3)).append("\n\n");
+      sb.append(new Heading(desc.getTopic(), 2)).append("\n");
+      sb.append("---\n\n");
       sb.append(formatSide(desc.getFromServer()));
       sb.append(formatSide(desc.getFromClient()));
     });
@@ -161,14 +163,14 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
       return "";
     }
     StringBuilder sb = new StringBuilder();
-    sb.append(new Heading(side.isFromServer() ? "From Server" : "From Client", 4)).append("\n\n");
+    sb.append(new Heading(side.isFromServer() ? "From Server" : "From Client", 3)).append("\n\n");
     sb.append(side.getDesc()).append("\n\n");
     Table.Builder table = new Builder()
         .withAlignments(Table.ALIGN_CENTER)
         .addRow("Name", "Type", "Description");
     side.getAttrs().forEach(attr -> table.addRow(attr.getKey(), code(attr.getType().toString()), attr.getDesc()));
     if (side.getPayload() != null) {
-      table.addRow(new BoldText("Payload"), side.getPayload().getType(), side.getPayload().getDesc());
+      table.addRow(new BoldText("Payload"), code(side.getPayload().getType().toString()), side.getPayload().getDesc());
     }
     if (!side.getAttrs().isEmpty() || side.getPayload() != null) {
       sb.append(table.build()).append("\n\n");
