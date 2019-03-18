@@ -2,7 +2,7 @@ logging:
   level:
     xdean: DEBUG
 server:
-  port: 8081 # https porta
+  port: 8081
   ssl:
     key-store: classpath:mini-boardgame.keystore.pfx
     key-store-password: ENC(wHOeiAhHQhF9MrIWQc7L4Jc+UqB44zvF)
@@ -17,7 +17,6 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     schema:
     - classpath:sql/schema/schema.sql
-    #- classpath:sql/schema/users_schema.sql
     initialization-mode: always
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
