@@ -22,6 +22,10 @@ spring:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
       ddl-auto: update
+  mvc:
+    contentnegotiation:
+      media-types:
+        md: text/markdown
 mini-boardgame:
   security:
     secret-key: ENC(T1unlh9EKSsyGq7ImbjTvcq2l59LGDk+)

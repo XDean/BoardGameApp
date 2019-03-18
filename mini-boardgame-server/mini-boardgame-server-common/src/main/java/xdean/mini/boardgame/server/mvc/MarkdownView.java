@@ -3,10 +3,7 @@ package xdean.mini.boardgame.server.mvc;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -20,14 +17,15 @@ import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
 public class MarkdownView extends AbstractTemplateView {
   @Override
   public boolean checkResource(Locale locale) throws Exception {
-    String templatePath = "static/" + getUrl();
-    URL templateUrl = MarkdownView.class.getClassLoader().getResource(templatePath);
-    return templateUrl != null;
+    return obtainApplicationContext().getResource(ResourceLoader.CLASSPATH_URL_PREFIX + getUrl()).exists();
   }
 
   @Override
@@ -47,12 +45,8 @@ public class MarkdownView extends AbstractTemplateView {
   }
 
   private String getHtmlFromMarkdown() throws URISyntaxException, IOException {
-    String templatePath = "static/" + getUrl();
-    URL templateUrl = MarkdownView.class.getClassLoader().getResource(templatePath);
-    Path path = Paths.get(templateUrl.toURI());
-
-    String markdown = new String(Files.readAllBytes(path));
-
+    Resource resource = obtainApplicationContext().getResource(ResourceLoader.CLASSPATH_URL_PREFIX + getUrl());
+    String markdown = StreamUtils.copyToString(resource.getInputStream(), Charset.defaultCharset());
     List<Extension> extensions = Arrays.asList(TablesExtension.create());
     Parser parser = Parser.builder().extensions(extensions).build();
     Node document = parser.parse(markdown);
