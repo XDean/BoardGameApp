@@ -34,10 +34,32 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
+				<groupId>com.github.ulisesbocchio</groupId>
+				<artifactId>jasypt-spring-boot-starter</artifactId>
+				<version>2.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mybatis.spring.boot</groupId>
+				<artifactId>mybatis-spring-boot-starter</artifactId>
+				<version>1.3.2</version>
+			</dependency>
+			<!-- Common -->
+			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>23.0</version>
 			</dependency>
+			<dependency>
+				<groupId>javax.inject</groupId>
+				<artifactId>javax.inject</artifactId>
+				<version>1</version>
+			</dependency>
+			<dependency>
+				<groupId>cglib</groupId>
+				<artifactId>cglib</artifactId>
+				<version>3.2.4</version>
+			</dependency>
+			<!-- XDean -->
 			<dependency>
 				<groupId>com.github.XDean</groupId>
 				<artifactId>Java-EX</artifactId>
@@ -49,24 +71,80 @@
 				<version>0.1.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-				<groupId>com.github.ulisesbocchio</groupId>
-				<artifactId>jasypt-spring-boot-starter</artifactId>
-				<version>2.0.0</version>
+				<groupId>com.github.XDean</groupId>
+				<artifactId>MyBatis-EX</artifactId>
+				<version>0.1.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>com.github.XDean</groupId>
 				<artifactId>auto-spring-factories</artifactId>
 				<version>0.1.3-SNAPSHOT</version>
 			</dependency>
-    <dependency>
-      <groupId>com.github.XDean</groupId>
-      <artifactId>AnnotationProcessorToolkit</artifactId>
-      <version>0.3.0-SNAPSHOT</version>
-    </dependency>
+			<dependency>
+				<groupId>com.github.XDean</groupId>
+				<artifactId>AnnotationProcessorToolkit</artifactId>
+				<version>0.3.0-SNAPSHOT</version>
+			</dependency>
 			<dependency>
 				<groupId>com.github.XDean</groupId>
 				<artifactId>deannotation-checker</artifactId>
 				<version>HEAD-SNAPSHOT</version>
+			</dependency>
+			<!-- Swagger -->
+			<dependency>
+				<groupId>io.swagger</groupId>
+				<artifactId>swagger-annotations</artifactId>
+				<version>1.5.20</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>2.9.2</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-bean-validators</artifactId>
+				<version>2.9.2</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>2.9.2</version>
+			</dependency>
+			<!-- Markdown -->
+			<dependency>
+				<groupId>com.atlassian.commonmark</groupId>
+				<artifactId>commonmark</artifactId>
+				<version>0.12.1</version>
+			</dependency>
+			<dependency>
+				<groupId>com.atlassian.commonmark</groupId>
+				<artifactId>commonmark-ext-gfm-tables</artifactId>
+				<version>0.12.1</version>
+			</dependency>
+			<!-- JWT -->
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt-api</artifactId>
+				<version>0.10.5</version>
+			</dependency>
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt-impl</artifactId>
+				<version>0.10.5</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt-jackson</artifactId>
+				<version>0.10.5</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.auth0</groupId>
+				<artifactId>java-jwt</artifactId>
+				<version>3.7.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
