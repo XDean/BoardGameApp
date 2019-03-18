@@ -10,12 +10,13 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.springframework.http.HttpStatus;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
 import xdean.jex.extra.collection.IntList;
-import xdean.mini.boardgame.server.gdjzj.model.GdjzjErrorCode;
 import xdean.mini.boardgame.server.model.GameBoard;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
@@ -133,7 +134,8 @@ public class GdjzjBoard extends GameBoard {
   public static void assertTurn(int turn) {
     if (turn < 0 || turn > 2) {
       throw MiniBoardgameException.builder()
-          .code(GdjzjErrorCode.ILLEGAL_TURN)
+          .code(HttpStatus.BAD_REQUEST)
+          .message("Illegal turn, except: " + turn)
           .build();
     }
   }

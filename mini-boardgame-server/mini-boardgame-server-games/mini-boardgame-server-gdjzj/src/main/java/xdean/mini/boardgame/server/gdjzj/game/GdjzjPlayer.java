@@ -2,8 +2,9 @@ package xdean.mini.boardgame.server.gdjzj.game;
 
 import java.util.Arrays;
 
+import org.springframework.http.HttpStatus;
+
 import xdean.jex.extra.collection.IntList;
-import xdean.mini.boardgame.server.gdjzj.model.GdjzjErrorCode;
 import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 
 public class GdjzjPlayer {
@@ -52,14 +53,14 @@ public class GdjzjPlayer {
     IntList leftPlayers = board.getLeftPlayers();
     if (leftPlayers.isEmpty()) {
       throw MiniBoardgameException.builder()
+          .code(HttpStatus.BAD_REQUEST)
           .message("You are the last player in this turn. Can't select next player.")
-          .code(GdjzjErrorCode.LAST_PLAYER_IN_TURN)
           .build();
     }
     if (!leftPlayers.contains(index)) {
       throw MiniBoardgameException.builder()
+          .code(HttpStatus.BAD_REQUEST)
           .message("Can't select the player as next because it already done in this turn.")
-          .code(GdjzjErrorCode.PLAYER_ALREADY_DONE)
           .build();
     }
     board.currentPlayer = index;
@@ -86,7 +87,7 @@ public class GdjzjPlayer {
       assertRole(GdjzjRole.XU_YUAN);
       if (getTurnInfo().checkCard2 != -1) {
         throw MiniBoardgameException.builder()
-            .code(GdjzjErrorCode.ILLEGAL_STATE)
+            .code(HttpStatus.BAD_REQUEST)
             .message("The player has checked cards")
             .build();
       }
@@ -117,7 +118,8 @@ public class GdjzjPlayer {
     assertRole(GdjzjRole.YAO_BURAN);
     if (index == this.index) {
       throw MiniBoardgameException.builder()
-          .code(GdjzjErrorCode.ATTACK_SELF)
+          .code(HttpStatus.BAD_REQUEST)
+          .message("You can't attack yourself")
           .build();
     }
     board.players.get(index).attacked();
@@ -161,7 +163,7 @@ public class GdjzjPlayer {
     TurnInfo turnInfo = getTurnInfo();
     if (turnInfo.vote) {
       throw MiniBoardgameException.builder()
-          .code(GdjzjErrorCode.ILLEGAL_STATE)
+          .code(HttpStatus.BAD_REQUEST)
           .message("You have voted card this turn")
           .build();
     }
@@ -174,7 +176,7 @@ public class GdjzjPlayer {
     assertPlayer(index);
     if (vote != -1) {
       throw MiniBoardgameException.builder()
-          .code(GdjzjErrorCode.ILLEGAL_STATE)
+          .code(HttpStatus.BAD_REQUEST)
           .message("You have voted player")
           .build();
     }
@@ -188,7 +190,7 @@ public class GdjzjPlayer {
   private void assertCurrentPlayer() {
     if (board.currentPlayer != index) {
       throw MiniBoardgameException.builder()
-          .code(GdjzjErrorCode.ILLEGAL_PLAYER)
+          .code(HttpStatus.BAD_REQUEST)
           .message("You are not the active player")
           .build();
     }
@@ -197,7 +199,7 @@ public class GdjzjPlayer {
   private void assertCard(int index) {
     if (index / 4 != board.currentTurn) {
       throw MiniBoardgameException.builder()
-          .code(GdjzjErrorCode.ILLEGAL_CARD)
+          .code(HttpStatus.BAD_REQUEST)
           .message("This card can't be used in this turn")
           .build();
     }
@@ -206,7 +208,7 @@ public class GdjzjPlayer {
   private void assertPlayer(int index) {
     if (index < 0 || index >= board.players.size()) {
       throw MiniBoardgameException.builder()
-          .code(GdjzjErrorCode.ILLEGAL_PLAYER)
+          .code(HttpStatus.BAD_REQUEST)
           .message("Illegal player index")
           .build();
     }
@@ -215,8 +217,8 @@ public class GdjzjPlayer {
   private void assertRole(GdjzjRole... roles) {
     if (!Arrays.asList(roles).contains(role)) {
       throw MiniBoardgameException.builder()
+          .code(HttpStatus.BAD_REQUEST)
           .message("Illegal role to use the skill. Expect: " + Arrays.toString(roles))
-          .code(GdjzjErrorCode.ILLEGAL_ROLE)
           .build();
     }
   }

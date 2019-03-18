@@ -1,8 +1,6 @@
 package xdean.mini.boardgame.server.gdjzj.model;
 
-import xdean.mini.boardgame.server.model.exception.MiniBoardgameErrorCode;
-
-public enum GdjzjErrorCode implements MiniBoardgameErrorCode {
+public enum GdjzjErrorCode {
   ILLEGAL_STATE,
   ILLEGAL_TURN,
   ILLEGAL_PLAYER,
