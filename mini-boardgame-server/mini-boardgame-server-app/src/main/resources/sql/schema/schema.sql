@@ -15,9 +15,9 @@ CREATE TABLE IF NOT EXISTS `t_authorities` (
 
 CREATE TABLE IF NOT EXISTS `t_user_profiles`(  
   `id` INT PRIMARY KEY,
-  `nickname` VARCHAR(127) CHARACTER SET utf8 NOT NULL DEFAULT '' ,
+  `nickname` VARCHAR(127) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `male` TINYINT(1) DEFAULT NULL,
-  `avatar_url` TEXT NOT NULL DEFAULT '',
+  `avatar_url` TEXT,
   CONSTRAINT `fk_profile_user_id` FOREIGN KEY (`id`) REFERENCES `t_users`(`id`)
 ) DEFAULT CHARSET=latin1;
 
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `t_game_rooms`(
   `room_name` VARCHAR(127) DEFAULT '',
   `player_count` INT NOT NULL,
   `created_time` TIMESTAMP NOT NULL,
-  `board` TEXT NOT NULL
+  `board` TEXT
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `t_game_players`(  

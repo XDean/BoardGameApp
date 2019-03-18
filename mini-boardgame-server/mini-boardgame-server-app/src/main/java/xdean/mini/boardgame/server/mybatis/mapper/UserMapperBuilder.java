@@ -44,12 +44,13 @@ public class UserMapperBuilder extends BaseMapperBuilder implements Tables {
   }
 
   public String saveProfile(UserProfileEntity e) {
+    Boolean male = e.getMale();
     return MyBatisSQL.create()
         .INSERT_INTO(ProfileTable.table)
         .VALUES(ProfileTable.id.fullName, Integer.toString(e.getId()))
         .VALUES(ProfileTable.avatarUrl.fullName, wrapString(e.getAvatarUrl()))
         .VALUES(ProfileTable.nickname.fullName, wrapString(e.getNickname()))
-        .VALUES(ProfileTable.male.fullName, e.getMale().toString())
+        .VALUES(ProfileTable.male.fullName, male == null ? "NULL" : male.toString())
         .ON_DUPLICATE_KEY_UPDATE(ProfileTable.avatarUrl, ProfileTable.nickname, ProfileTable.male)
         .toString();
   }
