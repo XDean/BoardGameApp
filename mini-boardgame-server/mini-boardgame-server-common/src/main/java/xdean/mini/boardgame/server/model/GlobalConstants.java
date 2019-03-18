@@ -1,7 +1,6 @@
 package xdean.mini.boardgame.server.model;
 
 import xdean.mini.boardgame.server.annotation.Attr;
-import xdean.mini.boardgame.server.annotation.BeanType;
 import xdean.mini.boardgame.server.annotation.FromClient;
 import xdean.mini.boardgame.server.annotation.FromServer;
 import xdean.mini.boardgame.server.annotation.Payload;
@@ -18,19 +17,19 @@ public interface GlobalConstants {
   }
 
   interface AttrKey {
-    @BeanType(Integer.class)
+    @Attr(type = Integer.class)
     String USER_ID = "USER_ID";
 
-    @BeanType(GameRoomEntity.class)
+    @Attr(type = GameRoomEntity.class)
     String ROOM = "ROOM";
 
-    @BeanType(String.class)
+    @Attr(type = String.class)
     String ACCESS_TOKEN = "ACCESS_TOKEN";
 
-    @BeanType(int.class)
+    @Attr(type = int.class)
     String FROM_SEAT = "FROM_SEAT";
 
-    @BeanType(int.class)
+    @Attr(type = int.class)
     String TO_SEAT = "TO_SEAT";
   }
 
@@ -60,11 +59,11 @@ public interface GlobalConstants {
     @FromServer
     String ROOM_CANCEL = "ROOM_CANCEL";
 
-    @FromClient(attr = @Attr(value = AttrKey.TO_SEAT))
-    @FromServer(attr = @Attr(value = AttrKey.FROM_SEAT))
+    @FromClient(attr = @Attr(AttrKey.TO_SEAT))
+    @FromServer(attr = @Attr(AttrKey.FROM_SEAT))
     String CHANGE_SEAT_REQUEST = "CHANGE_SEAT_REQUEST";
 
-    @FromServer(attr = @Attr(value = { AttrKey.FROM_SEAT, AttrKey.TO_SEAT }))
+    @FromServer(attr = { @Attr(AttrKey.FROM_SEAT), @Attr(AttrKey.TO_SEAT) })
     String CHANGE_SEAT = "CHANGE_SEAT";
 
     @FromServer

@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(FIELD)
 public @interface FromServer {
-  Attr attr() default @Attr;
+  Attr[] attr() default {};
 
   Payload payload() default @Payload;
 
