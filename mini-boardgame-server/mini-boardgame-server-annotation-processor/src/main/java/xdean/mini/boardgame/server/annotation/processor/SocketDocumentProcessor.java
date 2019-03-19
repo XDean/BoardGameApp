@@ -134,11 +134,12 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
 
   private SocketPayload processPayload(Payload payload) {
     TypeMirror type = ElementUtil.getAnnotationClassValue(elements, payload, p -> p.type());
-    if (type.toString().equals(void.class.getName()) && payload.desc().isEmpty()) {
+    boolean noType = type.toString().equals(void.class.getName());
+    if (noType && payload.desc().isEmpty()) {
       return null;
     } else {
       return SocketPayload.builder()
-          .type(type)
+          .type(noType ? null : type)
           .desc(description(payload.desc()))
           .build();
     }
@@ -170,7 +171,8 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
         .addRow("Name", "Type", "Description");
     side.getAttrs().forEach(attr -> table.addRow(attr.getKey(), code(attr.getType().toString()), attr.getDesc()));
     if (side.getPayload() != null) {
-      table.addRow(new BoldText("Payload"), code(side.getPayload().getType().toString()), side.getPayload().getDesc());
+      TypeMirror type = side.getPayload().getType();
+      table.addRow(new BoldText("Payload"), code(type == null ? "Undefined" : type.toString()), side.getPayload().getDesc());
     }
     if (!side.getAttrs().isEmpty() || side.getPayload() != null) {
       sb.append(table.build()).append("\n\n");
