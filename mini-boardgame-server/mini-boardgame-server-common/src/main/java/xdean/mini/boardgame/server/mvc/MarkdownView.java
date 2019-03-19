@@ -23,8 +23,12 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
 public class MarkdownView extends AbstractTemplateView {
+
   @Override
   public boolean checkResource(Locale locale) throws Exception {
+    if (getUrl().endsWith("README.md")) {
+      return false;
+    }
     return getResource().exists();
   }
 
