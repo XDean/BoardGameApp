@@ -41,7 +41,7 @@ import xdean.mini.boardgame.server.security.TokenAuthProvider;
 import xdean.mini.boardgame.server.service.UserDataService;
 
 @Component
-public class GameSocketHandler extends TextWebSocketHandler implements Logable, GlobalConstants {
+public class GameSocketEndpoint extends TextWebSocketHandler implements Logable, GlobalConstants {
 
   private final Map<Integer, GameRoomSocketHandler> rooms = new ConcurrentHashMap<>();
 

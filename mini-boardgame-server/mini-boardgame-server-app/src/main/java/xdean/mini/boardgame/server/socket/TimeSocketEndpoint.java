@@ -17,11 +17,11 @@ import io.reactivex.Observable;
 import xdean.jex.log.Logable;
 
 @Service
-public class TimeSocketHandler extends TextWebSocketHandler implements Logable {
+public class TimeSocketEndpoint extends TextWebSocketHandler implements Logable {
 
   List<WebSocketSession> sessions = Collections.synchronizedList(new ArrayList<>());
 
-  public TimeSocketHandler() {
+  public TimeSocketEndpoint() {
     Observable.interval(1, TimeUnit.SECONDS)
         .subscribe(e -> sendTime());
   }

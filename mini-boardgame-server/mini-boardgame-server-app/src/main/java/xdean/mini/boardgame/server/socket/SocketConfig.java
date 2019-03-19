@@ -13,10 +13,10 @@ import xdean.mini.boardgame.server.model.GlobalConstants;
 @EnableWebSocket
 public class SocketConfig implements WebSocketConfigurer, GlobalConstants {
   @Inject
-  TimeSocketHandler handler;
+  TimeSocketEndpoint handler;
 
   @Inject
-  GameSocketHandler gameHandler;
+  GameSocketEndpoint gameHandler;
 
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
