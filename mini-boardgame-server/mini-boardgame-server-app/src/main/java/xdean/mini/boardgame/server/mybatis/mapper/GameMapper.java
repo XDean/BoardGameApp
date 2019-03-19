@@ -30,7 +30,7 @@ public interface GameMapper extends BaseMapper {
 
   void saveRoom(GameRoomEntity room);
 
-  void delete(GameRoomEntity room);
+  void delete(Integer roomId);
 
   @ResultMapType
   List<GameRoomEntity> findAllRoom(String gameName, RowBounds page);

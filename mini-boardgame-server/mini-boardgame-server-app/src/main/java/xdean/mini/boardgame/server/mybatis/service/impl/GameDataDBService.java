@@ -63,7 +63,7 @@ public class GameDataDBService implements GameDataService {
 
   @Override
   public void delete(GameRoomEntity room) {
-    gameMapper.delete(room);
+    gameMapper.delete(room.getId());
   }
 
   @Override
