@@ -25,7 +25,7 @@ import org.springframework.web.servlet.view.AbstractTemplateView;
 public class MarkdownView extends AbstractTemplateView {
   @Override
   public boolean checkResource(Locale locale) throws Exception {
-    return obtainApplicationContext().getResource(ResourceLoader.CLASSPATH_URL_PREFIX + getUrl()).exists();
+    return getResource().exists();
   }
 
   @Override
@@ -45,12 +45,29 @@ public class MarkdownView extends AbstractTemplateView {
   }
 
   private String getHtmlFromMarkdown() throws URISyntaxException, IOException {
-    Resource resource = obtainApplicationContext().getResource(ResourceLoader.CLASSPATH_URL_PREFIX + getUrl());
+    Resource resource = getResource();
     String markdown = StreamUtils.copyToString(resource.getInputStream(), Charset.defaultCharset());
     List<Extension> extensions = Arrays.asList(TablesExtension.create());
     Parser parser = Parser.builder().extensions(extensions).build();
     Node document = parser.parse(markdown);
     HtmlRenderer renderer = HtmlRenderer.builder().extensions(extensions).build();
     return renderer.render(document);
+  }
+
+  private Resource getResource() {
+    String mdName = getBeanName();
+    if (!mdName.endsWith(".md")) {
+      mdName = mdName + ".md";
+    }
+    Resource mdResource = obtainApplicationContext().getResource(ResourceLoader.CLASSPATH_URL_PREFIX + mdName);
+    if (mdResource.exists()) {
+      return mdResource;
+    }
+    String readmeName = getBeanName();
+    if (!readmeName.endsWith("/")) {
+      readmeName = readmeName + "/";
+    }
+    readmeName = readmeName + "README.md";
+    return obtainApplicationContext().getResource(ResourceLoader.CLASSPATH_URL_PREFIX + readmeName);
   }
 }

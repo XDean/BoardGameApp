@@ -53,7 +53,7 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     if (roundEnv.processingOver()) {
       String document = generateDocument();
       try {
-        FileObject file = filer.createResource(StandardLocation.CLASS_OUTPUT, "", "doc/socket.md");
+        FileObject file = filer.createResource(StandardLocation.CLASS_OUTPUT, "", "doc/socket/topics.md");
         PrintStream ps = new PrintStream(file.openOutputStream());
         ps.print(document);
         ps.close();
