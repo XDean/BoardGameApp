@@ -17,12 +17,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
-import xdean.jex.log.Logable;
+import lombok.extern.slf4j.Slf4j;
 import xdean.mini.boardgame.server.model.GlobalConstants;
 import xdean.mini.boardgame.server.model.GlobalConstants.SocketTopic;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
-public abstract class AbstractGameSocketProvider implements GameSocketProvider, Logable {
+@Slf4j
+public abstract class AbstractGameSocketProvider implements GameSocketProvider {
 
   @Value
   @FieldDefaults(level = AccessLevel.PUBLIC, makeFinal = true)
@@ -86,7 +87,7 @@ public abstract class AbstractGameSocketProvider implements GameSocketProvider, 
     },
         e -> {
           if (e instanceof RuntimeException) {
-            debug("Unexpected error happens: " + processedContext.session, e);
+            log.debug("Unexpected error happens: " + processedContext.session, e);
             processedContext.outputObserver.onNext(WebSocketEvent.builder()
                 .type(WebSocketSendType.SELF)
                 .topic(SocketTopic.ERROR_TOPIC)
