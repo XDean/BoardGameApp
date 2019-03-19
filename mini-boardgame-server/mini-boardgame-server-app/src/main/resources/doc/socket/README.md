@@ -22,4 +22,4 @@ All requests and responses are json
 
 ## [Topics](socket/topics)
 
-## [Debug Tool](socket/index.html)
+## [Debug Tool](/socket/index.html)
