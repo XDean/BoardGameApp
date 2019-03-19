@@ -1,6 +1,6 @@
 package xdean.mini.boardgame.server.annotation;
 
-import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
@@ -13,14 +13,16 @@ import xdean.deannotation.checker.CheckModifier;
 import xdean.deannotation.checker.CheckType;
 
 @Retention(RUNTIME)
-@Target(FIELD)
+@Target(ANNOTATION_TYPE)
 @CheckField(
     type = @CheckType(String.class),
     modifier = @CheckModifier(require = { Modifier.STATIC, Modifier.FINAL }))
-public @interface FromServer {
+public @interface Side {
   Attr[] attr() default {};
 
   Payload payload() default @Payload;
 
   String desc() default "";
+
+  boolean disable() default false;
 }

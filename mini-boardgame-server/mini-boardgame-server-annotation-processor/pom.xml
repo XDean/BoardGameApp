@@ -14,10 +14,14 @@
 			<artifactId>mini-boardgame-server-annotation</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.github.XDean</groupId>
-			<artifactId>AnnotationProcessorToolkit</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>com.github.XDean</groupId>
+      <artifactId>AnnotationProcessorToolkit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.XDean</groupId>
+      <artifactId>Java-EX</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>net.steppschuh.markdowngenerator</groupId>
 			<artifactId>markdowngenerator</artifactId>

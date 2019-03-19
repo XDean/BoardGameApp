@@ -5,7 +5,8 @@ import lombok.Value;
 
 @Value
 @Builder
-public class SocketDescription {
+public class SocketTopic {
+  String[] category;
   String topic;
   SocketSide fromServer;
   SocketSide fromClient;

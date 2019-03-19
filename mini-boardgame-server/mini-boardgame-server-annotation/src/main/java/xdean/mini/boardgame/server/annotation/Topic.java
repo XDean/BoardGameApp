@@ -17,10 +17,10 @@ import xdean.deannotation.checker.CheckType;
 @CheckField(
     type = @CheckType(String.class),
     modifier = @CheckModifier(require = { Modifier.STATIC, Modifier.FINAL }))
-public @interface FromClient {
-  Attr[] attr() default {};
+public @interface Topic {
+  String[] category() default {};
 
-  Payload payload() default @Payload;
+  Side fromServer() default @Side(disable = true);
 
-  String desc() default "";
+  Side fromClient() default @Side(disable = true);
 }

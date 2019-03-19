@@ -2,8 +2,10 @@ package xdean.mini.boardgame.server.annotation.processor;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,29 +26,29 @@ import com.google.auto.service.AutoService;
 import net.steppschuh.markdowngenerator.table.Table;
 import net.steppschuh.markdowngenerator.table.Table.Builder;
 import net.steppschuh.markdowngenerator.text.emphasis.BoldText;
-import net.steppschuh.markdowngenerator.text.heading.Heading;
 import xdean.annotation.processor.toolkit.AssertException;
 import xdean.annotation.processor.toolkit.ElementUtil;
 import xdean.annotation.processor.toolkit.XAbstractProcessor;
 import xdean.annotation.processor.toolkit.annotation.SupportedAnnotation;
+import xdean.jex.util.string.StringUtil;
 import xdean.mini.boardgame.server.annotation.Attr;
-import xdean.mini.boardgame.server.annotation.FromClient;
-import xdean.mini.boardgame.server.annotation.FromServer;
 import xdean.mini.boardgame.server.annotation.Payload;
+import xdean.mini.boardgame.server.annotation.Side;
+import xdean.mini.boardgame.server.annotation.Topic;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketAttr;
-import xdean.mini.boardgame.server.annotation.processor.model.SocketDescription;
-import xdean.mini.boardgame.server.annotation.processor.model.SocketDescription.SocketDescriptionBuilder;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketPayload;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketSide;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketSide.SocketSideBuilder;
+import xdean.mini.boardgame.server.annotation.processor.model.SocketTopic;
+import xdean.mini.boardgame.server.annotation.processor.model.SocketTopicGroup;
 
 @AutoService(Processor.class)
-@SupportedAnnotation({ FromServer.class, FromClient.class, Attr.class })
+@SupportedAnnotation({ Topic.class, Attr.class })
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class SocketDocumentProcessor extends XAbstractProcessor {
 
   private final Map<String, SocketAttr> attrs = new HashMap<>();
-  private final Map<String, SocketDescriptionBuilder> descBuilders = new HashMap<>();
+  private final List<SocketTopic> topics = new ArrayList<>();
 
   @Override
   public boolean processActual(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws AssertException {
@@ -65,10 +67,8 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     }
     Set<VariableElement> attrs = ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(Attr.class));
     attrs.forEach(e -> processAttr(e, e.getAnnotation(Attr.class)));
-    Set<VariableElement> fromServers = ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(FromServer.class));
-    Set<VariableElement> fromClients = ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(FromClient.class));
-    fromServers.forEach(e -> processFromServerEvent(e));
-    fromClients.forEach(e -> processFromClientEvent(e));
+    Set<VariableElement> topics = ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(Topic.class));
+    topics.forEach(e -> processTopic(e));
     return true;
   }
 
@@ -100,36 +100,29 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     return attr;
   }
 
-  private void processFromServerEvent(VariableElement e) {
+  private void processTopic(VariableElement e) {
     assertNonNull(e.getConstantValue());
-
-    FromServer anno = e.getAnnotation(FromServer.class);
-    SocketSideBuilder sideBuilder = SocketSide.builder()
-        .desc(description(anno.desc()));
-    Arrays.stream(anno.attr()).forEach(attr -> sideBuilder.attr(processAttr(null, attr)));
-    sideBuilder.fromServer(true);
-    sideBuilder.payload(processPayload(anno.payload()));
-    SocketSide side = sideBuilder.build();
-
+    Topic anno = e.getAnnotation(Topic.class);
     String topic = e.getConstantValue().toString();
-    descBuilders.computeIfAbsent(topic, t -> SocketDescription.builder().topic(t))
-        .fromServer(side);
+    topics.add(SocketTopic.builder()
+        .topic(topic)
+        .category(anno.category())
+        .fromClient(processSide(anno.fromClient()))
+        .fromServer(processSide(anno.fromServer()))
+        .build());
   }
 
-  private void processFromClientEvent(VariableElement e) {
-    assertNonNull(e.getConstantValue());
-
-    FromClient anno = e.getAnnotation(FromClient.class);
+  private SocketSide processSide(Side anno) {
+    if (anno.disable()) {
+      return null;
+    }
     SocketSideBuilder sideBuilder = SocketSide.builder()
         .desc(description(anno.desc()));
     Arrays.stream(anno.attr()).forEach(attr -> sideBuilder.attr(processAttr(null, attr)));
     sideBuilder.fromServer(false);
     sideBuilder.payload(processPayload(anno.payload()));
     SocketSide side = sideBuilder.build();
-
-    String topic = e.getConstantValue().toString();
-    descBuilders.computeIfAbsent(topic, t -> SocketDescription.builder().topic(t))
-        .fromClient(side);
+    return side;
   }
 
   private SocketPayload processPayload(Payload payload) {
@@ -145,18 +138,41 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     }
   }
 
+  private SocketTopicGroup getGroup() {
+    SocketTopicGroup group = new SocketTopicGroup("Topics", 0);
+    topics.forEach(t -> group.add(t));
+    return group;
+  }
+
   private String generateDocument() {
+    SocketTopicGroup group = getGroup();
     StringBuilder sb = new StringBuilder();
-    sb.append(new Heading("Socket Topics", 1)).append("\n");
+    sb.append("# Socket Topics").append("\n");
     sb.append("---\n\n");
-    descBuilders.values().forEach(builder -> {
-      SocketDescription desc = builder.build();
-      sb.append(new Heading(desc.getTopic(), 2)).append("\n");
-      sb.append("---\n\n");
-      sb.append(formatSide(desc.getFromServer()));
-      sb.append(formatSide(desc.getFromClient()));
+    sb.append("Table of Contents\n---\n\n");
+    group.forEach((e, level) -> {
+      sb.append(StringUtil.repeat("  ", level - 1)).append("- ");
+      String name = e.unify(g -> g.getName(), t -> t.getTopic());
+      sb.append(String.format("[%s](%s)", name, titleToLink(name))).append("\n");
+    });
+
+    group.forEach((e, level) -> {
+      e.exec(g -> {
+        sb.append(String.format("<a name=\"%s\"/>\n\n", g.getName()));
+        sb.append(StringUtil.repeat("#", level)).append(" ").append(g.getName()).append("\n---\n\n");
+      }, t -> {
+        sb.append(String.format("<a name=\"%s\"/>\n\n", t.getTopic()));
+        sb.append(StringUtil.repeat("#", level)).append(" ").append(t.getTopic()).append("\n---\n\n");
+        sb.append("Topic: `").append(t.getTopic()).append("`\n\n");
+        sb.append(formatSide(t.getFromServer()));
+        sb.append(formatSide(t.getFromClient()));
+      });
     });
     return sb.toString();
+  }
+
+  private String titleToLink(String title) {
+    return "#" + title.toLowerCase().replace(" ", "-").replace("`", "").replace("*", "");
   }
 
   private String formatSide(SocketSide side) {
@@ -164,7 +180,7 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
       return "";
     }
     StringBuilder sb = new StringBuilder();
-    sb.append(new Heading(side.isFromServer() ? "From Server" : "From Client", 3)).append("\n\n");
+    sb.append(new BoldText(side.isFromServer() ? "From Server" : "From Client")).append("\n\n");
     sb.append(side.getDesc()).append("\n\n");
     Table.Builder table = new Builder()
         .withAlignments(Table.ALIGN_CENTER)
