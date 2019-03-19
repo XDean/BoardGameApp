@@ -1,7 +1,6 @@
 package xdean.mini.boardgame.server.security;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
 
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -33,26 +32,12 @@ import xdean.mini.boardgame.server.security.model.SecurityProperties;
 @EnableConfigurationProperties
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-  @Inject
-  DataSource dataSource;
-
-  @Inject
-  DataSourceProperties dataSourceProperties;
-
-  @Inject
-  DispatchLoginHandler loginHandler;
-
-  @Inject
-  DispatchLogoutHandler logoutHandler;
-
-  @Inject
-  DispatchAuthenticationHandler authenticationHandler;
-
-  @Inject
-  TokenAuthenticationProvider tokenAuthProvider;
-
-  @Inject
-  AuthenticationInfoHandler authInfoHandler;
+  private @Inject DataSourceProperties dataSourceProperties;
+  private @Inject DispatchLoginHandler loginHandler;
+  private @Inject DispatchLogoutHandler logoutHandler;
+  private @Inject DispatchAuthenticationHandler authenticationHandler;
+  private @Inject TokenAuthenticationProvider tokenAuthProvider;
+  private @Inject AuthenticationInfoHandler authInfoHandler;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -62,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .addFilterAfter(authInfoHandler, FilterSecurityInterceptor.class)
         .addFilterBefore(tokenAuthProvider, UsernamePasswordAuthenticationFilter.class)
         .authorizeRequests()
-        .antMatchers("/sign-up", "/login**").permitAll()
+        .antMatchers("/public/**").permitAll()
         .antMatchers("/**/favicon.ico", "/webjars/**").permitAll()
         .anyRequest().authenticated()
         .and()

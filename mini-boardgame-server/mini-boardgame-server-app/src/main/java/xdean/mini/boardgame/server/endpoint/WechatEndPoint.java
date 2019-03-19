@@ -19,7 +19,7 @@ import xdean.mini.boardgame.server.security.endpoint.UserAuthEndpoint;
 
 @Api(tags = "WeChat")
 @RestController
-@RequestMapping("/wechat")
+@RequestMapping("/public/wechat")
 public class WechatEndPoint {
   @Inject
   UserAuthEndpoint authEndPoint;

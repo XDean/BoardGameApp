@@ -83,7 +83,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
       if (player.getRoom().isPresent()) {
         throw MiniBoardgameException.builder()
             .code(HttpStatus.BAD_REQUEST)
-            .message("Not in a game room")
+            .message("Already in a room")
             .build();
       }
       Integer roomId = generateId();

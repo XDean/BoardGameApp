@@ -46,7 +46,7 @@ public class UserAuthEndpoint implements Logable {
   private @Autowired(required = false) List<OpenIdAuthProvider> providers = Collections.emptyList();
 
   @ApiOperation("Sign up a new user")
-  @PostMapping(path = "/sign-up")
+  @PostMapping(path = "/public/sign-up")
   public SignUpResponse signUp(
       HttpServletRequest request,
       HttpServletResponse response,
@@ -69,7 +69,7 @@ public class UserAuthEndpoint implements Logable {
   }
 
   // @ApiOperation("Login with username and password")
-  // @PostMapping(path = "/login")
+  // @PostMapping(path = "/public/login")
   public LoginResponse login(
       HttpServletRequest request,
       HttpServletResponse response,
@@ -88,7 +88,7 @@ public class UserAuthEndpoint implements Logable {
   }
 
   @ApiOperation("Login with openid")
-  @PostMapping(path = "/login-openid")
+  @PostMapping(path = "/public/login-openid")
   public LoginResponse loginOpenId(
       HttpServletRequest request,
       HttpServletResponse response,
