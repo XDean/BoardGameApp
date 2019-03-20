@@ -2,12 +2,12 @@ package xdean.mini.boardgame.server.annotation.processor;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.processing.Processor;
@@ -35,6 +35,7 @@ import xdean.mini.boardgame.server.annotation.Attr;
 import xdean.mini.boardgame.server.annotation.Payload;
 import xdean.mini.boardgame.server.annotation.Side;
 import xdean.mini.boardgame.server.annotation.Topic;
+import xdean.mini.boardgame.server.annotation.TopicDoc;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketAttr;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketPayload;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketSide;
@@ -43,32 +44,45 @@ import xdean.mini.boardgame.server.annotation.processor.model.SocketTopic;
 import xdean.mini.boardgame.server.annotation.processor.model.SocketTopicGroup;
 
 @AutoService(Processor.class)
-@SupportedAnnotation({ Topic.class, Attr.class })
+@SupportedAnnotation({ TopicDoc.class, Attr.class })
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class SocketDocumentProcessor extends XAbstractProcessor {
 
   private final Map<String, SocketAttr> attrs = new HashMap<>();
-  private final List<SocketTopic> topics = new ArrayList<>();
+  private final Map<TopicDoc, SocketTopicGroup> groups = new HashMap<>();
 
   @Override
   public boolean processActual(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws AssertException {
     if (roundEnv.processingOver()) {
-      String document = generateDocument();
-      try {
-        FileObject file = filer.createResource(StandardLocation.CLASS_OUTPUT, "", "doc/socket/topics.md");
-        PrintStream ps = new PrintStream(file.openOutputStream());
-        ps.print(document);
-        ps.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-        throw new Error(e);
-      }
+      groups.forEach((anno, g) -> {
+        String document = generateDocument(g);
+        try {
+          String path = anno.path();
+          if (path.startsWith("/")) {
+            path = path.substring(1);
+          }
+          FileObject file = filer.createResource(StandardLocation.CLASS_OUTPUT, "", path);
+          PrintStream ps = new PrintStream(file.openOutputStream());
+          ps.print(document);
+          ps.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+          throw new Error(e);
+        }
+      });
       return false;
     }
     Set<VariableElement> attrs = ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(Attr.class));
     attrs.forEach(e -> processAttr(e, e.getAnnotation(Attr.class)));
-    Set<VariableElement> topics = ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(Topic.class));
-    topics.forEach(e -> processTopic(e));
+
+    Set<TypeElement> topicDocs = ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(TopicDoc.class));
+    topicDocs.forEach(d -> {
+      List<VariableElement> topics = ElementFilter.fieldsIn(
+          d.getEnclosedElements().stream().filter(e -> e.getAnnotation(Topic.class) != null).collect(Collectors.toList()));
+      SocketTopicGroup group = new SocketTopicGroup("Topics", 0);
+      topics.forEach(e -> group.add(processTopic(e)));
+      groups.put(d.getAnnotation(TopicDoc.class), group);
+    });
     return true;
   }
 
@@ -100,16 +114,16 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     return attr;
   }
 
-  private void processTopic(VariableElement e) {
+  private SocketTopic processTopic(VariableElement e) {
     assertNonNull(e.getConstantValue());
     Topic anno = e.getAnnotation(Topic.class);
     String topic = e.getConstantValue().toString();
-    topics.add(SocketTopic.builder()
+    return SocketTopic.builder()
         .topic(topic)
         .category(anno.category())
         .fromClient(processSide(anno.fromClient()))
         .fromServer(processSide(anno.fromServer()))
-        .build());
+        .build();
   }
 
   private SocketSide processSide(Side anno) {
@@ -138,14 +152,7 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     }
   }
 
-  private SocketTopicGroup getGroup() {
-    SocketTopicGroup group = new SocketTopicGroup("Topics", 0);
-    topics.forEach(t -> group.add(t));
-    return group;
-  }
-
-  private String generateDocument() {
-    SocketTopicGroup group = getGroup();
+  private String generateDocument(SocketTopicGroup group) {
     StringBuilder sb = new StringBuilder();
     sb.append("# Socket Topics").append("\n");
     sb.append("---\n\n");
@@ -158,10 +165,10 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
 
     group.forEach((e, level) -> {
       e.exec(g -> {
-        sb.append(String.format("<a name=\"%s\"/>\n\n", g.getName()));
+        sb.append(String.format("<a name=\"%s\"></a>\n\n", g.getName()));
         sb.append(StringUtil.repeat("#", level)).append(" ").append(g.getName()).append("\n---\n\n");
       }, t -> {
-        sb.append(String.format("<a name=\"%s\"/>\n\n", t.getTopic()));
+        sb.append(String.format("<a name=\"%s\"></a>\n\n", t.getTopic()));
         sb.append(StringUtil.repeat("#", level)).append(" ").append(t.getTopic()).append("\n---\n\n");
         sb.append("Topic: `").append(t.getTopic()).append("`\n\n");
         sb.append(formatSide(t.getFromServer()));

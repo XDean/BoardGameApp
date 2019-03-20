@@ -4,6 +4,7 @@ import xdean.mini.boardgame.server.annotation.Attr;
 import xdean.mini.boardgame.server.annotation.Payload;
 import xdean.mini.boardgame.server.annotation.Side;
 import xdean.mini.boardgame.server.annotation.Topic;
+import xdean.mini.boardgame.server.annotation.TopicDoc;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 public interface CommonConstants {
@@ -24,6 +25,7 @@ public interface CommonConstants {
     String TO_SEAT = "TO_SEAT";
   }
 
+  @TopicDoc(path = "/doc/socket/topics.md")
   interface SocketTopic {
     interface Category {
       String DEFAULT = "Default";
