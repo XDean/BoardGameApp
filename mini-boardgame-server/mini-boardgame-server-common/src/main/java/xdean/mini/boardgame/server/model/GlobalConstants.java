@@ -7,15 +7,6 @@ import xdean.mini.boardgame.server.annotation.Topic;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 public interface GlobalConstants {
-
-  interface TagKey {
-  }
-
-  interface ErrorCode {
-    int SUCCESS = 0;
-    int ILLEGAL_ARGUEMENT = -100;
-  }
-
   interface AttrKey {
     @Attr(type = Integer.class)
     String USER_ID = "USER_ID";
@@ -42,6 +33,11 @@ public interface GlobalConstants {
     @Topic(category = Category.DEFAULT,
         fromServer = @Side(desc = "An error happened", payload = @Payload(type = String.class, desc = "Error message")))
     String ERROR_TOPIC = "ERROR";
+
+    @Topic(category = Category.DEFAULT,
+        fromServer = @Side(desc = "The message from client is bad",
+            payload = @Payload(type = String.class, desc = "Expect behavior")))
+    String BAD_REQUEST = "BAD_REQUEST";
 
     @Topic(category = Category.DEFAULT,
         fromClient = @Side(
@@ -101,7 +97,15 @@ public interface GlobalConstants {
     String CHANGE_SEAT = "CHANGE_SEAT";
 
     @Topic(category = Category.GAME_ROOM,
-        fromServer = @Side(desc = "Game Start!"))
+        fromClient = @Side(
+            desc = "The player is ready to start game or not",
+            payload = @Payload(desc = "Ready or not ready", type = boolean.class)),
+        fromServer = @Side(desc = "Player ready status changed",
+            attr = @Attr(desc = "", value = AttrKey.USER_ID),
+            payload = @Payload(desc = "Ready or not ready", type = boolean.class)))
+    String PLAYER_READY = "PLAYER_READY";
+
+    @Topic(category = Category.GAME_ROOM, fromServer = @Side(desc = "Game Start!"))
     String GAME_START = "GAME_START";
 
     @Topic(category = Category.GAME_ROOM,

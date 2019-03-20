@@ -122,7 +122,7 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
       providers.forEach(p -> disposable.add(p.handle(session, room, messageSubject.observeOn(Schedulers.io()))
           .subscribeOn(Schedulers.io())
           .subscribe(e -> sendMessage(session, e),
-              e -> warn("Unhandled error happens: " + session, e))));
+              e -> error("Unhandled error happens: " + session, e))));
       subjects.put(session, messageSubject);
       disposables.put(session, disposable);
       trace("Websocket subscribe to provider: " + session);

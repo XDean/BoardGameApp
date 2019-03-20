@@ -263,6 +263,9 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           case SocketTopic.CHANGE_SEAT_REQUEST:
             changeSeat(context, e);
             break;
+          case SocketTopic.PLAYER_READY:
+            playerReady(context, e);
+            break;
           }
         })
         .doOnComplete(() -> context.outputObserver.onNext(WebSocketEvent.builder()
@@ -272,12 +275,12 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   }
 
   private void changeSeat(SocketContext context, WebSocketEvent<?> e) {
-    GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId()).orElseThrow(IllegalStateException::new);
-    int toSeat = ((Number) e.getAttributes().get(AttrKey.TO_SEAT)).intValue();
     synchronized (getLock(context.room.getId())) {
       synchronized (getLock(context.userId)) {
-        GamePlayerEntity fromUser = roomEntity.getPlayers().stream().filter(p -> p.getId() == context.userId).findFirst()
-            .orElseThrow(IllegalStateException::new);
+        GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId()).orElseThrow(IllegalStateException::new);
+        int toSeat = ((Number) e.getAttributes().get(AttrKey.TO_SEAT)).intValue();
+        GamePlayerEntity fromUser = roomEntity.getPlayers().stream().filter(p -> p.getId() == context.userId)
+            .findFirst().orElseThrow(()->new IllegalArgumentException("Only player in the room can change seat"));
         int fromSeat = fromUser.getSeat();
         if (fromSeat == toSeat) {
           return;
@@ -310,6 +313,17 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
             .attribute(AttrKey.FROM_SEAT, fromSeat)
             .attribute(AttrKey.TO_SEAT, toSeat)
             .build());
+      }
+    }
+  }
+
+  private void playerReady(SocketContext context, WebSocketEvent<?> e) {
+    synchronized (getLock(context.room.getId())) {
+      synchronized (getLock(context.userId)) {
+        GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId()).orElseThrow(IllegalStateException::new);
+        GamePlayerEntity user = roomEntity.getPlayers().stream().filter(p -> p.getId() == context.userId)
+            .findFirst().orElseThrow(()->new IllegalArgumentException("Only player in the room can be ready"));
+//        user.setReady(e.getPayload());
       }
     }
   }
