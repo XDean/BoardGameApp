@@ -20,6 +20,8 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
   public String findPlayer(Integer id) {
     return MyBatisSQL.create()
         .SELECT_FROM(GamePlayerTable.table)
+        .SELECT_ALL(ProfileTable.table)
+        .INNER_JOIN(ProfileTable.table, equal(GamePlayerTable.id, ProfileTable.id))
         .WHERE(equal(GamePlayerTable.id.fullName, id))
         .toString();
   }
@@ -42,6 +44,8 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
   public String findAllPlayersInRoom(Integer roomId) {
     return MyBatisSQL.create()
         .SELECT_FROM(GamePlayerTable.table)
+        .SELECT_ALL(ProfileTable.table)
+        .INNER_JOIN(ProfileTable.table, equal(GamePlayerTable.id, ProfileTable.id))
         .WHERE(equal(GamePlayerTable.roomId.fullName, roomId))
         .toString();
   }

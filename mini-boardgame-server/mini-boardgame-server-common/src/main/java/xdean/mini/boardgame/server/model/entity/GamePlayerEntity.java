@@ -27,7 +27,11 @@ public class GamePlayerEntity {
   @ApiModelProperty(position = 1, example = "0")
   int seat = -1;
 
+  @ApiModelProperty(position = 2, example = "true")
   boolean ready;
+
+  @ApiModelProperty(position = 3)
+  UserProfileEntity profile;
 
   public void setRoom(GameRoomEntity e) {
     room = Optional.ofNullable(e);

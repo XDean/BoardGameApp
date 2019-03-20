@@ -1,5 +1,7 @@
 package xdean.mini.boardgame.server.mybatis.mapper;
 
+import javax.inject.Inject;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,6 +13,9 @@ import xdean.mybatis.extension.resultmap.InitResultMap;
 
 @Configuration
 public class GameResultMap implements Tables {
+
+  @Inject
+  UserResultMap userResultMap;
 
   @Bean
   public InitResultMap<GameRoomEntity> gameRoomMapper() {
@@ -35,7 +40,8 @@ public class GameResultMap implements Tables {
             .stringFree()
             .mapping(GamePlayerTable.id, GamePlayerEntity::setId)
             .mapping(GamePlayerTable.seat, GamePlayerEntity::setSeat)
-            .mapping(GamePlayerTable.ready, GamePlayerEntity::isReady))
+            .mapping(GamePlayerTable.ready, GamePlayerEntity::isReady)
+            .mapping(d -> d.property(GamePlayerEntity::setProfile).nestMap(userResultMap.userProfileMapper().getId())))
         .build();
   }
 }
