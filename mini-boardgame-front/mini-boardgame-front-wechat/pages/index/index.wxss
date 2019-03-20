@@ -16,6 +16,7 @@
   color: #aaa;
 }
 
-.usermotto {
-  margin-top: 200px;
+.create-game {
+  margin-top: 200rpx;
+  margin-bottom: 50rpx;
 }
