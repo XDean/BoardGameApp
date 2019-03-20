@@ -9,19 +9,19 @@ import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 public interface CommonConstants {
   interface AttrKey {
-    @Attr(type = Integer.class)
+    @Attr(type = Integer.class, desc = "Player ID")
     String USER_ID = "USER_ID";
 
-    @Attr(type = GameRoomEntity.class)
+    @Attr(type = GameRoomEntity.class, desc = "Room ID")
     String ROOM = "ROOM";
 
-    @Attr(type = String.class)
+    @Attr(type = String.class, desc = "Access Token from cookie")
     String ACCESS_TOKEN = "ACCESS_TOKEN";
 
-    @Attr(type = int.class)
+    @Attr(type = int.class, desc = "From seat")
     String FROM_SEAT = "FROM_SEAT";
 
-    @Attr(type = int.class)
+    @Attr(type = int.class, desc = "To seat")
     String TO_SEAT = "TO_SEAT";
   }
 
@@ -103,7 +103,7 @@ public interface CommonConstants {
             desc = "The player is ready to start game or not",
             payload = @Payload(desc = "Ready or not ready", type = boolean.class)),
         fromServer = @Side(desc = "Player ready status changed",
-            attr = @Attr(desc = "", value = AttrKey.USER_ID),
+            attr = @Attr(AttrKey.USER_ID),
             payload = @Payload(desc = "Ready or not ready", type = boolean.class)))
     String PLAYER_READY = "PLAYER_READY";
 

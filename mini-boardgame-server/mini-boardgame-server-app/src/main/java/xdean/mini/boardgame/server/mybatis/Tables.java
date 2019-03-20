@@ -38,6 +38,7 @@ public interface Tables {
     Column id = ColumnBuilder.create().table(table).column("id").jdbcType(JdbcType.INTEGER).id().build();
     Column roomId = ColumnBuilder.create().table(table).column("room_id").jdbcType(JdbcType.INTEGER).index().build();
     Column seat = ColumnBuilder.create().table(table).column("seat").jdbcType(JdbcType.INTEGER).build();
+    Column ready = ColumnBuilder.create().table(table).column("ready").jdbcType(JdbcType.BOOLEAN).build();
   }
 
   interface GameRoomTable {

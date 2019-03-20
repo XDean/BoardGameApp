@@ -13,13 +13,11 @@ import java.util.stream.IntStream;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
 import xdean.jex.extra.collection.IntList;
 import xdean.mini.boardgame.server.model.GameBoard;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
-import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;
 
 public class GdjzjBoard extends GameBoard {
@@ -30,13 +28,12 @@ public class GdjzjBoard extends GameBoard {
   int currentTurn = 0;
 
   @JsonCreator
-  public GdjzjBoard(@JsonProperty("room") GameRoomEntity room) {
-    super(room);
+  public GdjzjBoard() {
   }
 
   @Override
   public void start(GamePlayerEntity[] players) {
-    checkState(WAITING);
+    checkState(State.WAITING);
     Arrays.sort(players, Comparator.comparing(p -> p.getSeat()));
     this.cards = createCards();
     List<GdjzjRole> roles = GdjzjRole.getRoles(players.length);
@@ -45,7 +42,7 @@ public class GdjzjBoard extends GameBoard {
         .collect(Collectors.toList()));
     this.currentPlayer = ThreadLocalRandom.current().nextInt(players.length);
     this.currentTurn = 0;
-    state = START;
+    setState(State.PLAYING);
   }
 
   public void nextTurn() {

@@ -19,6 +19,6 @@ public class GdjzjGame implements GameProvider<GdjzjBoard> {
   public GdjzjBoard createGame(GameRoomEntity room) {
     Assert.isTrue(room.getGameName().equals(name()), "Game must be gdjzj");
     Assert.isTrue(room.getPlayerCount() >= 6 && room.getPlayerCount() <= 8, "Gdjzj player count must be 6-8");
-    return new GdjzjBoard(room);
+    return new GdjzjBoard();
   }
 }

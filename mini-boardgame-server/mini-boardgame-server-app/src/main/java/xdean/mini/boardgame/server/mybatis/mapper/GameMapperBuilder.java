@@ -53,7 +53,8 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
           .VALUES(GamePlayerTable.id.fullName, Integer.toString(e.getId()))
           .VALUES(GamePlayerTable.roomId.fullName, Integer.toString(e.getRoom().get().getId()))
           .VALUES(GamePlayerTable.seat.fullName, Integer.toString(e.getSeat()))
-          .ON_DUPLICATE_KEY_UPDATE(GamePlayerTable.roomId, GamePlayerTable.seat)
+          .VALUES(GamePlayerTable.ready.fullName, Boolean.toString(e.isReady()))
+          .ON_DUPLICATE_KEY_UPDATE(GamePlayerTable.roomId, GamePlayerTable.seat, GamePlayerTable.ready)
           .toString();
     } else {
       return MyBatisSQL.create()

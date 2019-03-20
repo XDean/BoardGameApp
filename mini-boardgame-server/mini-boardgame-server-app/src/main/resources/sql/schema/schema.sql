@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS `t_game_players`(
   `id` INT PRIMARY KEY,
   `room_id` INT NOT NULL,
   `seat` INT DEFAULT -1 NOT NULL,
+	`ready` TINYINT(1) DEFAULT 0 NOT NULL,
   CONSTRAINT `fk_player_user_id` FOREIGN KEY (`id`) REFERENCES `t_users`(`id`),
   CONSTRAINT `fk_player_room_id` FOREIGN KEY (`room_id`) REFERENCES `t_game_rooms`(`id`)
 ) DEFAULT CHARSET=latin1;

@@ -43,6 +43,7 @@ public class GameDataDBService implements GameDataService {
     if (room != null) {
       List<GamePlayerEntity> players = gameMapper.findAllPlayersInRoom(room.getId());
       room.setPlayers(players);
+      room.getBoard().setRoom(room);
       players.forEach(e -> e.setRoom(room));
       return Optional.of(room);
     }
@@ -68,7 +69,9 @@ public class GameDataDBService implements GameDataService {
 
   @Override
   public List<GameRoomEntity> findAllByRoomGameName(String gameName, RowBounds page) {
-    return gameMapper.findAllRoom(gameName, page);
+    List<GameRoomEntity> rooms = gameMapper.findAllRoom(gameName, page);
+    rooms.forEach(e -> e.getBoard().setRoom(e));
+    return rooms;
   }
 
   @Override

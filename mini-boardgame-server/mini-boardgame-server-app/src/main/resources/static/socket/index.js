@@ -116,7 +116,7 @@ new function () {
           }
         }
         attributesstr=(attributesstr.slice(attributesstr.length-1)==',')?attributesstr.slice(0,-1):attributesstr;
-        var msg = '{"topic":"' + $('#topic').val() + '","attributes":{' + attributesstr + '}, "payload":"' + $('#payload').val() + '"}';
+        var msg = '{"topic":"' + $('#topic').val() + '","attributes":{' + attributesstr + '}, "payload":' + $('#payload').val() + '}';
         addMessage(msg, 'SENT');
         ws.send(msg);
       });

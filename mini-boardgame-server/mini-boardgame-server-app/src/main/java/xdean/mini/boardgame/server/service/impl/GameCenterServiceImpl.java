@@ -24,10 +24,11 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 import xdean.jex.extra.collection.Pair;
 import xdean.jex.log.Logable;
-import xdean.mini.boardgame.server.model.GameBoard;
 import xdean.mini.boardgame.server.model.CommonConstants;
 import xdean.mini.boardgame.server.model.CommonConstants.AttrKey;
 import xdean.mini.boardgame.server.model.CommonConstants.SocketTopic;
+import xdean.mini.boardgame.server.model.GameBoard;
+import xdean.mini.boardgame.server.model.GameBoard.State;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
@@ -96,6 +97,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           .player(player)
           .build();
       GameBoard board = game.get().createGame(room);
+      board.setRoom(room);
       room.setBoard(board);
 
       player.setRoom(room);
@@ -280,7 +282,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
         GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId()).orElseThrow(IllegalStateException::new);
         int toSeat = ((Number) e.getAttributes().get(AttrKey.TO_SEAT)).intValue();
         GamePlayerEntity fromUser = roomEntity.getPlayers().stream().filter(p -> p.getId() == context.userId)
-            .findFirst().orElseThrow(()->new IllegalArgumentException("Only player in the room can change seat"));
+            .findFirst().orElseThrow(() -> new IllegalArgumentException("Only player in the room can change seat"));
         int fromSeat = fromUser.getSeat();
         if (fromSeat == toSeat) {
           return;
@@ -317,13 +319,30 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     }
   }
 
-  private void playerReady(SocketContext context, WebSocketEvent<?> e) {
+  private void playerReady(SocketContext context, WebSocketEvent<JsonNode> e) {
     synchronized (getLock(context.room.getId())) {
       synchronized (getLock(context.userId)) {
         GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId()).orElseThrow(IllegalStateException::new);
+        roomEntity.getBoard().checkState(State.WAITING);
         GamePlayerEntity user = roomEntity.getPlayers().stream().filter(p -> p.getId() == context.userId)
-            .findFirst().orElseThrow(()->new IllegalArgumentException("Only player in the room can be ready"));
-//        user.setReady(e.getPayload());
+            .findFirst().orElseThrow(() -> new IllegalArgumentException("Only player in the room can be ready"));
+        boolean ready = e.getPayload().booleanValue();
+        if (user.isReady() == ready) {
+          return;
+        }
+        user.setReady(ready);
+        gameMapper.save(user);
+        sendEvent(context.userId, WebSocketEvent.builder()
+            .topic(SocketTopic.PLAYER_READY)
+            .attribute(AttrKey.USER_ID, context.userId)
+            .payload(ready)
+            .build());
+        if (roomEntity.getPlayers().stream().filter(p -> p.isReady()).count() == roomEntity.getPlayerCount()) {
+          roomEntity.getBoard().setState(State.PLAYING);
+          sendEvent(context.userId, WebSocketEvent.builder()
+              .topic(SocketTopic.GAME_START)
+              .build());
+        }
       }
     }
   }

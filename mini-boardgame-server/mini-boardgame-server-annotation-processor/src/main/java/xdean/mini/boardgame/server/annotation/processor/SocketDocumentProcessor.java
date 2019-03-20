@@ -151,19 +151,19 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     return SocketTopic.builder()
         .topic(topic)
         .category(anno.category())
-        .fromClient(processSide(anno.fromClient()))
-        .fromServer(processSide(anno.fromServer()))
+        .fromClient(processSide(anno.fromClient(), false))
+        .fromServer(processSide(anno.fromServer(), true))
         .build();
   }
 
-  private SocketSide processSide(Side anno) {
+  private SocketSide processSide(Side anno, boolean server) {
     if (anno.disable()) {
       return null;
     }
     SocketSideBuilder sideBuilder = SocketSide.builder()
         .desc(description(anno.desc()));
     Arrays.stream(anno.attr()).forEach(attr -> sideBuilder.attr(processAttr(null, attr)));
-    sideBuilder.fromServer(false);
+    sideBuilder.fromServer(server);
     sideBuilder.payload(processPayload(anno.payload()));
     SocketSide side = sideBuilder.build();
     return side;

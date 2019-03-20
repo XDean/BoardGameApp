@@ -6,7 +6,7 @@
 
 ## Connect
 
-`host/game/room/{roomId}`
+`/game/room/{roomId}`
 
 ## Request and Response
 
