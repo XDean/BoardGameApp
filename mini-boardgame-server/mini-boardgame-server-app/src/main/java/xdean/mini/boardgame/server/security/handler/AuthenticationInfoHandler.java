@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import xdean.mini.boardgame.server.handler.LoginSuccessProvider;
-import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
+import xdean.mini.boardgame.server.model.CommonConstants.AttrKey;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.service.GameDataService;
 import xdean.mini.boardgame.server.service.UserDataService;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
+import xdean.mini.boardgame.server.model.CommonConstants.AttrKey;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateRequest;
 import xdean.mini.boardgame.server.model.param.UserProfileUpdateResponse;

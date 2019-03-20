@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
-import xdean.mini.boardgame.server.model.GlobalConstants;
+import xdean.mini.boardgame.server.model.CommonConstants;
 import xdean.mini.boardgame.server.model.param.CreateGameRequest;
 import xdean.mini.boardgame.server.model.param.CreateGameResponse;
 import xdean.mini.boardgame.server.model.param.CurrentGameResponse;
@@ -29,7 +29,7 @@ import xdean.mini.boardgame.server.service.GameDataService;
 @Api(tags = "Game/Game-Center")
 @RestController
 @RequestMapping("/game/room")
-public class GameCenterEndPoint implements GlobalConstants {
+public class GameCenterEndPoint implements CommonConstants {
 
   private @Inject GameCenterService service;
   private @Inject GameDataService gameService;

@@ -6,7 +6,7 @@ import xdean.mini.boardgame.server.annotation.Side;
 import xdean.mini.boardgame.server.annotation.Topic;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
-public interface GlobalConstants {
+public interface CommonConstants {
   interface AttrKey {
     @Attr(type = Integer.class)
     String USER_ID = "USER_ID";

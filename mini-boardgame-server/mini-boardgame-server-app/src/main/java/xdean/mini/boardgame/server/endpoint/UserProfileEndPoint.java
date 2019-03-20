@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
-import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
+import xdean.mini.boardgame.server.model.CommonConstants.AttrKey;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.model.entity.UserProfileEntity;
 import xdean.mini.boardgame.server.model.exception.MiniBoardgameException;

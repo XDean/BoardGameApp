@@ -18,8 +18,8 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import xdean.mini.boardgame.server.model.GlobalConstants;
-import xdean.mini.boardgame.server.model.GlobalConstants.SocketTopic;
+import xdean.mini.boardgame.server.model.CommonConstants;
+import xdean.mini.boardgame.server.model.CommonConstants.SocketTopic;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 
 @Slf4j
@@ -49,7 +49,7 @@ public abstract class AbstractGameSocketProvider implements GameSocketProvider {
   @Override
   public Observable<WebSocketEvent<?>> handle(WebSocketSession session, GameRoomEntity room,
       Observable<WebSocketEvent<JsonNode>> input) {
-    Integer id = (Integer) session.getAttributes().get(GlobalConstants.AttrKey.USER_ID);
+    Integer id = (Integer) session.getAttributes().get(CommonConstants.AttrKey.USER_ID);
     Assert.notNull(id, "Authed user must have id");
     SocketContext context = SocketContext.builder()
         .session(session)

@@ -33,7 +33,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import xdean.jex.log.Logable;
-import xdean.mini.boardgame.server.model.GlobalConstants;
+import xdean.mini.boardgame.server.model.CommonConstants;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
 import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
@@ -41,7 +41,7 @@ import xdean.mini.boardgame.server.security.TokenAuthProvider;
 import xdean.mini.boardgame.server.service.UserDataService;
 
 @Component
-public class GameSocketEndpoint extends TextWebSocketHandler implements Logable, GlobalConstants {
+public class GameSocketEndpoint extends TextWebSocketHandler implements Logable, CommonConstants {
 
   private final Map<Integer, GameRoomSocketHandler> rooms = new ConcurrentHashMap<>();
 

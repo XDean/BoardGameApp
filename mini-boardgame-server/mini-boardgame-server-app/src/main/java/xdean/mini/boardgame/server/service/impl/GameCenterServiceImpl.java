@@ -25,9 +25,9 @@ import io.reactivex.subjects.Subject;
 import xdean.jex.extra.collection.Pair;
 import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.GameBoard;
-import xdean.mini.boardgame.server.model.GlobalConstants;
-import xdean.mini.boardgame.server.model.GlobalConstants.AttrKey;
-import xdean.mini.boardgame.server.model.GlobalConstants.SocketTopic;
+import xdean.mini.boardgame.server.model.CommonConstants;
+import xdean.mini.boardgame.server.model.CommonConstants.AttrKey;
+import xdean.mini.boardgame.server.model.CommonConstants.SocketTopic;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
@@ -151,7 +151,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
         int playerId = player.getId();
         sendEvent(playerId, WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_JOIN)
-            .attribute(GlobalConstants.AttrKey.USER_ID, playerId)
+            .attribute(CommonConstants.AttrKey.USER_ID, playerId)
             .build());
         return JoinGameResponse.builder()
             .build();
@@ -190,7 +190,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
         int playerId = player.getId();
         sendEvent(playerId, WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_EXIT)
-            .attribute(GlobalConstants.AttrKey.USER_ID, playerId)
+            .attribute(CommonConstants.AttrKey.USER_ID, playerId)
             .build());
         if (room.getPlayers().isEmpty()) {
           sendEvent(player.getId(), WebSocketEvent.builder()
@@ -251,7 +251,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     return BehaviorSubject.createDefault(WebSocketEvent.builder()
         .type(WebSocketSendType.ALL)
         .topic(SocketTopic.PLAYER_CONNECT)
-        .attribute(GlobalConstants.AttrKey.USER_ID, context.getUserId())
+        .attribute(CommonConstants.AttrKey.USER_ID, context.getUserId())
         .build());
   }
 
@@ -270,7 +270,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
         })
         .doOnComplete(() -> context.outputObserver.onNext(WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_DISCONNECT)
-            .attribute(GlobalConstants.AttrKey.USER_ID, context.userId)
+            .attribute(CommonConstants.AttrKey.USER_ID, context.userId)
             .build()));
   }
 
