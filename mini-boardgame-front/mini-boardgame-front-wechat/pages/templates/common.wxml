@@ -1,0 +1,13 @@
+<template name="userInfo">
+  <view class="userInfo">
+    <image class="userinfo-avatar" src="{{avatarUrl}}" mode="cover"></image>
+    <text class="userinfo-nickname">{{nickName}}</text>
+  </view>
+</template>
+
+<template name="userInfo-mini">
+  <view class="userInfo-mini">
+    <image class="userinfo-avatar-mini" src="{{avatarUrl}}" mode="cover"></image>
+    <text class="userinfo-nickname-mini">{{nickName}}</text>
+  </view>
+</template>

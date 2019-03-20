@@ -1,2 +1,6 @@
 <!--pages/index/create-game.wxml-->
-<text>pages/index/create-game.wxml</text>
+<view>
+<view style="flex-direction:row;">
+
+</view>
+</view>

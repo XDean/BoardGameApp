@@ -27,7 +27,6 @@ Page({
     }
   },
   getUserInfo: function(e) {
-    console.log(e)
     this.updateUserInfo(e.detail.userInfo)
   },
   //事件处理函数
@@ -41,7 +40,8 @@ Page({
       url: 'join-game'
     })
   },
-  updateUserInfo: function(userInfo) {
+  updateUserInfo: function (userInfo) {
+    console.log(userInfo)
     this.setData({
       userInfo: userInfo,
       hasUserInfo: true

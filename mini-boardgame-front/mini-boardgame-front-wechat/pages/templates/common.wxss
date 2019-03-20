@@ -1,0 +1,33 @@
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.userinfo-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  margin: 20rpx;
+  border-radius: 50%;
+}
+
+.userinfo-nickname {
+  color: #aaa;
+}
+
+.userInfo-mini {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.userinfo-avatar-mini {
+  width: 64rpx;
+  height: 64rpx;
+  margin: 10rpx;
+  border-radius: 50%;
+}
+
+.userinfo-nickname-mini {
+  color: #aaa;
+}
