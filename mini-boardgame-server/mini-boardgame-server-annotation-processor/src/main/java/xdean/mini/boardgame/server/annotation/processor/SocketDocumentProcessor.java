@@ -1,5 +1,7 @@
 package xdean.mini.boardgame.server.annotation.processor;
 
+import static xdean.jex.util.lang.ExceptionUtil.uncheck;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -10,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -28,6 +31,7 @@ import net.steppschuh.markdowngenerator.table.Table.Builder;
 import net.steppschuh.markdowngenerator.text.emphasis.BoldText;
 import xdean.annotation.processor.toolkit.AssertException;
 import xdean.annotation.processor.toolkit.ElementUtil;
+import xdean.annotation.processor.toolkit.NestCompileFile;
 import xdean.annotation.processor.toolkit.XAbstractProcessor;
 import xdean.annotation.processor.toolkit.annotation.SupportedAnnotation;
 import xdean.jex.util.string.StringUtil;
@@ -48,15 +52,41 @@ import xdean.mini.boardgame.server.annotation.processor.model.SocketTopicGroup;
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class SocketDocumentProcessor extends XAbstractProcessor {
 
+  private static final String ATTR_FILE = "META-INF/attr.csv";
   private final Map<String, SocketAttr> attrs = new HashMap<>();
   private final Map<TopicDoc, SocketTopicGroup> groups = new HashMap<>();
 
   @Override
+  public synchronized void init(ProcessingEnvironment processingEnv) {
+    super.init(processingEnv);
+    NestCompileFile attrFiles = new NestCompileFile(ATTR_FILE);
+    try {
+      attrFiles.readLines().forEach(s -> {
+        String[] split = s.substring(1, s.length() - 1).split("\",\"");
+        assertThat(split.length == 3).log("Attr file is invalid");
+        SocketAttr attr = SocketAttr.builder()
+            .key(split[0])
+            .desc(split[1])
+            .type(split[2])
+            .build();
+        attrs.put(attr.getKey(), attr);
+      });
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  @Override
   public boolean processActual(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws AssertException {
     if (roundEnv.processingOver()) {
-      groups.forEach((anno, g) -> {
-        String document = generateDocument(g);
-        try {
+      try {
+        FileObject attrFile = filer.createResource(StandardLocation.CLASS_OUTPUT, "", ATTR_FILE);
+        PrintStream attrStream = new PrintStream(attrFile.openOutputStream());
+        attrs.values()
+            .forEach(a -> attrStream.println(String.format("\"%s\",\"%s\",\"%s\"", a.getKey(), a.getDesc(), a.getType())));
+        attrStream.close();
+        groups.forEach((anno, g) -> uncheck(() -> {
+          String document = generateDocument(g);
           String path = anno.path();
           if (path.startsWith("/")) {
             path = path.substring(1);
@@ -65,11 +95,11 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
           PrintStream ps = new PrintStream(file.openOutputStream());
           ps.print(document);
           ps.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-          throw new Error(e);
-        }
-      });
+        }));
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw new Error(e);
+      }
       return false;
     }
     Set<VariableElement> attrs = ElementFilter.fieldsIn(roundEnv.getElementsAnnotatedWith(Attr.class));
@@ -108,7 +138,7 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     SocketAttr attr = SocketAttr.builder()
         .key(id)
         .desc(desc)
-        .type(ElementUtil.getAnnotationClassValue(elements, anno, a -> a.type()))
+        .type(ElementUtil.getAnnotationClassValue(elements, anno, a -> a.type()).toString())
         .build();
     attrs.put(id, attr);
     return attr;
@@ -192,7 +222,7 @@ public class SocketDocumentProcessor extends XAbstractProcessor {
     Table.Builder table = new Builder()
         .withAlignments(Table.ALIGN_CENTER)
         .addRow("Name", "Type", "Description");
-    side.getAttrs().forEach(attr -> table.addRow(attr.getKey(), code(attr.getType().toString()), attr.getDesc()));
+    side.getAttrs().forEach(attr -> table.addRow(attr.getKey(), code(attr.getType()), attr.getDesc()));
     if (side.getPayload() != null) {
       TypeMirror type = side.getPayload().getType();
       table.addRow(new BoldText("Payload"), code(type == null ? "Undefined" : type.toString()), side.getPayload().getDesc());
