@@ -24,7 +24,7 @@
 .userinfo-avatar-mini {
   width: 64rpx;
   height: 64rpx;
-  margin: 10rpx;
+  margin: 20rpx;
   border-radius: 50%;
 }
 

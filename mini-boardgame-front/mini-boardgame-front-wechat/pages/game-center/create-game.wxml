@@ -1,0 +1,13 @@
+<!--pages/index/create-game.wxml-->
+<import src="../templates/common.wxml" />
+<view class="container">
+  <template is="userInfo-mini" data="{{...userInfo}}" />
+  <picker bindchange="selectGame" value="{{gameChoice}}" range="{{gameList}}" range-key='name'>
+    <view class="picker">
+      选择游戏：{{gameList[gameChoice].name}}
+    </view>
+  </picker>
+  <view>
+  </view>
+  <button>创建</button>
+</view>

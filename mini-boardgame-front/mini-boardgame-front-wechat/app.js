@@ -1,6 +1,6 @@
 //app.js
 App({
-  onLaunch: function () {
+  onLaunch: function() {
     // 展示本地存储能力
     var logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
@@ -34,6 +34,23 @@ App({
     })
   },
   globalData: {
-    userInfo: null
+    userInfo: null,
+    gameList: [{
+        id: "lc",
+        name: "Lost Cities",
+        config: {}
+      },
+      {
+        id: "gdjzj",
+        name: "古中局",
+        config: {
+          playerCountList: [6,7,8],
+          playerCountChoice: 0,
+          selectPlayerCount: function(e){
+            
+          }
+        }
+      }
+    ]
   }
 })
