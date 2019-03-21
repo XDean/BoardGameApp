@@ -1,9 +1,11 @@
 package xdean.mini.boardgame.server.model.param;
 
+import java.util.Map;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -16,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateGameRequest {
   @Default
   @NotBlank
@@ -28,5 +31,5 @@ public class CreateGameRequest {
 
   @NotNull
   @ApiModelProperty(position = 2, required = true)
-  JsonNode gameConfig;
+  Map<String, Object> gameConfig;
 }

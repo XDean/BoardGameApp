@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashMultimap;
@@ -117,12 +116,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   }
 
   private <C extends GameConfig> void config(CreateGameRequest request, GameProvider<?, C> game, GameRoomEntity room) {
-    C config;
-    try {
-      config = objectMapper.treeToValue(request.getGameConfig(), game.configClass());
-    } catch (JsonProcessingException e) {
-      throw new IllegalArgumentException("Game config is illegal", e);
-    }
+    C config = objectMapper.convertValue(request.getGameConfig(), game.configClass());
     game.configRoom(room, config);
   }
 

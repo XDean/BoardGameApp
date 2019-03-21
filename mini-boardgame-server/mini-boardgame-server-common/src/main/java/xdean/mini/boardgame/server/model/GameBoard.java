@@ -2,6 +2,8 @@ package xdean.mini.boardgame.server.model;
 
 import org.springframework.util.Assert;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
@@ -14,7 +16,9 @@ public abstract class GameBoard {
     PLAYING
   }
 
+  @JsonIgnore
   GameRoomEntity room;
+
   State state = State.WAITING;
 
   public abstract void start(GamePlayerEntity[] players);
