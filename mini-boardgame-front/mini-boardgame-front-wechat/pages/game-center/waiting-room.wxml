@@ -4,8 +4,8 @@
   <text>房间名：{{room.roomName}}</text>
   <text>游戏：{{gameName}}</text>
   <view>
-    <lost-cities-config wx:if="{{gameName=='lost-cities'}}" id='lc-config' readOnly='true' />
-    <gdjzj-config wx:if="{{gameName=='gdjzj'}}" id='gdjzj-config' readOnly='true' />
+    <lost-cities-config wx:if="{{room.gameName=='lost-cities'}}" id='lost-cities-config' readOnly='true' />
+    <gdjzj-config wx:if="{{room.gameName=='gdjzj'}}" id='gdjzj-config' readOnly='true' />
   </view>
   <view class="playerContainer">
     <template is="userInfo" data="{{...userInfo}}" />

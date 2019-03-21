@@ -13,6 +13,7 @@ Page({
     util.request({
       url: 'game/room',
       success: function(e) {
+        console.log(e.data)
         self.setData({
           room: e.data.room,
           gameName: app.globalData.gameList.find(x => x.id == e.data.room.gameName).name
