@@ -1,5 +1,5 @@
 <!--pages/index/create-game.wxml-->
-<import src="../templates/common.wxml" />
+<import src="/templates/common.wxml" />
 <view class="container">
   <template is="userInfo-mini" data="{{...userInfo}}" />
   <picker bindchange="selectGame" value="{{gameChoice}}" range="{{gameList}}" range-key='name'>
@@ -8,6 +8,8 @@
     </view>
   </picker>
   <view>
+    <lc-config wx:if="{{gameList[gameChoice].id=='lc'}}"/>
+    <gdjzj-config wx:if="{{gameList[gameChoice].id=='gdjzj'}}"/>
   </view>
   <button>创建</button>
 </view>

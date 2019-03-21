@@ -1,5 +1,6 @@
 {
   "usingComponents": {
-    "lc-config":"/"
+    "lc-config": "/components/game-config/lc-config",
+    "gdjzj-config": "/components/game-config/gdjzj-config"
   }
 }

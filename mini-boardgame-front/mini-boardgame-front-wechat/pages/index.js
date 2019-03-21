@@ -32,12 +32,12 @@ Page({
   //事件处理函数
   createGame: function() {
     wx.navigateTo({
-      url: 'create-game'
+      url: 'game-center/create-game'
     })
   },
   joinGame: function() {
     wx.navigateTo({
-      url: 'join-game'
+      url: 'game-center/join-game'
     })
   },
   updateUserInfo: function (userInfo) {

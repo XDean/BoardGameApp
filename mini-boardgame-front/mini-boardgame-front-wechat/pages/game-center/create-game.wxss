@@ -1,2 +1,2 @@
 /* pages/index/create-game.wxss */
-@import "../templates/common.wxss";
+@import "/templates/common.wxss";

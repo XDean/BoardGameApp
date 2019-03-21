@@ -1,3 +1,3 @@
 <view>
-  <picker bindchange="selectPlayerCount()" value="{{gameChoice}}" range="{{gameList}}" range-key='name'>人数： {{playerCount}}</picker>
+  <picker bindchange="selectPlayerCount" value="{{playerCountChoice}}" range="{{playerCountList}}">人数： {{playerCountList[playerCountChoice]}}</picker>
 </view>

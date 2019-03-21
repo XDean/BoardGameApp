@@ -37,19 +37,11 @@ App({
     userInfo: null,
     gameList: [{
         id: "lc",
-        name: "Lost Cities",
-        config: {}
+        name: "Lost Cities"
       },
       {
         id: "gdjzj",
-        name: "古中局",
-        config: {
-          playerCountList: [6,7,8],
-          playerCountChoice: 0,
-          selectPlayerCount: function(e){
-            
-          }
-        }
+        name: "古中局"
       }
     ]
   }

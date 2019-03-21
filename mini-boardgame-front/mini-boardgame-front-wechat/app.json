@@ -1,9 +1,8 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/logs/logs",
-    "pages/index/create-game",
-    "pages/index/join-game"
+    "pages/index",
+    "pages/game-center/create-game",
+    "pages/game-center/join-game"
   ],
   "window": {
     "backgroundTextStyle": "light",
