@@ -14,9 +14,15 @@ Page({
       gameList: app.globalData.gameList
     })
   },
-  selectGame:function(e) {
+  selectGame: function(e) {
     this.setData({
       gameChoice: e.detail.value
     })
+  },
+  createGame: function(e) {
+    var gameId = this.data.gameList[this.data.gameChoice].id
+    console.log('To create game: ' + gameId)
+    var config = this.selectComponent('#' + gameId + '-config').data.config
+    console.log('With config: ' + config)
   }
 })

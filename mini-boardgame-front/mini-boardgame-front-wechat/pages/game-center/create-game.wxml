@@ -8,8 +8,8 @@
     </view>
   </picker>
   <view>
-    <lc-config wx:if="{{gameList[gameChoice].id=='lc'}}"/>
-    <gdjzj-config wx:if="{{gameList[gameChoice].id=='gdjzj'}}"/>
+    <lc-config wx:if="{{gameList[gameChoice].id=='lc'}}" id='lc-config' />
+    <gdjzj-config wx:if="{{gameList[gameChoice].id=='gdjzj'}}" id='gdjzj-config' />
   </view>
-  <button>创建</button>
+  <button bindtap='createGame'>创建</button>
 </view>

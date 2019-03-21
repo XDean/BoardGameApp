@@ -3,7 +3,10 @@ Component({
   properties: {},
   data: {
     playerCountList: [6, 7, 8],
-    playerCountChoice: 0
+    playerCountChoice: 0,
+    config: {
+      playerCount: 6
+    }
   },
   methods: {
     selectPlayerCount: function(e) {
