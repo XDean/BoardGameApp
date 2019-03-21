@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `t_game_rooms`(
   `room_name` VARCHAR(127) DEFAULT '',
   `player_count` INT NOT NULL,
   `created_time` TIMESTAMP NOT NULL,
+  `config` TEXT,
   `board` TEXT
 ) DEFAULT CHARSET=utf8;
 

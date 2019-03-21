@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
-import xdean.mini.boardgame.server.model.handler.GameBoardConverter;
+import xdean.mini.boardgame.server.model.handler.ObjectJsonConverter;
 import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.resultmap.InitResultMap;
 
@@ -28,7 +28,12 @@ public class GameResultMap implements Tables {
             .mapping(GameRoomTable.roomName, GameRoomEntity::setRoomName)
             .mapping(GameRoomTable.createdTime, GameRoomEntity::setCreatedTime)
             .mapping(GameRoomTable.playerCount, GameRoomEntity::setPlayerCount)
-            .mapping(d -> d.column(GameRoomTable.board).property(GameRoomEntity::setBoard).typeHandler(GameBoardConverter.class)))
+            .mapping(d -> d.column(GameRoomTable.config)
+                .property(GameRoomEntity::setConfig)
+                .typeHandler(ObjectJsonConverter.class))
+            .mapping(d -> d.column(GameRoomTable.board)
+                .property(GameRoomEntity::setBoard)
+                .typeHandler(ObjectJsonConverter.class)))
         .build();
   }
 

@@ -14,10 +14,11 @@ App({
               }
               util.request({
                 url: 'user/profile',
+                method: 'POST',
                 data: JSON.stringify({
                   profile: {
-                    nickname: res.userInfo.name,
-                    male: res.userInfo.male,
+                    nickname: res.userInfo.nickName,
+                    male: res.userInfo.gender,
                     avatarUrl: res.userInfo.avatarUrl
                   }
                 })

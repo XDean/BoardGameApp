@@ -10,12 +10,12 @@ import org.apache.ibatis.annotations.Param;
 
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
-import xdean.mini.boardgame.server.model.handler.GameBoardConverter;
+import xdean.mini.boardgame.server.model.handler.ObjectJsonConverter;
 import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.MyBatisSQL;
 
 public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
-  private GameBoardConverter gameBoardConverter = new GameBoardConverter();
+  private ObjectJsonConverter objectConverter = new ObjectJsonConverter();
 
   public String findPlayer(Integer id) {
     return MyBatisSQL.create()
@@ -76,9 +76,10 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
         .VALUES(GameRoomTable.roomName.fullName, wrapString(e.getRoomName()))
         .VALUES(GameRoomTable.createdTime.fullName, wrapString(new Timestamp(e.getCreatedTime().getTime()).toString()))
         .VALUES(GameRoomTable.playerCount.fullName, Integer.toString(e.getPlayerCount()))
-        .VALUES(GameRoomTable.board.fullName, wrapString(gameBoardConverter.toString(e.getBoard())))
+        .VALUES(GameRoomTable.config.fullName, wrapString(objectConverter.toString(e.getConfig())))
+        .VALUES(GameRoomTable.board.fullName, wrapString(objectConverter.toString(e.getBoard())))
         .ON_DUPLICATE_KEY_UPDATE(GameRoomTable.gameName, GameRoomTable.roomName, GameRoomTable.createdTime,
-            GameRoomTable.playerCount, GameRoomTable.board)
+            GameRoomTable.playerCount, GameRoomTable.config, GameRoomTable.board)
         .toString();
   }
 
@@ -98,8 +99,8 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
     return MyBatisSQL.create()
         .SELECT_FROM(GameRoomTable.table)
         .WHERE(equal(GameRoomTable.gameName.fullName, wrapString(gameName)))
-//        .LIMIT(page.getLimit())
-//        .OFFSET(page.getOffset())
+        // .LIMIT(page.getLimit())
+        // .OFFSET(page.getOffset())
         .toString();
   }
 }

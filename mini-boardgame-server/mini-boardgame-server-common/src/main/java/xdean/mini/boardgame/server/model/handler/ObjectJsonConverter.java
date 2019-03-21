@@ -11,19 +11,18 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 import xdean.jex.log.Logable;
-import xdean.mini.boardgame.server.model.GameBoard;
 import xdean.mybatis.extension.resultmap.StringParseHandler;
 
-public class GameBoardConverter implements StringParseHandler<GameBoard>, Logable {
+public class ObjectJsonConverter implements StringParseHandler<Object>, Logable {
   ObjectMapper objectMapper = new ObjectMapper();
 
-  public GameBoardConverter() {
+  public ObjectJsonConverter() {
     objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
   }
 
   @Override
-  public String toString(GameBoard board) {
+  public String toString(Object board) {
     if (board == null) {
       return "";
     }
@@ -39,14 +38,13 @@ public class GameBoardConverter implements StringParseHandler<GameBoard>, Logabl
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public GameBoard parse(String dbData) {
+  public Object parse(String dbData) {
     if (Strings.isNullOrEmpty(dbData)) {
       return null;
     }
     try {
       JsonNode map = objectMapper.readValue(dbData, JsonNode.class);
-      Class<? extends GameBoard> clz = (Class<? extends GameBoard>) Class.forName(map.get("class").textValue());
+      Class<?> clz = Class.forName(map.get("class").textValue());
       return objectMapper.treeToValue(map.get("value"), clz);
     } catch (IOException | ClassNotFoundException e) {
       debug("Fail to deserialize game board: " + dbData, e);
