@@ -42,7 +42,7 @@ App({
     userInfo: null,
     accessToken: null,
     gameList: [{
-        id: "lc",
+        id: "lost-cities",
         name: "Lost Cities"
       },
       {

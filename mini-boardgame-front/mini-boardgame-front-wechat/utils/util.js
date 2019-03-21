@@ -24,7 +24,7 @@ const request = input => {
       find = e.cookies.find(x => x.name === 'JSESSIONID')
       if (find)
         sessionId = find.value
-      if (input.success)
+      if (e.statusCode == 200 && input.success)
         input.success(e)
     },
     fail: input.fail,

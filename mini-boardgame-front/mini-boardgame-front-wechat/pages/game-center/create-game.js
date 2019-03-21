@@ -32,6 +32,10 @@ Page({
     console.log('To create game: ' + gameId)
     var config = this.selectComponent('#' + gameId + '-config').data.config
     console.log('With config: ' + config)
+    wx.showLoading({
+      title: '创建中...',
+      mask: true,
+    })
     util.request({
       url: 'game/room/create',
       method: 'POST',
@@ -39,6 +43,12 @@ Page({
         'gameName': gameId,
         'roomName': this.data.roomName,
         'gameConfig': config
+      },
+      success: function(){
+        wx.hideLoading()
+        wx.redirectTo({
+          url: `../games/${gameId}`,
+        })
       }
     })
   }

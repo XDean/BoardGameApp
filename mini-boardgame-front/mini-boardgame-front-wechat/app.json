@@ -2,7 +2,9 @@
   "pages": [
     "pages/index",
     "pages/game-center/create-game",
-    "pages/game-center/join-game"
+    "pages/game-center/join-game",
+    "pages/games/gdjzj",
+    "pages/games/lost-cities"
   ],
   "window": {
     "backgroundTextStyle": "light",
