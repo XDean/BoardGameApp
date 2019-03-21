@@ -1,0 +1,6 @@
+/* pages/game-center/waiting-room.wxss */
+.playerContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

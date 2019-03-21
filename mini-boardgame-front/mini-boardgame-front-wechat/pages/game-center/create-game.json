@@ -1,6 +1,6 @@
 {
   "usingComponents": {
-    "lc-config": "/components/game-config/lc-config",
+    "lost-cities-config": "/components/game-config/lost-cities-config",
     "gdjzj-config": "/components/game-config/gdjzj-config"
   }
 }

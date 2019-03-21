@@ -4,7 +4,8 @@
     "pages/game-center/create-game",
     "pages/game-center/join-game",
     "pages/games/gdjzj",
-    "pages/games/lost-cities"
+    "pages/games/lost-cities",
+    "pages/game-center/waiting-room"
   ],
   "window": {
     "backgroundTextStyle": "light",

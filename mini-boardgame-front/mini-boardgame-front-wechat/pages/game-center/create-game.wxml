@@ -12,7 +12,7 @@
     <input placeholder='选填' bindinput='inputRoomName'></input>
   </view>
   <view>
-    <lc-config wx:if="{{gameList[gameChoice].id=='lc'}}" id='lc-config' />
+    <lost-cities-config wx:if="{{gameList[gameChoice].id=='lost-cities'}}" id='lost-cities-config' />
     <gdjzj-config wx:if="{{gameList[gameChoice].id=='gdjzj'}}" id='gdjzj-config' />
   </view>
   <button bindtap='createGame'>创建</button>

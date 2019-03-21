@@ -47,7 +47,7 @@ Page({
       success: function(){
         wx.hideLoading()
         wx.redirectTo({
-          url: `../games/${gameId}`,
+          url: 'waiting-room',
         })
       }
     })

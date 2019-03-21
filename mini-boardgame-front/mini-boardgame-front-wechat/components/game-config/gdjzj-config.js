@@ -1,6 +1,8 @@
 // pages/components/game-config/gdjzj-config.js
 Component({
-  properties: {},
+  properties: {
+    readOnly: Boolean
+  },
   data: {
     playerCountList: [6, 7, 8],
     playerCountChoice: 0,
