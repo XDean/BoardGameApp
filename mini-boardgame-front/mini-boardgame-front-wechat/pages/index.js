@@ -10,6 +10,7 @@ Page({
     canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
   onLoad: function() {
+    var self = this
     if (app.globalData.userInfo) {
       // user info is ready
     } else if (this.data.canIUse) {
@@ -31,7 +32,7 @@ Page({
         })
       },
       badRequest: function(e) {
-        this.setData({
+        self.setData({
           notInGame: true
         })
       }

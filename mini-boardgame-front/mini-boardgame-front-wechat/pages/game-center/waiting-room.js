@@ -25,6 +25,17 @@ Page({
     })
   },
   onUnload: function() {
-
+    wx.showLoading({
+      title: '退出中...',
+      mask: true
+    })
+    util.request({
+      url: 'game/room/exit',
+      method: 'POST',
+      data: '{}',
+      complete: function(){
+        wx.hideLoading()
+      }
+    })
   }
 })
