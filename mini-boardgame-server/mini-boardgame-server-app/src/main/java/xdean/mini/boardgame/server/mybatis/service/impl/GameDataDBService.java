@@ -41,10 +41,7 @@ public class GameDataDBService implements GameDataService {
   public Optional<GameRoomEntity> findRoom(int roomId) {
     GameRoomEntity room = gameMapper.findRoom(roomId);
     if (room != null) {
-      List<GamePlayerEntity> players = gameMapper.findAllPlayersInRoom(room.getId());
-      room.setPlayers(players);
-      room.getBoard().setRoom(room);
-      players.forEach(e -> e.setRoom(room));
+      fillRoom(room);
       return Optional.of(room);
     }
     return Optional.empty();
@@ -70,7 +67,7 @@ public class GameDataDBService implements GameDataService {
   @Override
   public List<GameRoomEntity> findAllByRoomGameName(String gameName, RowBounds page) {
     List<GameRoomEntity> rooms = gameMapper.findAllRoom(gameName, page);
-    rooms.forEach(e -> e.getBoard().setRoom(e));
+    rooms.forEach(this::fillRoom);
     return rooms;
   }
 
@@ -82,5 +79,12 @@ public class GameDataDBService implements GameDataService {
   @Override
   public boolean roomExist(int id) {
     return gameMapper.roomExist(id);
+  }
+
+  private void fillRoom(GameRoomEntity room) {
+    List<GamePlayerEntity> players = gameMapper.findAllPlayersInRoom(room.getId());
+    room.setPlayers(players);
+    room.getBoard().setRoom(room);
+    players.forEach(e -> e.setRoom(room));
   }
 }

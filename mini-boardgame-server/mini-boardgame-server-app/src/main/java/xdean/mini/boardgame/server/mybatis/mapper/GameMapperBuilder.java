@@ -6,7 +6,7 @@ import static xdean.mybatis.extension.SqlUtil.wrapString;
 
 import java.sql.Timestamp;
 
-import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.annotations.Param;
 
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
@@ -94,12 +94,12 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
             .toString());
   }
 
-  public String findAllRoom(String gameName, RowBounds page) {
+  public String findAllRoom(@Param("gameName") String gameName) {
     return MyBatisSQL.create()
         .SELECT_FROM(GameRoomTable.table)
         .WHERE(equal(GameRoomTable.gameName.fullName, wrapString(gameName)))
-        .LIMIT(page.getLimit())
-        .OFFSET(page.getOffset())
+//        .LIMIT(page.getLimit())
+//        .OFFSET(page.getOffset())
         .toString();
   }
 }
