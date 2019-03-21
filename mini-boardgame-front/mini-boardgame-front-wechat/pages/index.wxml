@@ -5,6 +5,6 @@
     <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
     <template wx:else is="userInfo" data="{{...userInfo}}" />
   </view>
-  <button class='create-game' disabled='{{!hasUserInfo}}' bindtap='createGame'>创建游戏</button>
-  <button disabled='{{!hasUserInfo}}' bindtap='joinGame'>加入游戏</button>
+  <button class='create-game' disabled='{{!hasUserInfo||!notInGame}}' bindtap='createGame'>创建游戏</button>
+  <button disabled='{{!hasUserInfo||!notInGame}}' bindtap='joinGame'>加入游戏</button>
 </view>

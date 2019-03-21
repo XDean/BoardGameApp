@@ -1,9 +1,12 @@
 const app = getApp()
 
+import * as util from '../utils/util.js'
+
 Page({
   data: {
     userInfo: {},
     hasUserInfo: false,
+    notInGame: true,
     canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
   onLoad: function() {
@@ -20,6 +23,19 @@ Page({
         }
       })
     }
+    util.request({
+      url: 'game/room',
+      success: function(e) {
+        wx.navigateTo({
+          url: 'game-center/waiting-room',
+        })
+      },
+      badRequest: function(e) {
+        this.setData({
+          notInGame: true
+        })
+      }
+    })
   },
   getUserInfo: function(e) {
     this.updateUserInfo(e.detail.userInfo)
@@ -34,7 +50,7 @@ Page({
       url: 'game-center/join-game'
     })
   },
-  updateUserInfo: function (userInfo) {
+  updateUserInfo: function(userInfo) {
     console.log(userInfo)
     this.setData({
       userInfo: userInfo,
