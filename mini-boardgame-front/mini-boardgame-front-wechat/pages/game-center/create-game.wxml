@@ -7,6 +7,10 @@
       选择游戏：{{gameList[gameChoice].name}}
     </view>
   </picker>
+  <view style='display: flex; flex-direction: row; align-items: center; justify-content: center;'>
+    <text>房间名字</text>
+    <input placeholder='选填' bindinput='inputRoomName'></input>
+  </view>
   <view>
     <lc-config wx:if="{{gameList[gameChoice].id=='lc'}}" id='lc-config' />
     <gdjzj-config wx:if="{{gameList[gameChoice].id=='gdjzj'}}" id='gdjzj-config' />

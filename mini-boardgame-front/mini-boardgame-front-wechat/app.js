@@ -2,21 +2,7 @@
 import * as util from '/utils/util.js'
 
 App({
-  onLaunch: function () {
-    wx.login({
-      success: res => {
-        util.request({
-          url: `public/login-openid?provider=wechat-mbg&token=${res.code}`,
-          method: 'post',
-          success: function(e){
-            util.request({
-              url: 'hello'
-            })
-          }
-        })
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      }
-    })
+  onLaunch: function() {
     wx.getSetting({
       success: res => {
         if (res.authSetting['scope.userInfo']) {
@@ -26,6 +12,26 @@ App({
               if (this.userInfoReadyCallback) {
                 this.userInfoReadyCallback(res)
               }
+              wx.login({
+                success: loginRes => {
+                  util.request({
+                    url: `public/login-openid?provider=wechat-mbg&token=${loginRes.code}`,
+                    method: 'post',
+                    success: function(e) {
+                      util.request({
+                        url: 'user/profile',
+                        data: JSON.stringify({
+                          profile: {
+                            nickname: res.userInfo.name,
+                            male: res.userInfo.male,
+                            avatarUrl: res.userInfo.avatarUrl
+                          }
+                        })
+                      })
+                    }
+                  })
+                }
+              })
             }
           })
         }
