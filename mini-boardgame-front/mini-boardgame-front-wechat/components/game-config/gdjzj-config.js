@@ -15,10 +15,20 @@ Component({
   },
   methods: {
     selectPlayerCount: function(e) {
+      var count = this.data.playerCountList[e.detail.value];
       this.setData({
-        playerCountChoice: e.detail.value
+        playerCountChoice: e.detail.value,
+        'config.playerCount': count
       })
-      config.playerCount = playerCountList[e.detail.value]
+    }
+  },
+  observers: {
+    'config': function(newValue) {
+      console.log(this.data.config)
+      var index = this.data.playerCountList.findIndex(x => x == newValue.playerCount)
+      this.setData({
+        playerCountChoice: index
+      })
     }
   }
 })

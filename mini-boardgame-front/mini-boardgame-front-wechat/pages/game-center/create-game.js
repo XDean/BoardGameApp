@@ -31,7 +31,7 @@ Page({
     var gameId = this.data.gameList[this.data.gameChoice].id
     console.log('To create game: ' + gameId)
     var config = this.selectComponent('#' + gameId + '-config').data.config
-    console.log('With config: ' + config)
+    console.log(config)
     wx.showLoading({
       title: '创建中...',
       mask: true,
