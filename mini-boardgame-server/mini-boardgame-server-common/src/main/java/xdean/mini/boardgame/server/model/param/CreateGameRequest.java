@@ -1,7 +1,9 @@
 package xdean.mini.boardgame.server.model.param;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -24,7 +26,7 @@ public class CreateGameRequest {
   @ApiModelProperty(position = 1, example = "New Room")
   String roomName = "";
 
-  @Min(1)
-  @ApiModelProperty(position = 2, required = true, example = "6")
-  int playerCount;
+  @NotNull
+  @ApiModelProperty(position = 2, required = true)
+  JsonNode gameConfig;
 }

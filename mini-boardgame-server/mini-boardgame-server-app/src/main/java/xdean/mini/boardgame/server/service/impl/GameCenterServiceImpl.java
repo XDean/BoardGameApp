@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -29,6 +31,7 @@ import xdean.mini.boardgame.server.model.CommonConstants.AttrKey;
 import xdean.mini.boardgame.server.model.CommonConstants.SocketTopic;
 import xdean.mini.boardgame.server.model.GameBoard;
 import xdean.mini.boardgame.server.model.GameBoard.State;
+import xdean.mini.boardgame.server.model.GameConfig;
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
@@ -55,32 +58,34 @@ import xdean.mini.boardgame.server.socket.WebSocketSendType;
 public class GameCenterServiceImpl extends AbstractGameSocketProvider implements GameCenterService, GameSocketProvider, Logable {
 
   @Autowired(required = false)
-  List<GameProvider<?>> games = Collections.emptyList();
+  List<GameProvider<?, ?>> games = Collections.emptyList();
 
   private @Inject UserDataService userService;
   private @Inject GameDataService gameMapper;
+  private @Inject ObjectMapper objectMapper;
 
   private final Object[] locks = IntStream.range(0, 32).mapToObj(i -> new Object()).toArray();
 
   @Override
   public CreateGameResponse createGame(CreateGameRequest request) {
-    Optional<GameProvider<?>> game = findGame(request.getGameName());
-    if (!game.isPresent()) {
-      throw MiniBoardgameException.builder()
-          .code(HttpStatus.NOT_FOUND)
-          .message("No such game")
-          .build();
-    }
-    Optional<UserEntity> user = userService.getCurrentUser();
-    if (!user.isPresent()) {
+    Optional<UserEntity> userOptional = userService.getCurrentUser();
+    if (!userOptional.isPresent()) {
       throw MiniBoardgameException.builder()
           .code(HttpStatus.UNAUTHORIZED)
           .message("No authorized user")
           .build();
     }
-    UserEntity e = user.get();
-    synchronized (getLock(e.getId())) {
-      GamePlayerEntity player = gameMapper.findPlayer(e.getId());
+    Optional<GameProvider<?, ?>> gameOptional = findGame(request.getGameName());
+    if (!gameOptional.isPresent()) {
+      throw MiniBoardgameException.builder()
+          .code(HttpStatus.NOT_FOUND)
+          .message("No such game")
+          .build();
+    }
+    GameProvider<?, ?> game = gameOptional.get();
+    UserEntity user = userOptional.get();
+    synchronized (getLock(user.getId())) {
+      GamePlayerEntity player = gameMapper.findPlayer(user.getId());
       if (player.getRoom().isPresent()) {
         throw MiniBoardgameException.builder()
             .code(HttpStatus.BAD_REQUEST)
@@ -92,11 +97,12 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           .id(roomId)
           .gameName(request.getGameName())
           .createdTime(new Date())
-          .playerCount(request.getPlayerCount())
+          // .playerCount(request.getPlayerCount())
           .roomName(request.getRoomName().isEmpty() ? "Room " + roomId : request.getRoomName())
           .player(player)
           .build();
-      GameBoard board = game.get().createGame(room);
+      config(request, game, room);
+      GameBoard board = game.createGame(room);
       board.setRoom(room);
       room.setBoard(board);
 
@@ -108,6 +114,16 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           .roomId(roomId)
           .build();
     }
+  }
+
+  private <C extends GameConfig> void config(CreateGameRequest request, GameProvider<?, C> game, GameRoomEntity room) {
+    C config;
+    try {
+      config = objectMapper.treeToValue(request.getGameConfig(), game.configClass());
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException("Game config is illegal", e);
+    }
+    game.configRoom(room, config);
   }
 
   @Override
@@ -206,7 +222,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
 
   @Override
   public SearchGameResponse searchGame(SearchGameRequest request) {
-    Optional<GameProvider<?>> game = findGame(request.getGameName());
+    Optional<GameProvider<?, ?>> game = findGame(request.getGameName());
     if (!game.isPresent()) {
       throw MiniBoardgameException.builder()
           .code(HttpStatus.NOT_FOUND)
@@ -356,7 +372,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
     return id;
   }
 
-  private Optional<GameProvider<?>> findGame(String name) {
+  private Optional<GameProvider<?, ?>> findGame(String name) {
     return games.stream().filter(g -> g.name().equals(name)).findFirst();
   }
 

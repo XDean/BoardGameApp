@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.BufferRecyclers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
@@ -24,19 +23,17 @@ public class GameBoardConverter implements StringParseHandler<GameBoard>, Logabl
   }
 
   @Override
-  public String toString(GameBoard attribute) {
-    if (attribute == null) {
+  public String toString(GameBoard board) {
+    if (board == null) {
       return "";
     }
     try {
-      String clz = attribute.getClass().getName();
-      String value = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(attribute);
-      value = new String(BufferRecyclers.quoteAsJsonUTF8(value));
+      String clz = board.getClass().getName();
       return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(ImmutableMap.of(
           "class", clz,
-          "value", value));
+          "value", board));
     } catch (JsonProcessingException e) {
-      debug("Fail to serialize game board: " + attribute, e);
+      debug("Fail to serialize game board: " + board, e);
       return null;
     }
   }
@@ -50,8 +47,7 @@ public class GameBoardConverter implements StringParseHandler<GameBoard>, Logabl
     try {
       JsonNode map = objectMapper.readValue(dbData, JsonNode.class);
       Class<? extends GameBoard> clz = (Class<? extends GameBoard>) Class.forName(map.get("class").textValue());
-      String valueStr = map.get("value").textValue();
-      return objectMapper.readValue(valueStr, clz);
+      return objectMapper.treeToValue(map.get("value"), clz);
     } catch (IOException | ClassNotFoundException e) {
       debug("Fail to deserialize game board: " + dbData, e);
       return null;

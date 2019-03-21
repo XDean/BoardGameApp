@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 import xdean.mini.boardgame.server.model.GameBoard;
+import xdean.mini.boardgame.server.model.GameConfig;
 
 @Data
 @AllArgsConstructor
@@ -34,6 +35,8 @@ public class GameRoomEntity {
 
   @Singular
   List<GamePlayerEntity> players;
+
+  GameConfig config;
 
   @JsonIgnore
   GameBoard board;
