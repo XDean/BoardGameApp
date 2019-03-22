@@ -1,6 +1,30 @@
 /* pages/game-center/waiting-room.wxss */
-.playerContainer {
+@import "../../utils/toolTip.wxss";
+.playersContainer {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
+  margin: 30rpx;
+  justify-content: center;
+}
+
+.playerContainer {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  border: 3rpx solid black;
+  margin: 10rpx;
+}
+
+.player-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 128rpx;
 }

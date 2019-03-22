@@ -1,5 +1,6 @@
 <!--pages/game-center/waiting-room.wxml-->
-<import src="/templates/common.wxml" />
+<import src="../../utils/toolTip.wxml" />
+<template is="toolTip" data="{{_toolTip_}}" />
 <view class='container'>
   <text>房间名：{{room.roomName}}</text>
   <text>游戏：{{gameName}}</text>
@@ -7,7 +8,10 @@
     <lost-cities-config wx:if="{{room.gameName=='lost-cities'}}" id='lost-cities-config' readOnly='true' config='{{room.config}}' />
     <gdjzj-config wx:if="{{room.gameName=='gdjzj'}}" id='gdjzj-config' readOnly='true' config='{{room.config}}' />
   </view>
-  <view class="playerContainer">
-    <template is="userInfo" data="{{...userInfo}}" />
+  <view class="playersContainer">
+    <view wx:for="{{seatList}}" wx:for-index="playerIndex" wx:for-item='player' wx:key='{{id}}' class="playerContainer">
+      <image wx:if='{{player.profile.avatarUrl}}' class="player-avatar" src="{{player.profile.avatarUrl}}" mode="aspectFit" bindtap='clickIcon' id='{{playerIndex}}'></image>
+      <text wx:else class="player-avatar">空</text>
+    </view>
   </view>
 </view>
