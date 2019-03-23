@@ -1,66 +1,58 @@
 // pages/index/join-game/join-game.js
+
+import * as util from '../../utils/util.js'
+
+var roomId = null
+var getRoomTaskId = null
+
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
+    room: null
+  },
+  onLoad: function(options) {
 
   },
-
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad: function (options) {
-
+  inputRoomId: function(e) {
+    var self = this
+    roomId = e.detail.value
+    if (getRoomTaskId)
+      clearTimeout(getRoomTaskId)
+    getRoomTaskId = setTimeout(() => {
+      var id = roomId
+      util.request({
+        url: 'game/room/search',
+        method: 'POST',
+        data: {
+          'roomId': id
+        },
+        success: e => {
+          console.debug(e.data)
+          if (e.data.rooms && e.data.rooms.length == 1) {
+            self.setData({
+              room: e.data.rooms[0]
+            })
+          }
+        }
+      })
+    }, 1000)
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-
+  joinGame: function(e){
+    wx.showLoading({
+      title: '加入中...',
+      mask: true,
+    })
+    util.request({
+      url: 'game/room/join',
+      method: 'POST',
+      data: {
+        'roomId': roomId
+      },
+      success: function () {
+        wx.hideLoading()
+        wx.redirectTo({
+          url: 'waiting-room',
+        })
+      }
+    })
   }
 })

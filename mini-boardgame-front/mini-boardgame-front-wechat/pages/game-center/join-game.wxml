@@ -1,2 +1,8 @@
 <!--pages/index/join-game/join-game.wxml-->
-<text>pages/index/join-game/join-game.wxml</text>
+<view class='container'>
+  <input placeholder='房间号' bindinput='inputRoomId' type='number' focus='true'></input>
+  <button disabled='{{!room}}' bindtap='joinGame'>加入房间</button>
+  <text>房间名：{{room.roomName}}</text>
+  <text>游戏名：{{room.gameName}}</text>
+  <text>游戏人数:{{room.players.length}}/{{room.playerCount}}</text>
+</view>
