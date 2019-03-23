@@ -2,6 +2,7 @@
 <import src="../../utils/toolTip.wxml" />
 <template is="toolTip" data="{{_toolTip_}}" />
 <view class='container'>
+  <text>房间号{{room.id}}</text>
   <text>房间名：{{room.roomName}}</text>
   <text>游戏：{{gameName}}</text>
   <view>

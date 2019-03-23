@@ -61,6 +61,7 @@ Page({
     })
   },
   clickSeat(e) {
+    var self = this;
     var seat = Number(e.currentTarget.id)
     var player = this.data.room.players.find(x => x.seat == seat)
     if (player) {
@@ -69,7 +70,7 @@ Page({
       wx.showActionSheet({
         itemList: [`和${player.profile.nickname}换座位`],
         success: index => {
-          socket.send({
+          self.data.socket.send({
             topic: 'CHANGE_SEAT_REQUEST',
             attributes: {
               TO_SEAT: seat
@@ -88,7 +89,37 @@ Page({
     }
   },
   handleMessage: function(msg) {
+    var self = this;
     switch (msg.topic) {
+      case 'PLAYER_JOIN':
+        var player = {
+          id: msg.attributes.USER_ID,
+          seat: msg.attributes.SEAT,
+          ready: false,
+          profile: {}
+        }
+        this.data.room.players.push(player)
+        this.updateSeatList()
+        util.request({
+          url: 'user/profile',
+          data: {
+            id: player.id
+          },
+          success: e => {
+            player.profile = e.data.profile
+            self.updateSeatList()
+          }
+        })
+        break;
+      case 'PLAYER_EXIT':
+        var id = msg.attributes.USER_ID
+        var index = this.data.room.players.findIndex(x => x.id == id)
+        console.log(this.data.room.players[index])
+        if (index) {
+          this.data.room.players.splice(index, 1)
+          this.updateSeatList()
+        }
+        break;
       case 'CHANGE_SEAT':
         var fromSeat = msg.attributes.FROM_SEAT
         var toSeat = msg.attributes.TO_SEAT
