@@ -8,7 +8,8 @@ Page({
   data: {
     room: {},
     gameName: {},
-    seatList: []
+    seatList: [],
+    socket: {}
   },
   onLoad: function() {
     var self = this
@@ -22,6 +23,12 @@ Page({
           gameName: app.globalData.gameList.find(x => x.id == e.data.room.gameName).name
         })
         self.updateSeatList()
+        var socket = util.connectSocket({
+          url: `game/room/${e.data.room.id}`
+        })
+        self.data.socket = socket
+        socket.onMessage(x => {
+        })
       },
       badRequest: function(e) {
         wx.navigateBack()
