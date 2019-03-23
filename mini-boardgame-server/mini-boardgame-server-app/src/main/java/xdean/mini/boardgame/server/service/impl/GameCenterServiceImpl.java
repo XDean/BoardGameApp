@@ -10,7 +10,6 @@ import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 
-import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -218,17 +217,8 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
 
   @Override
   public SearchGameResponse searchGame(SearchGameRequest request) {
-    Optional<GameProvider<?, ?>> game = findGame(request.getGameName());
-    if (!game.isPresent()) {
-      throw MiniBoardgameException.builder()
-          .code(HttpStatus.NOT_FOUND)
-          .message("Not such game")
-          .build();
-    }
-    List<GameRoomEntity> rooms = gameMapper.findAllByRoomGameName(request.getGameName(),
-        new RowBounds(request.getPage() * request.getPageSize(), request.getPageSize()));
     return SearchGameResponse.builder()
-        .rooms(rooms)
+        .rooms(gameMapper.searchGame(request))
         .build();
   }
 

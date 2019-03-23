@@ -3,10 +3,10 @@ package xdean.mini.boardgame.server.mybatis.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.session.RowBounds;
 
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
+import xdean.mini.boardgame.server.model.param.SearchGameRequest;
 import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.annotation.DefaultBuilder;
 import xdean.mybatis.extension.annotation.ResultMapType;
@@ -33,7 +33,7 @@ public interface GameMapper extends BaseMapper {
   void delete(Integer roomId);
 
   @ResultMapType
-  List<GameRoomEntity> findAllRoom(String gameName, RowBounds page);
+  List<GameRoomEntity> searchRoom(SearchGameRequest request);
 
   default boolean roomExist(int id) {
     return exist(Tables.GameRoomTable.id, Integer.toString(id));

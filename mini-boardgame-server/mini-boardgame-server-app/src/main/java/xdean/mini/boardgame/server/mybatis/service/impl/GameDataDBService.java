@@ -5,11 +5,11 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
+import xdean.mini.boardgame.server.model.param.SearchGameRequest;
 import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.service.GameDataService;
 
@@ -65,8 +65,8 @@ public class GameDataDBService implements GameDataService {
   }
 
   @Override
-  public List<GameRoomEntity> findAllByRoomGameName(String gameName, RowBounds page) {
-    List<GameRoomEntity> rooms = gameMapper.findAllRoom(gameName, page);
+  public List<GameRoomEntity> searchGame(SearchGameRequest request) {
+    List<GameRoomEntity> rooms = gameMapper.searchRoom(request);
     rooms.forEach(this::fillRoom);
     return rooms;
   }

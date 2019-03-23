@@ -6,13 +6,13 @@ import static xdean.mybatis.extension.SqlUtil.wrapString;
 
 import java.sql.Timestamp;
 
-import org.apache.ibatis.annotations.Param;
-
 import xdean.mini.boardgame.server.model.entity.GamePlayerEntity;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.handler.ObjectJsonConverter;
+import xdean.mini.boardgame.server.model.param.SearchGameRequest;
 import xdean.mini.boardgame.server.mybatis.Tables;
 import xdean.mybatis.extension.MyBatisSQL;
+import xdean.mybatis.extension.MyBatisSQL.MSB;
 
 public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
   private ObjectJsonConverter objectConverter = new ObjectJsonConverter();
@@ -95,12 +95,15 @@ public class GameMapperBuilder extends BaseMapperBuilder implements Tables {
             .toString());
   }
 
-  public String findAllRoom(@Param("gameName") String gameName) {
+  public String searchRoom(SearchGameRequest request) {
     return MyBatisSQL.create()
         .SELECT_FROM(GameRoomTable.table)
-        .WHERE(equal(GameRoomTable.gameName.fullName, wrapString(gameName)))
-        // .LIMIT(page.getLimit())
-        // .OFFSET(page.getOffset())
+        .COMPOSE(MSB.when(!request.getGameName().isEmpty(), sql -> sql
+            .WHERE(equal(GameRoomTable.gameName.fullName, wrapString(request.getGameName())))))
+        .COMPOSE(MSB.when(request.getRoomId() != -1, sql -> sql
+            .WHERE(equal(GameRoomTable.id.fullName, Integer.toString(request.getRoomId())))))
+        .OFFSET(request.getPage() * request.getPageSize())
+        .LIMIT(request.getPageSize())
         .toString();
   }
 }
