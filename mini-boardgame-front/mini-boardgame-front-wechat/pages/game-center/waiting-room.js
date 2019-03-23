@@ -6,6 +6,7 @@ const app = getApp()
 
 Page({
   data: {
+    myId: null,
     room: {},
     gameName: {},
     seatList: [],
@@ -19,6 +20,7 @@ Page({
       success: function(e) {
         console.log(e.data)
         self.setData({
+          myId: e.data.playerId,
           room: e.data.room,
           gameName: app.globalData.gameList.find(x => x.id == e.data.room.gameName).name
         })
@@ -27,8 +29,7 @@ Page({
           url: `game/room/${e.data.room.id}`
         })
         self.data.socket = socket
-        socket.onMessage(x => {
-        })
+        socket.onMessage(x => self.handleMessage(x))
       },
       badRequest: function(e) {
         wx.navigateBack()
@@ -59,8 +60,44 @@ Page({
       seatList: seatList
     })
   },
-  clickIcon(e) {
-    var player = this.data.room.players[e.currentTarget.id]
-    tooltip.showToolTip('info', player.profile.nickname, 2000);
+  clickSeat(e) {
+    var seat = Number(e.currentTarget.id)
+    var player = this.data.room.players.find(x => x.seat == seat)
+    if (player) {
+      if (player.id == this.data.myId)
+        return
+      wx.showActionSheet({
+        itemList: [`和${player.profile.nickname}换座位`],
+        success: index => {
+          socket.send({
+            topic: 'CHANGE_SEAT_REQUEST',
+            attributes: {
+              TO_SEAT: seat
+            }
+          })
+          tooltip.showToolTip('info', '正在请求换座位', 2000)
+        }
+      })
+    } else {
+      this.data.socket.send({
+        topic: 'CHANGE_SEAT_REQUEST',
+        attributes: {
+          TO_SEAT: seat
+        }
+      })
+    }
+  },
+  handleMessage: function(msg) {
+    switch (msg.topic) {
+      case 'CHANGE_SEAT':
+        var fromSeat = msg.attributes.FROM_SEAT
+        var toSeat = msg.attributes.TO_SEAT
+        var fromPlayer = this.data.room.players.find(x => x.seat == fromSeat)
+        var toPlayer = this.data.room.players.find(x => x.seat == toSeat)
+        fromPlayer && (fromPlayer.seat = toSeat)
+        toPlayer && (toPlayer.seat = fromSeat)
+        this.updateSeatList()
+        break;
+    }
   }
 })

@@ -10,8 +10,8 @@
   </view>
   <view class="playersContainer">
     <view wx:for="{{seatList}}" wx:for-index="playerIndex" wx:for-item='player' wx:key='{{id}}' class="playerContainer">
-      <image wx:if='{{player.profile.avatarUrl}}' class="player-avatar" src="{{player.profile.avatarUrl}}" mode="aspectFit" bindtap='clickIcon' id='{{playerIndex}}'></image>
-      <text wx:else class="player-avatar">空</text>
+      <image wx:if='{{player.profile.avatarUrl}}' class="player-avatar" src="{{player.profile.avatarUrl}}" mode="aspectFit" bindtap='clickSeat' id='{{playerIndex}}'></image>
+      <text wx:else class="player-avatar" bindtap='clickSeat' id='{{playerIndex}}'>空</text>
     </view>
   </view>
 </view>
