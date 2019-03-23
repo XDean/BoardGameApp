@@ -23,6 +23,10 @@ public class WebSocketEvent<T> {
   @JsonIgnore
   WebSocketSendType type = WebSocketSendType.ALL;
 
+  @Default
+  @JsonIgnore
+  boolean consumed = false;
+
   String topic;
 
   @Singular

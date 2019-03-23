@@ -111,7 +111,9 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
     void initSession(WebSocketSession session) {
       Subject<WebSocketEvent<JsonNode>> messageSubject = PublishSubject.create();
       CompositeDisposable disposable = new CompositeDisposable();
-      providers.forEach(p -> disposable.add(p.handle(session, room, messageSubject.observeOn(Schedulers.io()))
+      providers.forEach(p -> disposable.add(p.handle(session, room, messageSubject
+          .filter(e -> !e.isConsumed())
+          .observeOn(Schedulers.io()))
           .subscribeOn(Schedulers.io())
           .subscribe(e -> sendMessage(session, e),
               e -> error("Unhandled error happens: " + session, e))));

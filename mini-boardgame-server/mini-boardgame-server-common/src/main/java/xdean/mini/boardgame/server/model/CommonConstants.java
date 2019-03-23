@@ -23,6 +23,9 @@ public interface CommonConstants {
 
     @Attr(type = int.class, desc = "To seat")
     String TO_SEAT = "TO_SEAT";
+
+    @Attr(type = long.class, desc = "Timestamp")
+    String TIMESTAMP = "TIMESTAMP";
   }
 
   @TopicDoc(path = "/doc/socket/topics.md")
@@ -31,6 +34,11 @@ public interface CommonConstants {
       String DEFAULT = "Default";
       String GAME_ROOM = "Game Room";
     }
+
+    @Topic(category = Category.DEFAULT,
+        fromServer = @Side(desc = "HeartBeat", attr = @Attr(value = AttrKey.TIMESTAMP)),
+        fromClient = @Side(desc = "HeartBeat", attr = @Attr(value = AttrKey.TIMESTAMP)))
+    String HEART_BEAT = "HEART_BEAT";
 
     @Topic(category = Category.DEFAULT,
         fromServer = @Side(desc = "An error happened", payload = @Payload(type = String.class, desc = "Error message")))
