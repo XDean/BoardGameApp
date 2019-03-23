@@ -26,7 +26,7 @@ public class HeartBeatHandler extends AbstractGameSocketProvider {
             if (time - sendTime > 5000) {
               log.info("Heart beat very delay: " + context.session);
             }
-            sendEvent(context.userId, WebSocketEvent.builder()
+            sendEvent(context.room.getId(), context.userId, WebSocketEvent.builder()
                 .id(e.getId())
                 .type(WebSocketSendType.SELF)
                 .topic(SocketTopic.HEART_BEAT)

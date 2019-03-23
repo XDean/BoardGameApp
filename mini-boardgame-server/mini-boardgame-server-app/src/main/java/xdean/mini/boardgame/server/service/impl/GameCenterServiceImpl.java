@@ -161,7 +161,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
         gameMapper.save(room);
         // gamePlayerRepo.save(player);
         int playerId = player.getId();
-        sendEvent(playerId, WebSocketEvent.builder()
+        sendEvent(room.getId(), playerId, WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_JOIN)
             .attribute(AttrKey.USER_ID, playerId)
             .attribute(AttrKey.SEAT, player.getSeat())
@@ -201,12 +201,12 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           gameMapper.save(room);
         }
         int playerId = player.getId();
-        sendEvent(playerId, WebSocketEvent.builder()
+        sendEvent(room.getId(), playerId, WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_EXIT)
             .attribute(CommonConstants.AttrKey.USER_ID, playerId)
             .build());
         if (room.getPlayers().isEmpty()) {
-          sendEvent(player.getId(), WebSocketEvent.builder()
+          sendEvent(room.getId(), player.getId(), WebSocketEvent.builder()
               .topic(SocketTopic.ROOM_CANCEL)
               .build());
         }
@@ -302,7 +302,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
             Pair<Integer, Integer> changeSeat = Pair.of(fromSeat, toSeat);
             changeSeatRequests.remove(context.room.getId(), changeSeat);
             changeSeatRequests.put(context.room.getId(), changeSeat);
-            sendEvent(toUser.get().getId(), WebSocketEvent.builder()
+            sendEvent(context.room.getId(), toUser.get().getId(), WebSocketEvent.builder()
                 .id(e.getId())
                 .type(WebSocketSendType.SELF)
                 .topic(SocketTopic.CHANGE_SEAT_REQUEST)
@@ -315,7 +315,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           fromUser.setSeat(toSeat);
           gameMapper.save(fromUser);
         }
-        sendEvent(context.userId, WebSocketEvent.builder()
+        sendEvent(context.room.getId(), context.userId, WebSocketEvent.builder()
             .id(e.getId())
             .topic(SocketTopic.CHANGE_SEAT)
             .attribute(AttrKey.FROM_SEAT, fromSeat)
@@ -326,9 +326,10 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   }
 
   private void playerReady(SocketContext context, WebSocketEvent<JsonNode> e) {
-    synchronized (getLock(context.room.getId())) {
+    int roomId = context.room.getId();
+    synchronized (getLock(roomId)) {
       synchronized (getLock(context.userId)) {
-        GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId())
+        GameRoomEntity roomEntity = gameMapper.findRoom(roomId)
             .orElseThrow(() -> WebSocketIllegalArgumentException.builder().event(e).message("Room canceled").build());
         roomEntity.getBoard().checkState(State.WAITING);
         GamePlayerEntity user = roomEntity.getPlayers().stream().filter(p -> p.getId() == context.userId).findFirst()
@@ -340,14 +341,14 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
         }
         user.setReady(ready);
         gameMapper.save(user);
-        sendEvent(context.userId, WebSocketEvent.builder()
+        sendEvent(roomId, context.userId, WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_READY)
             .attribute(AttrKey.USER_ID, context.userId)
             .payload(ready)
             .build());
         if (roomEntity.getPlayers().stream().filter(p -> p.isReady()).count() == roomEntity.getPlayerCount()) {
           roomEntity.getBoard().setState(State.PLAYING);
-          sendEvent(context.userId, WebSocketEvent.builder()
+          sendEvent(roomId, context.userId, WebSocketEvent.builder()
               .topic(SocketTopic.GAME_START)
               .build());
         }

@@ -37,12 +37,18 @@ public abstract class AbstractGameSocketProvider implements GameSocketProvider {
     Observer<WebSocketEvent<?>> outputObserver;
   }
 
-  Map<Integer, Subject<WebSocketEvent<?>>> playerSubjects = new HashMap<>();
+  Map<Integer, SocketContext> playerSubjects = new HashMap<>();
 
-  public void sendEvent(int playerId, WebSocketEvent<?> event) {
-    Subject<WebSocketEvent<?>> subject = playerSubjects.get(playerId);
-    if (subject != null) {
-      subject.onNext(event);
+  public void sendEvent(int roomId, int playerId, WebSocketEvent<?> event) {
+    SocketContext context = playerSubjects.get(playerId);
+    if (context != null) {
+      context.outputObserver.onNext(event);
+    } else if (event.type == WebSocketSendType.ALL) {
+      playerSubjects.values()
+          .stream()
+          .filter(c -> c.room.getId() == roomId)
+          .findAny()
+          .ifPresent(c -> c.outputObserver.onNext(event));
     }
   }
 
@@ -51,16 +57,18 @@ public abstract class AbstractGameSocketProvider implements GameSocketProvider {
       Observable<WebSocketEvent<JsonNode>> input) {
     Integer id = (Integer) session.getAttributes().get(CommonConstants.AttrKey.USER_ID);
     Assert.notNull(id, "Authed user must have id");
-    SocketContext context = SocketContext.builder()
-        .session(session)
-        .room(room)
-        .userId(id)
-        .inputFlow(input)
-        .build();
-    Subject<WebSocketEvent<?>> subject = playerSubjects.computeIfAbsent(id, i -> createOutputFlow(context));
-    SocketContext processedContext = initFlow(context.toBuilder().outputFlow(subject).outputObserver(subject).build());
-    subscribeInputFlow(processedContext);
-    return processedContext.outputFlow;
+    return playerSubjects.computeIfAbsent(id, i -> {
+      SocketContext context = SocketContext.builder()
+          .session(session)
+          .room(room)
+          .userId(id)
+          .inputFlow(input)
+          .build();
+      Subject<WebSocketEvent<?>> subject = createOutputFlow(context);
+      SocketContext processedContext = initFlow(context.toBuilder().outputFlow(subject).outputObserver(subject).build());
+      subscribeInputFlow(processedContext);
+      return processedContext;
+    }).outputFlow;
   }
 
   protected Subject<WebSocketEvent<?>> createOutputFlow(SocketContext context) {
