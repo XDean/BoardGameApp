@@ -25,8 +25,8 @@ public class GameDataDBService implements GameDataService {
     if (room != null) {
       List<GamePlayerEntity> players = gameMapper.findAllPlayersInRoom(room.getId());
       room.setPlayers(players);
+      players.forEach(e -> e.setRoom(room));
       GamePlayerEntity player = players.stream()
-          .peek(e -> e.setRoom(room))
           .filter(e -> e.getId() == id)
           .findAny()
           .orElse(null);
