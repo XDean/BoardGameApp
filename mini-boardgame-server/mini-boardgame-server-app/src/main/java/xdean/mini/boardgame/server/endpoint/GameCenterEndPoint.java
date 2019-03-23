@@ -61,7 +61,7 @@ public class GameCenterEndPoint implements CommonConstants {
     return response;
   }
 
-  @PostMapping("/search")
+  @GetMapping("/search")
   @ApiOperation("Search exist game rooms")
   SearchGameResponse searchGame(@RequestBody SearchGameRequest request) {
     return service.searchGame(request);

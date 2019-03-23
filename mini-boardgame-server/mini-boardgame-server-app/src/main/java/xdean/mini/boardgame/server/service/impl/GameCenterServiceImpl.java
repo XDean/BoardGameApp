@@ -226,7 +226,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           .build();
     }
     List<GameRoomEntity> rooms = gameMapper.findAllByRoomGameName(request.getGameName(),
-        new RowBounds((request.getPage() - 1) * request.getPageSize(), request.getPageSize()));
+        new RowBounds(request.getPage() * request.getPageSize(), request.getPageSize()));
     return SearchGameResponse.builder()
         .rooms(rooms)
         .build();

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Builder.Default;
 
 @Data
 @Builder
@@ -14,9 +15,11 @@ public class SearchGameRequest {
   @ApiModelProperty(position = 0, example = "gdjzj")
   String gameName;
 
-  @ApiModelProperty(position = 1, example = "1")
-  int page;
+  @Default
+  @ApiModelProperty(position = 1, example = "0")
+  int page = 0;
 
-  @ApiModelProperty(position = 2, example = "10")
-  int pageSize;
+  @Default
+  @ApiModelProperty(position = 2, example = "20")
+  int pageSize = 20;
 }
