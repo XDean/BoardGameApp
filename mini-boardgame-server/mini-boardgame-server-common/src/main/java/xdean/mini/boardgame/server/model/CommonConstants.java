@@ -18,6 +18,9 @@ public interface CommonConstants {
     @Attr(type = String.class, desc = "Access Token from cookie")
     String ACCESS_TOKEN = "ACCESS_TOKEN";
 
+    @Attr(type = int.class, desc = "Player seat")
+    String SEAT = "SEAT";
+
     @Attr(type = int.class, desc = "From seat")
     String FROM_SEAT = "FROM_SEAT";
 
@@ -80,7 +83,10 @@ public interface CommonConstants {
     @Topic(category = Category.GAME_ROOM,
         fromServer = @Side(
             desc = "A player join into this room",
-            attr = @Attr(desc = "The joined player id", value = AttrKey.USER_ID)))
+            attr = {
+                @Attr(desc = "The joined player id", value = AttrKey.USER_ID),
+                @Attr(desc = "The joined player seat", value = AttrKey.SEAT)
+            }))
     String PLAYER_JOIN = "PLAYER_JOIN";
 
     @Topic(category = Category.GAME_ROOM,

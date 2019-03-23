@@ -164,7 +164,8 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
         int playerId = player.getId();
         sendEvent(playerId, WebSocketEvent.builder()
             .topic(SocketTopic.PLAYER_JOIN)
-            .attribute(CommonConstants.AttrKey.USER_ID, playerId)
+            .attribute(AttrKey.USER_ID, playerId)
+            .attribute(AttrKey.SEAT, player.getSeat())
             .build());
         return JoinGameResponse.builder()
             .build();
