@@ -141,6 +141,7 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
               authenticate = tokenAuth.authenticate(token);
             } catch (AuthenticationException e) {
               sendMessage(session, WebSocketEvent.builder()
+                  .id(event.getId())
                   .type(WebSocketSendType.SELF)
                   .topic(SocketTopic.BAD_CREDENTIAL)
                   .payload("Bad Credential: " + e.getLocalizedMessage())
@@ -154,12 +155,14 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
               session.getAttributes().put(AttrKey.ACCESS_TOKEN, token);
               initSession(session);
               sendMessage(session, WebSocketEvent.builder()
+                  .id(event.getId())
                   .type(WebSocketSendType.SELF)
                   .topic(SocketTopic.AUTHENTICATION)
                   .build());
             } else {
               error("An authed user not in db: " + user.getUsername());
               sendMessage(session, WebSocketEvent.builder()
+                  .id(event.getId())
                   .type(WebSocketSendType.SELF)
                   .topic(SocketTopic.ERROR_TOPIC)
                   .payload("No such user, unexpected server error")
@@ -167,6 +170,7 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
             }
           } else {
             sendMessage(session, WebSocketEvent.builder()
+                .id(event.getId())
                 .type(WebSocketSendType.SELF)
                 .topic(SocketTopic.ERROR_TOPIC)
                 .payload("The web socket should AUTHENTICATION first")

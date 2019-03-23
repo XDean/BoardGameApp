@@ -86,13 +86,17 @@ public abstract class AbstractGameSocketProvider implements GameSocketProvider {
     return processedContext.inputFlow.subscribe(e -> {
     },
         e -> {
-          if (e instanceof IllegalArgumentException) {
+          if (e instanceof WebSocketIllegalArgumentException) {
             processedContext.outputObserver.onNext(WebSocketEvent.builder()
+                .id(((WebSocketIllegalArgumentException) e).getEvent().getId())
                 .type(WebSocketSendType.SELF)
                 .topic(SocketTopic.BAD_REQUEST)
                 .payload(e.getMessage())
                 .build());
           } else if (e instanceof RuntimeException) {
+            if (e instanceof IllegalArgumentException) {
+              log.warn("You should use WebSocketIllegalArgumentException", e);
+            }
             log.debug("Unexpected error happens: " + processedContext.session, e);
             processedContext.outputObserver.onNext(WebSocketEvent.builder()
                 .type(WebSocketSendType.SELF)

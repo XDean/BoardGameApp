@@ -17,6 +17,8 @@ import lombok.Singular;
 @Builder(toBuilder = true)
 public class WebSocketEvent<T> {
 
+  int id;
+
   @Default
   @JsonIgnore
   WebSocketSendType type = WebSocketSendType.ALL;

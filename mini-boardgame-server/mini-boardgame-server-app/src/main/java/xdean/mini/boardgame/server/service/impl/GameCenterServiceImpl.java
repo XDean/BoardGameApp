@@ -51,6 +51,7 @@ import xdean.mini.boardgame.server.service.UserDataService;
 import xdean.mini.boardgame.server.socket.AbstractGameSocketProvider;
 import xdean.mini.boardgame.server.socket.GameSocketProvider;
 import xdean.mini.boardgame.server.socket.WebSocketEvent;
+import xdean.mini.boardgame.server.socket.WebSocketIllegalArgumentException;
 import xdean.mini.boardgame.server.socket.WebSocketSendType;
 
 @Service
@@ -289,10 +290,12 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   private void changeSeat(SocketContext context, WebSocketEvent<?> e) {
     synchronized (getLock(context.room.getId())) {
       synchronized (getLock(context.userId)) {
-        GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId()).orElseThrow(IllegalStateException::new);
+        GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId())
+            .orElseThrow(() -> WebSocketIllegalArgumentException.builder().event(e).message("Room canceled").build());
         int toSeat = ((Number) e.getAttributes().get(AttrKey.TO_SEAT)).intValue();
         GamePlayerEntity fromUser = roomEntity.getPlayers().stream().filter(p -> p.getId() == context.userId)
-            .findFirst().orElseThrow(() -> new IllegalArgumentException("Only player in the room can change seat"));
+            .findFirst().orElseThrow(() -> WebSocketIllegalArgumentException.builder().event(e)
+                .message("Only player in the room can change seat").build());
         int fromSeat = fromUser.getSeat();
         if (fromSeat == toSeat) {
           return;
@@ -309,6 +312,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
             changeSeatRequests.remove(context.room.getId(), changeSeat);
             changeSeatRequests.put(context.room.getId(), changeSeat);
             sendEvent(toUser.get().getId(), WebSocketEvent.builder()
+                .id(e.getId())
                 .type(WebSocketSendType.SELF)
                 .topic(SocketTopic.CHANGE_SEAT_REQUEST)
                 .attribute(AttrKey.FROM_SEAT, fromSeat)
@@ -321,6 +325,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
           gameMapper.save(fromUser);
         }
         sendEvent(context.userId, WebSocketEvent.builder()
+            .id(e.getId())
             .topic(SocketTopic.CHANGE_SEAT)
             .attribute(AttrKey.FROM_SEAT, fromSeat)
             .attribute(AttrKey.TO_SEAT, toSeat)
@@ -332,10 +337,12 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
   private void playerReady(SocketContext context, WebSocketEvent<JsonNode> e) {
     synchronized (getLock(context.room.getId())) {
       synchronized (getLock(context.userId)) {
-        GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId()).orElseThrow(IllegalStateException::new);
+        GameRoomEntity roomEntity = gameMapper.findRoom(context.room.getId())
+            .orElseThrow(() -> WebSocketIllegalArgumentException.builder().event(e).message("Room canceled").build());
         roomEntity.getBoard().checkState(State.WAITING);
-        GamePlayerEntity user = roomEntity.getPlayers().stream().filter(p -> p.getId() == context.userId)
-            .findFirst().orElseThrow(() -> new IllegalArgumentException("Only player in the room can be ready"));
+        GamePlayerEntity user = roomEntity.getPlayers().stream().filter(p -> p.getId() == context.userId).findFirst()
+            .orElseThrow(() -> WebSocketIllegalArgumentException.builder().event(e)
+                .message("Only player in the room can be ready").build());
         boolean ready = e.getPayload().booleanValue();
         if (user.isReady() == ready) {
           return;
