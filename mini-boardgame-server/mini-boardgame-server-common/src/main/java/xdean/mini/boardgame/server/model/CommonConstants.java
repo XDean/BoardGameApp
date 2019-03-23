@@ -42,6 +42,7 @@ public interface CommonConstants {
     String BAD_REQUEST = "BAD_REQUEST";
 
     @Topic(category = Category.DEFAULT,
+        fromServer = @Side(desc = "Authenticate success"),
         fromClient = @Side(
             desc = "Authenticate current socket connection.",
             attr = @Attr(desc = "Access token, can be find in cookie", value = AttrKey.ACCESS_TOKEN)))

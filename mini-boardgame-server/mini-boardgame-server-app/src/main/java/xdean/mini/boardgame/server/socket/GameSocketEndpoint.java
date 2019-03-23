@@ -45,19 +45,11 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
 
   private final Map<Integer, GameRoomSocketHandler> rooms = new ConcurrentHashMap<>();
 
-  @Autowired(required = false)
-  List<GameSocketProvider> providers = Collections.emptyList();
-
-  ObjectMapper objectMapper = new ObjectMapper();
-
-  @Inject
-  GameMapper gameMapper;
-
-  @Inject
-  UserDataService userService;
-
-  @Inject
-  TokenAuthProvider tokenAuth;
+  private @Autowired(required = false) List<GameSocketProvider> providers = Collections.emptyList();
+  private @Inject ObjectMapper objectMapper;
+  private @Inject GameMapper gameMapper;
+  private @Inject UserDataService userService;
+  private @Inject TokenAuthProvider tokenAuth;
 
   @Override
   public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -161,6 +153,10 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
               session.getAttributes().put(AttrKey.USER_ID, ue.get().getId());
               session.getAttributes().put(AttrKey.ACCESS_TOKEN, token);
               initSession(session);
+              sendMessage(session, WebSocketEvent.builder()
+                  .type(WebSocketSendType.SELF)
+                  .topic(SocketTopic.AUTHENTICATION)
+                  .build());
             } else {
               error("An authed user not in db: " + user.getUsername());
               sendMessage(session, WebSocketEvent.builder()
