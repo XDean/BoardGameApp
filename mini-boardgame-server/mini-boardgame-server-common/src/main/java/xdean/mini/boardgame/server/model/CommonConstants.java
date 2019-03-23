@@ -37,6 +37,11 @@ public interface CommonConstants {
     String ERROR_TOPIC = "ERROR";
 
     @Topic(category = Category.DEFAULT,
+        fromServer = @Side(desc = "Client message is wrong format",
+            payload = @Payload(type = String.class, desc = "The incoming message")))
+    String WRONG_FORMAT = "WRONG_FORMAT";
+
+    @Topic(category = Category.DEFAULT,
         fromServer = @Side(desc = "The message from client is bad",
             payload = @Payload(type = String.class, desc = "Expect behavior")))
     String BAD_REQUEST = "BAD_REQUEST";

@@ -187,8 +187,8 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
       } catch (IOException e) {
         sendMessage(session, WebSocketEvent.builder()
             .type(WebSocketSendType.SELF)
-            .topic(SocketTopic.ERROR_TOPIC)
-            .payload("Wrong format. All messages must be like this message.")
+            .topic(SocketTopic.WRONG_FORMAT)
+            .payload(message)
             .build());
         trace("Session send wrong message: " + session, e);
       }
