@@ -5,7 +5,6 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,14 +33,15 @@ public class UserProfileEndPoint {
 
   @ApiOperation("Get user profile")
   @GetMapping(path = "/user/profile")
-  public UserProfileResponse getUserProfile(@RequestParam(name = "username", required = false) String username) {
-    if (username == null) {
-      username = userService.getCurrentUser().map(u -> u.getUsername()).orElse(null);
+  public UserProfileResponse getUserProfile(@RequestParam(name = "id", required = false) Integer id) {
+    Optional<UserEntity> user;
+    if (id == null) {
+      user = userService.getCurrentUser();
+    } else {
+      user = userService.findUserById(id);
     }
-    Assert.notNull(username, "Please specify username parameter");
-    Optional<UserEntity> p = userService.findUserByUsername(username);
-    if (p.isPresent()) {
-      UserProfileEntity profile = p.get().getProfile();
+    if (user.isPresent()) {
+      UserProfileEntity profile = user.get().getProfile();
       if (profile == null) {
         profile = UserProfileEntity.builder().build();
       }

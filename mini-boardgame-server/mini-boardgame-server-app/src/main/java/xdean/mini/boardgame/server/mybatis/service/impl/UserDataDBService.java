@@ -45,6 +45,15 @@ public class UserDataDBService implements UserDataService {
   }
 
   @Override
+  public Optional<UserEntity> findUserById(int id) {
+    UserEntity user = userMapper.findUserById(id);
+    if (user != null) {
+      user.setAuthorities(userMapper.findAuthorities(user.getId()));
+    }
+    return Optional.ofNullable(user);
+  }
+
+  @Override
   public void save(UserProfileEntity profile) {
     userMapper.saveProfile(profile);
   }

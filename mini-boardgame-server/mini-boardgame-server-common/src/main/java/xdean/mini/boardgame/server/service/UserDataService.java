@@ -10,6 +10,8 @@ public interface UserDataService {
 
   Optional<UserEntity> findUserByUsername(String username);
 
+  Optional<UserEntity> findUserById(int id);
+
   void save(UserEntity user);
 
   void save(UserProfileEntity profile);

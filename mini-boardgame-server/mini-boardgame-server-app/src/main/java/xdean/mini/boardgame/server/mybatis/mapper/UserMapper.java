@@ -19,6 +19,9 @@ public interface UserMapper extends BaseMapper, Tables {
   @ResultMapType
   UserEntity findByUsername(String username);
 
+  @ResultMapType
+  UserEntity findUserById(Integer id);
+
   List<String> findAuthorities(Integer id);
 
   void saveAuthorities(UserEntity user);
