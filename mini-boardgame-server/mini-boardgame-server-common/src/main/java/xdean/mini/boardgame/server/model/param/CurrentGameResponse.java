@@ -7,5 +7,6 @@ import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 @Value
 @Builder
 public class CurrentGameResponse {
+  int playerId;
   GameRoomEntity room;
 }

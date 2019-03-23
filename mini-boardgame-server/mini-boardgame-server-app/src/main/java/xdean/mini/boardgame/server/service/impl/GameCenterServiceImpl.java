@@ -250,7 +250,7 @@ public class GameCenterServiceImpl extends AbstractGameSocketProvider implements
             .build();
       }
       GameRoomEntity room = oRoom.get();
-      return CurrentGameResponse.builder().room(room).build();
+      return CurrentGameResponse.builder().playerId(player.getId()).room(room).build();
     }
   }
 
