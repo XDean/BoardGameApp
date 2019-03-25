@@ -25,11 +25,7 @@ Page({
           gameName: app.globalData.gameList.find(x => x.id == e.data.room.gameName).name
         })
         self.updateSeatList()
-        var socket = util.connectSocket({
-          url: `game/room/${e.data.room.id}`
-        })
-        self.data.socket = socket
-        socket.onMessage(x => self.handleMessage(x))
+        self.connectSocket()
       },
       badRequest: function(e) {
         wx.navigateBack()
@@ -49,6 +45,13 @@ Page({
         wx.hideLoading()
       }
     })
+  },
+  connectSocket() {
+    var socket = util.connectSocket({
+      url: `game/room/${this.data.room.id}`
+    })
+    this.data.socket = socket
+    socket.onMessage(this.handleMessage)
   },
   updateSeatList() {
     var room = this.data.room

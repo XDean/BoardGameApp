@@ -70,6 +70,8 @@ const wrapSocket = input => {
     lastMsgMillis: new Date().getTime(),
     heartBeatId: 0,
     originSocket: null,
+    retry: input.retry || 100000,
+    retryCount: 0,
   }
   var socket = {
     send: function(e) {
@@ -91,17 +93,31 @@ const wrapSocket = input => {
         onResponse: func => data.responseFunctions[msg.id] = func
       }
     },
-    onOpen: x => data.onOpens.push(x),
+    onOpen: x => {
+      if (authenticated)
+        x(data.header)
+      else
+        data.onOpens.push(x)
+    },
     onMessage: x => data.onMessages.push(x),
     onError: x => data.onErrors.push(x),
-    onClose: x => data.onCloses.push(x),
+    onClose: x => {
+      if (data.closed)
+        x()
+      else
+        data.onCloses.push(x)
+    },
     close: function() {
+      data.closed = true
       data.originSocket.close()
     },
     connect: function() {
       var originSocket = wx.connectSocket({
         ...input,
-        url: socketUrl + input.url
+        url: socketUrl + input.url,
+        header: {
+          'Authorization': accessToken
+        }
       })
       data.originSocket = originSocket
       originSocket.onOpen(e => {
@@ -126,6 +142,7 @@ const wrapSocket = input => {
           case 'AUTHENTICATION':
             data.authenticated = true
             data.onOpens.forEach(x => x(data.header))
+            data.onOpens = []
             data.messageBeforeAuth.forEach(x => {
               console.log('send', msg)
               data.originSocket.send({
@@ -133,18 +150,13 @@ const wrapSocket = input => {
               })
             })
             data.messageBeforeAuth = []
+            this.heartBeat()
             break
           case 'BAD_CREDENTIAL':
           case 'WRONG_FORMAT':
           case 'ERROR':
             console.error(msg)
             break
-          case 'ROOM_CANCEL':
-            data.closed = true
-            data.originSocket.close({
-              reason: 'Room canceled'
-            })
-            break;
           default:
             if (msg.id) {
               var responseFunc = data.responseFunctions[msg.id]
@@ -158,15 +170,24 @@ const wrapSocket = input => {
       })
       originSocket.onError(x => {
         console.log('error', x)
-        onErrors.forEach(e => e(x))
-        originSocket.close()
+        data.onErrors.forEach(e => e(x))
+        data.originSocket.close()
       })
       originSocket.onClose(x => {
+        data.authenticated = false
+        data.originSocket = null
         console.log('close', x)
-        onCloses.forEach(e => e(x))
+        data.onCloses.forEach(e => e(x))
         clearInterval(data.heartBeatId)
+        if (!data.closed) {
+          if (data.retry > data.retryCount) {
+            console.info('Socket is closed. Reconnect will be attempted in 1 second.', x.reason);
+            setTimeout(() => this.connect(), 1000);
+          } else {
+            console.error('Connect max times, still fail')
+          }
+        }
       })
-      this.heartBeat()
     },
     heartBeat: function() {
       data.heartBeatId = setInterval(() => {
