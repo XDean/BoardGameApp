@@ -14,7 +14,7 @@ new function () {
   var sendButton;
 
   var open = function () {
-    var url = 'ws://'+window.location.host+'/game/room/' + serverUrl.val();
+    var url = 'ws://'+window.location.host+'/socket/game/room/' + serverUrl.val();
     ws = new WebSocket(url);
     ws.onopen = onOpen;
     ws.onclose = onClose;

@@ -18,11 +18,15 @@ public class SocketConfig implements WebSocketConfigurer, CommonConstants {
   @Inject
   GameSocketEndpoint gameHandler;
 
+  @Inject
+  AuthHandShakeInterceptor authHandShake;
+
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
     registry
-        .addHandler(handler, "/socket-test/**")
-        .addHandler(gameHandler, "/game/room/*")
-        .setAllowedOrigins("*");
+        .addHandler(handler, "/socket/socket-test/**")
+        .addHandler(gameHandler, "/socket/game/room/*")
+        .setAllowedOrigins("*")
+        .addInterceptors(authHandShake);
   }
 }

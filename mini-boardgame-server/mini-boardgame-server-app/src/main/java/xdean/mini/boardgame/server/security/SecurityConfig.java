@@ -48,6 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .addFilterBefore(tokenAuthProvider, UsernamePasswordAuthenticationFilter.class)
         .authorizeRequests()
         .antMatchers("/public/**").permitAll()
+        .antMatchers("/socket/**").permitAll()
         .antMatchers("/**/favicon.ico", "/webjars/**").permitAll()
         .anyRequest().authenticated()
         .and()

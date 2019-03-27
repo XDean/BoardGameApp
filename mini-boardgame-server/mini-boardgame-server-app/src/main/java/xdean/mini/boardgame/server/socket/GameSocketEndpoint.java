@@ -36,8 +36,8 @@ import xdean.jex.log.Logable;
 import xdean.mini.boardgame.server.model.CommonConstants;
 import xdean.mini.boardgame.server.model.entity.GameRoomEntity;
 import xdean.mini.boardgame.server.model.entity.UserEntity;
-import xdean.mini.boardgame.server.mybatis.mapper.GameMapper;
 import xdean.mini.boardgame.server.security.TokenAuthProvider;
+import xdean.mini.boardgame.server.service.GameDataService;
 import xdean.mini.boardgame.server.service.UserDataService;
 
 @Component
@@ -47,7 +47,7 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
 
   private @Autowired(required = false) List<GameSocketProvider> providers = Collections.emptyList();
   private @Inject ObjectMapper objectMapper;
-  private @Inject GameMapper gameMapper;
+  private @Inject GameDataService gameService;
   private @Inject UserDataService userService;
   private @Inject TokenAuthProvider tokenAuth;
 
@@ -56,10 +56,10 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
     GameRoomEntity room;
     try {
       int id = getRoomIdFromSession(session);
-      room = gameMapper.findRoom(id);
+      room = gameService.findRoom(id).get();
     } catch (Exception ex) {
       trace("Fail to find room: " + session, ex);
-      session.close(CloseStatus.BAD_DATA.withReason("Can't find room id"));
+      session.close(CloseStatus.BAD_DATA.withReason("Can't find room"));
       return;
     }
     if (room != null) {
@@ -106,6 +106,10 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
 
     void addSession(WebSocketSession session) {
       sessions.add(session);
+      Object token = session.getAttributes().get(AttrKey.ACCESS_TOKEN);
+      if (token != null) {
+        authSession(session, token.toString(), 0);
+      }
     }
 
     void initSession(WebSocketSession session) {
@@ -137,39 +141,7 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
         });
         if (session.getAttributes().get(AttrKey.ACCESS_TOKEN) == null) {
           if (event.topic.equals(SocketTopic.AUTHENTICATION)) {
-            String token = event.attributes.getOrDefault(AttrKey.ACCESS_TOKEN, "").toString();
-            Authentication authenticate;
-            try {
-              authenticate = tokenAuth.authenticate(token);
-            } catch (AuthenticationException e) {
-              sendMessage(session, WebSocketEvent.builder()
-                  .id(event.getId())
-                  .type(WebSocketSendType.SELF)
-                  .topic(SocketTopic.BAD_CREDENTIAL)
-                  .payload("Bad Credential: " + e.getLocalizedMessage())
-                  .build());
-              return;
-            }
-            User user = (User) authenticate.getPrincipal();
-            Optional<UserEntity> ue = userService.findUserByUsername(user.getUsername());
-            if (ue.isPresent()) {
-              session.getAttributes().put(AttrKey.USER_ID, ue.get().getId());
-              session.getAttributes().put(AttrKey.ACCESS_TOKEN, token);
-              initSession(session);
-              sendMessage(session, WebSocketEvent.builder()
-                  .id(event.getId())
-                  .type(WebSocketSendType.SELF)
-                  .topic(SocketTopic.AUTHENTICATION)
-                  .build());
-            } else {
-              error("An authed user not in db: " + user.getUsername());
-              sendMessage(session, WebSocketEvent.builder()
-                  .id(event.getId())
-                  .type(WebSocketSendType.SELF)
-                  .topic(SocketTopic.ERROR_TOPIC)
-                  .payload("No such user, unexpected server error")
-                  .build());
-            }
+            authSession(session, event.attributes.getOrDefault(AttrKey.ACCESS_TOKEN, "").toString(), event.getId());
           } else {
             sendMessage(session, WebSocketEvent.builder()
                 .id(event.getId())
@@ -193,6 +165,41 @@ public class GameSocketEndpoint extends TextWebSocketHandler implements Logable,
             .payload(message)
             .build());
         trace("Session send wrong message: " + session, e);
+      }
+    }
+
+    void authSession(WebSocketSession session, String token, int id) {
+      Authentication authenticate;
+      try {
+        authenticate = tokenAuth.authenticate(token);
+      } catch (AuthenticationException e) {
+        sendMessage(session, WebSocketEvent.builder()
+            .id(id)
+            .type(WebSocketSendType.SELF)
+            .topic(SocketTopic.BAD_CREDENTIAL)
+            .payload("Bad Credential: " + e.getLocalizedMessage())
+            .build());
+        return;
+      }
+      User user = (User) authenticate.getPrincipal();
+      Optional<UserEntity> ue = userService.findUserByUsername(user.getUsername());
+      if (ue.isPresent()) {
+        session.getAttributes().put(AttrKey.USER_ID, ue.get().getId());
+        session.getAttributes().put(AttrKey.ACCESS_TOKEN, token);
+        initSession(session);
+        sendMessage(session, WebSocketEvent.builder()
+            .id(id)
+            .type(WebSocketSendType.SELF)
+            .topic(SocketTopic.AUTHENTICATION)
+            .build());
+      } else {
+        error("An authed user not in db: " + user.getUsername());
+        sendMessage(session, WebSocketEvent.builder()
+            .id(id)
+            .type(WebSocketSendType.SELF)
+            .topic(SocketTopic.ERROR_TOPIC)
+            .payload("No such user, unexpected server error")
+            .build());
       }
     }
 

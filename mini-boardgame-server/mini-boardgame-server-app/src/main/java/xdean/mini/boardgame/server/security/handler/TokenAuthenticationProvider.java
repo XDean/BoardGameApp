@@ -53,7 +53,6 @@ public class TokenAuthenticationProvider extends OncePerRequestFilter
       filterChain.doFilter(request, response);
       return;
     }
-
     Authentication auth = new AccessToken(token);
     SecurityContextHolder.getContext().setAuthentication(auth);
     filterChain.doFilter(request, response);
