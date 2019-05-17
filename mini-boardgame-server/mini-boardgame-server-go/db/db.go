@@ -3,13 +3,13 @@ package db
 import (
 	"errors"
 	"github.com/jinzhu/gorm"
-	"xdean/mini-boardgame/log"
 
+	"github.com/XDean/MiniBoardgame/config"
+	"github.com/XDean/MiniBoardgame/log"
 	// load mysql Driver
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	// load sqlite Driver
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"xdean/mini-boardgame/config"
 )
 
 // DB instance

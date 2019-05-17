@@ -1,4 +1,4 @@
-module xdean/mini-boardgame
+module github.com/XDean/MiniBoardgame
 
 go 1.12
 
