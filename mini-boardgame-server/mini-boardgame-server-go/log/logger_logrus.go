@@ -13,29 +13,35 @@ type logrusLogger struct {
 type logrusSubLog struct {
 	level       Level
 	logrusLevel logrus.Level
+	logger      *logrus.Logger
 }
 
-func NewLogrusLogger() *logrusLogger {
+func NewLogrusLogger(logger *logrus.Logger) *logrusLogger {
 	return &logrusLogger{
 		trace: &logrusSubLog{
 			level:       TraceLevel,
 			logrusLevel: logrus.TraceLevel,
+			logger:      logger,
 		},
 		debug: &logrusSubLog{
 			level:       DebugLevel,
 			logrusLevel: logrus.DebugLevel,
+			logger:      logger,
 		},
 		info: &logrusSubLog{
 			level:       InfoLevel,
 			logrusLevel: logrus.InfoLevel,
+			logger:      logger,
 		},
 		warn: &logrusSubLog{
 			level:       WarnLevel,
 			logrusLevel: logrus.WarnLevel,
+			logger:      logger,
 		},
 		error: &logrusSubLog{
 			level:       ErrorLevel,
 			logrusLevel: logrus.ErrorLevel,
+			logger:      logger,
 		},
 	}
 }
@@ -70,42 +76,42 @@ func (s *logrusSubLog) IsEnable() bool {
 func (s *logrusSubLog) Log(args ...interface{}) {
 	switch s.level {
 	case TraceLevel:
-		logrus.Trace(args)
+		s.logger.Trace(args)
 	case DebugLevel:
-		logrus.Debug(args)
+		s.logger.Debug(args)
 	case InfoLevel:
-		logrus.Info(args)
+		s.logger.Info(args)
 	case WarnLevel:
-		logrus.Warn(args)
+		s.logger.Warn(args)
 	case ErrorLevel:
-		logrus.Error(args)
+		s.logger.Error(args)
 	}
 }
 func (s *logrusSubLog) Logf(format string, args ...interface{}) {
 	switch s.level {
 	case TraceLevel:
-		logrus.Tracef(format, args)
+		s.logger.Tracef(format, args)
 	case DebugLevel:
-		logrus.Debugf(format, args)
+		s.logger.Debugf(format, args)
 	case InfoLevel:
-		logrus.Infof(format, args)
+		s.logger.Infof(format, args)
 	case WarnLevel:
-		logrus.Warnf(format, args)
+		s.logger.Warnf(format, args)
 	case ErrorLevel:
-		logrus.Errorf(format, args)
+		s.logger.Errorf(format, args)
 	}
 }
 func (s *logrusSubLog) Logln(args ...interface{}) {
 	switch s.level {
 	case TraceLevel:
-		logrus.Traceln(args)
+		s.logger.Traceln(args)
 	case DebugLevel:
-		logrus.Debugln(args)
+		s.logger.Debugln(args)
 	case InfoLevel:
-		logrus.Infoln(args)
+		s.logger.Infoln(args)
 	case WarnLevel:
-		logrus.Warnln(args)
+		s.logger.Warnln(args)
 	case ErrorLevel:
-		logrus.Errorln(args)
+		s.logger.Errorln(args)
 	}
 }
