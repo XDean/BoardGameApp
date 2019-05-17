@@ -1,0 +1,4 @@
+debug: true
+db:
+  dialect: sqlite3
+  url: some-url

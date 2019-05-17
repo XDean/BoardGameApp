@@ -11,17 +11,17 @@ import (
 
 var sqlRegexp = regexp.MustCompile(`(\$\d+)|\?`)
 
-type gormLogger struct {
-	name   string
-	logger *logrus.Logger
+type GormLogger struct {
+	Name   string
+	Logger *logrus.Logger
 }
 
-func (l *gormLogger) Print(values ...interface{}) {
-	entry := l.logger.WithField("name", l.name)
+func (l *GormLogger) Print(values ...interface{}) {
+	entry := l.Logger.WithField("name", l.Name)
 	if len(values) > 1 {
 		level := values[0]
 		source := values[1]
-		entry = l.logger.WithField("source", source)
+		entry = l.Logger.WithField("source", source)
 		if level == "sql" {
 			duration := values[2]
 			// sql
@@ -55,24 +55,4 @@ func (l *gormLogger) Print(values ...interface{}) {
 		entry.Error(values...)
 	}
 
-}
-
-// New Create new logger
-func New() *gormLogger {
-	return NewWithName("db")
-}
-
-// NewWithName Create new logger with custom name
-func NewWithName(name string) *gormLogger {
-	return NewWithNameAndLogger(name, logrus.StandardLogger())
-}
-
-// NewWithLogger Create new logger with custom logger
-func NewLogrusGormLogger(logger *logrus.Logger) *gormLogger {
-	return NewWithNameAndLogger("db", logger)
-}
-
-// NewWithNameAndLogger Create new logger with custom name and logger
-func NewWithNameAndLogger(name string, logger *logrus.Logger) *gormLogger {
-	return &gormLogger{name: name, logger: logger}
 }
