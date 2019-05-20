@@ -2,18 +2,30 @@ package web
 
 import (
 	"github.com/XDean/MiniBoardgame/auth"
+	"github.com/XDean/MiniBoardgame/config"
+	"github.com/XDean/MiniBoardgame/handler"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"net/http"
 )
 
 func InitRouter() {
-	echo := echo.New()
-	echo.Use(middleware.Logger())
-	echo.Use(middleware.Recover())
+	e := echo.New()
+	if config.Global.Debug {
+		e.Use(middleware.Logger())
+	}
+	e.Use(middleware.Recover())
 
-	api := echo.Group("/api")
+	e.GET("/ping", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, "pong")
+	})
 
-	authored := api.Group("")
+	authGroup := e.Group("/auth")
+	authGroup.GET("sign-up", handler.SignUp)
+
+	apiGroup := e.Group("/apiGroup")
+
+	authored := apiGroup.Group("")
 	authored.Use(middleware.JWTWithConfig(auth.JwtAuthenticateConfig()))
 
 	admin := authored.Group("")

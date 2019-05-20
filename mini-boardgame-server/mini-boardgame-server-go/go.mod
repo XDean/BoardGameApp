@@ -11,5 +11,6 @@ require (
 	github.com/sirupsen/logrus v1.2.0
 	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734
 	gopkg.in/d4l3k/messagediff.v1 v1.2.1
+	gopkg.in/validator.v2 v2.0.0-20180514200540-135c24b11c19
 	gopkg.in/yaml.v2 v2.2.2
 )

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/XDean/MiniBoardgame/config"
 	_const "github.com/XDean/MiniBoardgame/const"
-	"github.com/XDean/MiniBoardgame/db"
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
@@ -15,8 +14,8 @@ import (
 )
 
 func AuthenticatePassword(username string, password string) error {
-	var user model.User
-	if err := db.DB.Where("username = ?", username).Find(&user).Error; err != nil {
+	user := new(model.User)
+	if err := user.GetByUsername(username); err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errors.New("Username not exist")
 		}
@@ -51,7 +50,7 @@ type Claims struct {
 
 func AdminAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(context echo.Context) error {
-		if roles, ok := context.Get(_const.ROLES).(_const.ROLES_TYPE); ok {
+		if roles, ok := context.Get(_const.ROLES).([]string); ok {
 			for _, role := range roles {
 				if _const.ROLE_ADMIN == role {
 					return next(context)
