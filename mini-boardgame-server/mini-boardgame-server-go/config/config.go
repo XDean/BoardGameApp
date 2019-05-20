@@ -11,8 +11,13 @@ var Global Config
 
 // Conf is the root configuration struct
 type Config struct {
-	Debug bool
-	DB    DB
+	Debug    bool
+	Security Security
+	DB       DB
+}
+
+type Security struct {
+	Key string
 }
 
 // DB is Database configuration struct

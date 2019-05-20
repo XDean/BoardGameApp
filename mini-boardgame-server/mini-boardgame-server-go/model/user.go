@@ -1,24 +1,22 @@
 package model
 
-import "github.com/jinzhu/gorm"
-
 type User struct {
-	gorm.Model
+	ID       uint `gorm:"primary_key"`
 	Username string
 	Password string
-	Enabled  bool
 	Roles    []Role
-	Profile  Profile
 }
 
 type Role struct {
-	gorm.Model
-	Name   string
+	ID     uint `gorm:"primary_key"`
 	UserID uint
+	Name   string
 }
 
 type Profile struct {
-	gorm.Model
+	ID        uint `gorm:"primary_key"`
+	UserID    uint
+	User      User
 	Nickname  string
 	Male      bool
 	AvatarURL string

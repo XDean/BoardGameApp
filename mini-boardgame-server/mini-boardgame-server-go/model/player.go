@@ -1,12 +1,11 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
 	"time"
 )
 
 type Room struct {
-	gorm.Model
+	ID          uint `gorm:"primary_key"`
 	GameName    string
 	PlayerCount uint8
 	RoomName    string
@@ -15,7 +14,7 @@ type Room struct {
 }
 
 type Player struct {
-	gorm.Model
+	ID     uint `gorm:"primary_key"`
 	UserID uint
 	RoomID uint
 	Seat   uint8
