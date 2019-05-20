@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"github.com/XDean/MiniBoardgame/model"
 	"github.com/jinzhu/gorm"
 
 	"github.com/XDean/MiniBoardgame/config"
@@ -37,7 +38,8 @@ func initDB() error {
 
 	// Db.ShowSQL(true)
 	DB.LogMode(config.Global.Debug)
+	DB = DB.Set("gorm:auto_preload", true)
 
-	err = DB.AutoMigrate(new(Book), new(Category), new(User), new(Lend), new(Subscribe), new(Admin)).Error
+	err = DB.AutoMigrate(new(model.User), new(model.Role), new(model.Profile), new(model.Room), new(model.Player)).Error
 	return err
 }
