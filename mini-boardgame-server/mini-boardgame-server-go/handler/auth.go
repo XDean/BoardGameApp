@@ -1,21 +1,49 @@
 package handler
 
 import (
+	_const "github.com/XDean/MiniBoardgame/const"
+	"github.com/XDean/MiniBoardgame/model"
 	"github.com/labstack/echo/v4"
-	"gopkg.in/validator.v2"
+	"net/http"
 )
 
-type SignUpParam struct {
-	Username string `validate:"min=6,regexp=^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$"`
-	Password string `validate:"min=6,regexp=^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$"`
-}
-
 func SignUp(c echo.Context) error {
-	param := new(SignUpParam)
+	type Param struct {
+		Username string `json:"username" validate:"required,regexp=USERNAME"`
+		Password string `json:"password" validate:"required,regexp=PASSWORD"`
+	}
+	param := new(Param)
 	if err := c.Bind(param); err != nil {
 		return err
 	}
-	if err := validator.Validate(param); err != nil {
+	if err := c.Validate(param); err != nil {
 		return err
 	}
+	user := &model.User{
+		Username: param.Username,
+		Password: param.Password,
+		Roles:    []model.Role{{Name: _const.ROLE_USER}},
+	}
+	return user.CreateAccount()
+}
+
+func Login(c echo.Context) error {
+	type Param struct {
+		Username string `json:"username" validate:"required"`
+		Password string `json:"password" validate:"required"`
+	}
+	param := new(Param)
+	if err := c.Bind(param); err != nil {
+		return err
+	}
+	if err := c.Validate(param); err != nil {
+		return err
+	}
+	user := new(model.User)
+	if err := user.FindByUsername(param.Username); err == nil {
+		if user.MatchPassword(param.Password) {
+			return c.JSON(http.StatusOK, _const.H{})
+		}
+	}
+	return echo.NewHTTPError(http.StatusUnauthorized, "Bad Credentials")
 }

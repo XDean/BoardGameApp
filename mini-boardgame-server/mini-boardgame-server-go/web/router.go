@@ -1,16 +1,19 @@
 package web
 
 import (
-	"github.com/XDean/MiniBoardgame/auth"
 	"github.com/XDean/MiniBoardgame/config"
 	"github.com/XDean/MiniBoardgame/handler"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"gopkg.in/go-playground/validator.v9"
 	"net/http"
 )
 
 func InitRouter() {
 	e := echo.New()
+
+	e.Validator = &Validator{validator: validator.New()}
+
 	if config.Global.Debug {
 		e.Use(middleware.Logger())
 	}
@@ -26,8 +29,8 @@ func InitRouter() {
 	apiGroup := e.Group("/apiGroup")
 
 	authored := apiGroup.Group("")
-	authored.Use(middleware.JWTWithConfig(auth.JwtAuthenticateConfig()))
+	authored.Use(middleware.JWTWithConfig(JwtAuthenticateConfig()))
 
 	admin := authored.Group("")
-	admin.Use(auth.AdminAuth)
+	admin.Use(AdminAuth)
 }

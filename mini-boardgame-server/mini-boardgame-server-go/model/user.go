@@ -14,7 +14,6 @@ type User struct {
 	Username string
 	Password string
 	Roles    []Role
-	Profile  Profile
 }
 
 type Role struct {
@@ -38,19 +37,19 @@ func GetCurrentUser(c echo.Context) (*User, error) {
 	}
 	if userID, ok := c.Get(_const.USERID).(uint); ok {
 		user := new(User)
-		return user, user.GetByID(userID)
+		return user, user.FindByID(userID)
 	}
 	return nil, errors.New("not authorized")
 }
 
-func (user *User) GetByID(id uint) error {
+func (user *User) FindByID(id uint) error {
 	if err := db.DB.Where("id = ?", id).Find(user).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (user *User) GetByUsername(username string) error {
+func (user *User) FindByUsername(username string) error {
 	if err := db.DB.Where("username = ?", username).Find(user).Error; err != nil {
 		return err
 	}
@@ -65,8 +64,22 @@ func (profile *Profile) Save() error {
 	return db.DB.Save(profile).Error
 }
 
+func (user *User) CreateAccount() error {
+	if encoded, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10); err == nil {
+		user.Password = string(encoded)
+		return user.Save()
+	} else {
+		return err
+	}
+}
+
+func (user *User) MatchPassword(pwd string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pwd))
+	return err == nil
+}
+
 func (user *User) ChangePassword(old, new string) error {
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(old)); err != nil {
+	if user.MatchPassword(old) {
 		return errors.New("Password not correct")
 	}
 	if newPassword, err := bcrypt.GenerateFromPassword([]byte(new), 10); err == nil {
@@ -79,7 +92,7 @@ func (user *User) ChangePassword(old, new string) error {
 
 func UserExistById(id uint) (bool, error) {
 	user := new(User)
-	if err := user.GetByID(id); gorm.IsRecordNotFoundError(err) {
+	if err := user.FindByID(id); gorm.IsRecordNotFoundError(err) {
 		return false, nil
 	} else {
 		return false, err
@@ -89,7 +102,7 @@ func UserExistById(id uint) (bool, error) {
 
 func UserExistByUsername(username string) (bool, error) {
 	user := new(User)
-	if err := user.GetByUsername(username); gorm.IsRecordNotFoundError(err) {
+	if err := user.FindByUsername(username); gorm.IsRecordNotFoundError(err) {
 		return false, nil
 	} else {
 		return false, err

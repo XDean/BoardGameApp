@@ -1,4 +1,4 @@
-package auth
+package web
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ import (
 
 func AuthenticatePassword(username string, password string) error {
 	user := new(model.User)
-	if err := user.GetByUsername(username); err != nil {
+	if err := user.FindByUsername(username); err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errors.New("Username not exist")
 		}
