@@ -1,4 +1,4 @@
-package web
+package handler
 
 import (
 	"fmt"
@@ -8,17 +8,17 @@ import (
 )
 
 type Validator struct {
-	validator *validator.Validate
+	Validator *validator.Validate
 }
 
 func (cv *Validator) Validate(i interface{}) error {
-	return cv.validator.Struct(i)
+	return cv.Validator.Struct(i)
 }
 
 func NewValidator() *Validator {
 	v := validator.New()
 	v.RegisterValidation("regexp", validRegexp)
-	return &Validator{validator: v}
+	return &Validator{Validator: v}
 }
 
 var REGEX = map[string]*regexp2.Regexp{
@@ -36,7 +36,7 @@ func validRegexp(fl validator.FieldLevel) bool {
 			isMatch, _ := regex.MatchString(field.String())
 			return isMatch
 		} else {
-			panic(fmt.Sprintf("Bad regex key %V", field.String()))
+			panic(fmt.Sprintf("Bad regex key %v", field.String()))
 		}
 	default:
 		panic(fmt.Sprintf("Bad field type %T", field.Interface()))

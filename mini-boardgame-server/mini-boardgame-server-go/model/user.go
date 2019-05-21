@@ -3,7 +3,6 @@ package model
 import (
 	"errors"
 	_const "github.com/XDean/MiniBoardgame/const"
-	"github.com/XDean/MiniBoardgame/db"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -43,25 +42,25 @@ func GetCurrentUser(c echo.Context) (*User, error) {
 }
 
 func (user *User) FindByID(id uint) error {
-	if err := db.DB.Where("id = ?", id).Find(user).Error; err != nil {
+	if err := DB.Where("id = ?", id).Find(user).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 func (user *User) FindByUsername(username string) error {
-	if err := db.DB.Where("username = ?", username).Find(user).Error; err != nil {
+	if err := DB.Where("username = ?", username).Find(user).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 func (user *User) Save() error {
-	return db.DB.Save(user).Error
+	return DB.Save(user).Error
 }
 
 func (profile *Profile) Save() error {
-	return db.DB.Save(profile).Error
+	return DB.Save(profile).Error
 }
 
 func (user *User) CreateAccount() error {

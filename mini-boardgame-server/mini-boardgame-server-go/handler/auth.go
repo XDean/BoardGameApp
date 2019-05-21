@@ -24,7 +24,11 @@ func SignUp(c echo.Context) error {
 		Password: param.Password,
 		Roles:    []model.Role{{Name: _const.ROLE_USER}},
 	}
-	return user.CreateAccount()
+	if err := user.CreateAccount(); err == nil {
+		return c.JSON(http.StatusCreated, M("Sign up success"))
+	} else {
+		return err
+	}
 }
 
 func Login(c echo.Context) error {
@@ -42,7 +46,7 @@ func Login(c echo.Context) error {
 	user := new(model.User)
 	if err := user.FindByUsername(param.Username); err == nil {
 		if user.MatchPassword(param.Password) {
-			return c.JSON(http.StatusOK, _const.H{})
+			return c.JSON(http.StatusOK, J{})
 		}
 	}
 	return echo.NewHTTPError(http.StatusUnauthorized, "Bad Credentials")

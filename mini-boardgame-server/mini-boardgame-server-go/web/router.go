@@ -5,14 +5,13 @@ import (
 	"github.com/XDean/MiniBoardgame/handler"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"gopkg.in/go-playground/validator.v9"
 	"net/http"
 )
 
 func InitRouter() {
 	e := echo.New()
 
-	e.Validator = &Validator{validator: validator.New()}
+	e.Validator = handler.NewValidator()
 
 	if config.Global.Debug {
 		e.Use(middleware.Logger())
