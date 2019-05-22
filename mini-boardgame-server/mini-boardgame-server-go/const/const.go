@@ -2,7 +2,8 @@ package _const
 
 // context keys
 const (
-	USER = "USER" // uint
+	USER     = "USER"     // uint
+	DATABASE = "DATABASE" // *gorm.DB
 )
 
 // roles

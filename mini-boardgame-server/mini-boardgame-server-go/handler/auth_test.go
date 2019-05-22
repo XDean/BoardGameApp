@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/XDean/MiniBoardgame/model"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -39,14 +40,15 @@ func TestSignUp(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	user := &model.User{
-		Username: "username",
-		Password: "pwd123456",
-	}
-	err := user.CreateAccount()
-	assert.NoError(t, err)
-
-	testHttp(t, Login, Request{
+	testHttp(t, func(c echo.Context) error {
+		user := &model.User{
+			Username: "username",
+			Password: "pwd123456",
+		}
+		err := user.CreateAccount(GetDB(c))
+		assert.NoError(t, err)
+		return Login(c)
+	}, Request{
 		Body: J{
 			"username": "username",
 			"password": "pwd123456",

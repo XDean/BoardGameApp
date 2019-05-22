@@ -2,9 +2,7 @@ package model
 
 import (
 	"errors"
-	_const "github.com/XDean/MiniBoardgame/const"
 	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -30,39 +28,32 @@ type Profile struct {
 	AvatarURL string
 }
 
-func GetCurrentUser(c echo.Context) (*User, error) {
-	if user, ok := c.Get(_const.USER).(*User); ok {
-		return user, nil
-	}
-	return nil, errors.New("not authorized")
-}
-
-func (user *User) FindByID(id uint) error {
-	if err := DB.Where("id = ?", id).Find(user).Error; err != nil {
+func (user *User) FindByID(db *gorm.DB, id uint) error {
+	if err := db.Where("id = ?", id).Find(user).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (user *User) FindByUsername(username string) error {
-	if err := DB.Where("username = ?", username).Find(user).Error; err != nil {
+func (user *User) FindByUsername(db *gorm.DB, username string) error {
+	if err := db.Where("username = ?", username).Find(user).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (user *User) Save() error {
-	return DB.Save(user).Error
+func (user *User) Save(db *gorm.DB) error {
+	return db.Save(user).Error
 }
 
-func (profile *Profile) Save() error {
-	return DB.Save(profile).Error
+func (profile *Profile) Save(db *gorm.DB) error {
+	return db.Save(profile).Error
 }
 
-func (user *User) CreateAccount() error {
+func (user *User) CreateAccount(db *gorm.DB) error {
 	if encoded, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10); err == nil {
 		user.Password = string(encoded)
-		return user.Save()
+		return user.Save(db)
 	} else {
 		return err
 	}
@@ -73,21 +64,21 @@ func (user *User) MatchPassword(pwd string) bool {
 	return err == nil
 }
 
-func (user *User) ChangePassword(old, new string) error {
+func (user *User) ChangePassword(db *gorm.DB, old, new string) error {
 	if user.MatchPassword(old) {
 		return errors.New("Password not correct")
 	}
 	if newPassword, err := bcrypt.GenerateFromPassword([]byte(new), 10); err == nil {
 		user.Password = string(newPassword)
-		return user.Save()
+		return user.Save(db)
 	} else {
 		return err
 	}
 }
 
-func UserExistById(id uint) (bool, error) {
+func UserExistById(db *gorm.DB, id uint) (bool, error) {
 	user := new(User)
-	if err := user.FindByID(id); gorm.IsRecordNotFoundError(err) {
+	if err := user.FindByID(db, id); gorm.IsRecordNotFoundError(err) {
 		return false, nil
 	} else {
 		return false, err
@@ -95,9 +86,9 @@ func UserExistById(id uint) (bool, error) {
 	return true, nil
 }
 
-func UserExistByUsername(username string) (bool, error) {
+func UserExistByUsername(db *gorm.DB, username string) (bool, error) {
 	user := new(User)
-	if err := user.FindByUsername(username); gorm.IsRecordNotFoundError(err) {
+	if err := user.FindByUsername(db, username); gorm.IsRecordNotFoundError(err) {
 		return false, nil
 	} else {
 		return false, err

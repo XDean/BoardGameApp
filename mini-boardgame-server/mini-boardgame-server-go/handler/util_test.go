@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/XDean/MiniBoardgame/config"
+	_const "github.com/XDean/MiniBoardgame/const"
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
@@ -17,6 +18,7 @@ import (
 )
 
 var echoContext *echo.Echo
+var dbContext *gorm.DB
 
 func TestMain(m *testing.M) {
 	config.Global.Debug = true
@@ -30,14 +32,14 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	model.DB = db
 	defer db.Close()
 
-	err = model.Config(db)
+	err = model.ConfigDB(db)
 	if err != nil {
 		panic(err)
 	}
 
+	dbContext = db
 	echoContext = echo.New()
 	echoContext.Validator = NewValidator()
 
@@ -59,10 +61,8 @@ type Response struct {
 }
 
 func testHttp(test *testing.T, fn echo.HandlerFunc, request Request, response Response) {
-	originDB := model.DB
-	model.DB = model.DB.Begin()
-	defer func() { model.DB = originDB }()
-	defer model.DB.Rollback()
+	tx := dbContext.Begin()
+	defer tx.Rollback()
 
 	request = defaultRequest(request)
 	response = defaultResponse(response)
@@ -80,6 +80,7 @@ func testHttp(test *testing.T, fn echo.HandlerFunc, request Request, response Re
 
 	rec := httptest.NewRecorder()
 	c := echoContext.NewContext(req, rec)
+	c.Set(_const.DATABASE, tx)
 
 	err = fn(c)
 	if response.Error {

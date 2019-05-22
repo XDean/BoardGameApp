@@ -11,19 +11,15 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-// DB instance
-var DB *gorm.DB
-
-func LoadFromConfig() error {
-	var err error
-	DB, err = gorm.Open(config.Global.DB.Dialect, config.Global.DB.URL)
+func LoadFromConfig() (*gorm.DB, error) {
+	db, err := gorm.Open(config.Global.DB.Dialect, config.Global.DB.URL)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return Config(DB)
+	return db, ConfigDB(db)
 }
 
-func Config(database *gorm.DB) error {
+func ConfigDB(database *gorm.DB) error {
 	database.SetLogger(&log.GormLogger{
 		Name:   "DB",
 		Logger: log.Global,

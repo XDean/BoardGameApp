@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"github.com/XDean/MiniBoardgame/config"
 	_const "github.com/XDean/MiniBoardgame/const"
 	"github.com/XDean/MiniBoardgame/model"
@@ -28,7 +29,7 @@ func SignUp(c echo.Context) error {
 		Password: param.Password,
 		Roles:    []model.Role{{Name: _const.ROLE_USER}},
 	}
-	if err := user.CreateAccount(); err == nil {
+	if err := user.CreateAccount(GetDB(c)); err == nil {
 		return c.JSON(http.StatusCreated, M("Sign up success"))
 	} else {
 		return err
@@ -48,7 +49,7 @@ func Login(c echo.Context) error {
 		return err
 	}
 	user := new(model.User)
-	if err := user.FindByUsername(param.Username); err == nil {
+	if err := user.FindByUsername(GetDB(c), param.Username); err == nil {
 		if user.MatchPassword(param.Password) {
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 				User: *user,
@@ -70,6 +71,13 @@ func Login(c echo.Context) error {
 	return echo.NewHTTPError(http.StatusUnauthorized, "Bad Credentials")
 }
 
+func GetCurrentUser(c echo.Context) (*model.User, error) {
+	if user, ok := c.Get(_const.USER).(*model.User); ok {
+		return user, nil
+	}
+	return nil, errors.New("not authorized")
+}
+
 func JwtAuthenticateConfig() middleware.JWTConfig {
 	return middleware.JWTConfig{
 		SigningKey: []byte(config.Global.Security.Key),
@@ -87,7 +95,7 @@ type Claims struct {
 	User model.User
 }
 
-func AdminAuth(next echo.HandlerFunc) echo.HandlerFunc {
+func AdminAuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(context echo.Context) error {
 		if user, ok := context.Get(_const.USER).(model.User); ok {
 			for _, role := range user.Roles {
