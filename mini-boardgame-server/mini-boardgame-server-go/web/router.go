@@ -29,14 +29,16 @@ func InitRouter() {
 		return c.JSON(http.StatusOK, "pong")
 	})
 
-	authGroup := e.Group("/auth")
-	authGroup.GET("sign-up", handler.SignUp)
+	loginGroup := e.Group("/auth")
+	loginGroup.GET("sign-up", handler.SignUp)
+	loginGroup.GET("login", handler.Login)
 
 	apiGroup := e.Group("/apiGroup")
 
 	authored := apiGroup.Group("")
-	authored.Use(middleware.JWTWithConfig(handler.JwtAuthenticateConfig()))
+	authored.Use(handler.AuthMiddleware())
 
 	admin := authored.Group("")
 	admin.Use(handler.AdminAuthMiddleware)
+
 }
