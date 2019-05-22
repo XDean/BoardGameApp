@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "github.com/XDean/MiniBoardgame/web"
 
+func main() {
+	web.Run()
 }

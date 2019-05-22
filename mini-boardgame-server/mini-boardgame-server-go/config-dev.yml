@@ -1,0 +1,6 @@
+debug: true
+db:
+  dialect: sqlite3
+  url: ./mini-boardgame.db
+security:
+  key: 123456

@@ -3,7 +3,9 @@ package model
 import (
 	"errors"
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 )
 
 type User struct {
@@ -53,7 +55,14 @@ func (profile *Profile) Save(db *gorm.DB) error {
 func (user *User) CreateAccount(db *gorm.DB) error {
 	if encoded, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10); err == nil {
 		user.Password = string(encoded)
-		return user.Save(db)
+		result := db.FirstOrCreate(user, User{Username: user.Username})
+		if result.Error != nil {
+			return result.Error
+		} else if result.RowsAffected > 0 {
+			return nil
+		} else {
+			return echo.NewHTTPError(http.StatusBadRequest, "Username existed")
+		}
 	} else {
 		return err
 	}
