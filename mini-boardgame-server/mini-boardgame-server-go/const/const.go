@@ -2,10 +2,7 @@ package _const
 
 // context keys
 const (
-	USERID      = "USERID"      // uint
-	USERNAME    = "USERNAME"    // string
-	ROLES       = "ROLES"       // []string
-	USER_ENTITY = "USER_ENTITY" // model.User
+	USER = "USER" // uint
 )
 
 // roles

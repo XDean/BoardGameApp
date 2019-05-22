@@ -9,8 +9,8 @@ import (
 )
 
 type User struct {
-	ID       uint `gorm:"primary_key"`
-	Username string
+	ID       uint   `gorm:"primary_key"`
+	Username string `gorm:"unique;not null"`
 	Password string
 	Roles    []Role
 }
@@ -23,7 +23,7 @@ type Role struct {
 
 type Profile struct {
 	ID        uint `gorm:"primary_key"`
-	UserID    uint
+	UserID    uint `gorm:"unique;not null"`
 	User      User
 	Nickname  string
 	Male      bool
@@ -31,12 +31,8 @@ type Profile struct {
 }
 
 func GetCurrentUser(c echo.Context) (*User, error) {
-	if user, ok := c.Get(_const.USER_ENTITY).(*User); ok {
+	if user, ok := c.Get(_const.USER).(*User); ok {
 		return user, nil
-	}
-	if userID, ok := c.Get(_const.USERID).(uint); ok {
-		user := new(User)
-		return user, user.FindByID(userID)
 	}
 	return nil, errors.New("not authorized")
 }

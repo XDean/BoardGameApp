@@ -28,8 +28,8 @@ func InitRouter() {
 	apiGroup := e.Group("/apiGroup")
 
 	authored := apiGroup.Group("")
-	authored.Use(middleware.JWTWithConfig(JwtAuthenticateConfig()))
+	authored.Use(middleware.JWTWithConfig(handler.JwtAuthenticateConfig()))
 
 	admin := authored.Group("")
-	admin.Use(AdminAuth)
+	admin.Use(handler.AdminAuth)
 }

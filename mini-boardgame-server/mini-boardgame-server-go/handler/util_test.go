@@ -2,23 +2,36 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/XDean/MiniBoardgame/config"
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 )
 
 var echoContext *echo.Echo
 
-func init() {
-	db, err := gorm.Open("sqlite3", ":memory:")
+func TestMain(m *testing.M) {
+	config.Global.Debug = true
+	tmp, err := ioutil.TempFile("", "mini-bg-*.db")
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(tmp.Name())
+	fmt.Println("Temp database file:", tmp.Name())
+	db, err := gorm.Open("sqlite3", tmp.Name())
 	if err != nil {
 		panic(err)
 	}
 	model.DB = db
+	defer db.Close()
 
 	err = model.Config(db)
 	if err != nil {
@@ -27,6 +40,10 @@ func init() {
 
 	echoContext = echo.New()
 	echoContext.Validator = NewValidator()
+
+	result := m.Run()
+
+	os.Exit(result)
 }
 
 type Request struct {
@@ -41,8 +58,14 @@ type Response struct {
 	ErrorDetail string
 }
 
-func testHttp(test *testing.T, request Request, response Response, fn echo.HandlerFunc) {
+func testHttp(test *testing.T, fn echo.HandlerFunc, request Request, response Response) {
+	originDB := model.DB
+	model.DB = model.DB.Begin()
+	defer func() { model.DB = originDB }()
+	defer model.DB.Rollback()
+
 	request = defaultRequest(request)
+	response = defaultResponse(response)
 
 	var body *strings.Reader
 	var err error
@@ -65,6 +88,8 @@ func testHttp(test *testing.T, request Request, response Response, fn echo.Handl
 			assert.EqualError(test, err, response.ErrorDetail)
 		}
 		echoContext.HTTPErrorHandler(err, c)
+	} else {
+		assert.NoError(test, err)
 	}
 	assert.Equal(test, response.Code, rec.Code)
 }
@@ -77,4 +102,11 @@ func defaultRequest(request Request) Request {
 		request.Path = "/mock-path"
 	}
 	return request
+}
+
+func defaultResponse(response Response) Response {
+	if response.Code == 0 {
+		response.Code = http.StatusOK
+	}
+	return response
 }
