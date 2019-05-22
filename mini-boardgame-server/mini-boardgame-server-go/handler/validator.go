@@ -3,7 +3,9 @@ package handler
 import (
 	"fmt"
 	"github.com/dlclark/regexp2"
+	"github.com/labstack/echo/v4"
 	"gopkg.in/go-playground/validator.v9"
+	"net/http"
 	"reflect"
 )
 
@@ -12,7 +14,11 @@ type Validator struct {
 }
 
 func (cv *Validator) Validate(i interface{}) error {
-	return cv.Validator.Struct(i)
+	if err := cv.Validator.Struct(i); err == nil {
+		return nil
+	} else {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
 }
 
 func NewValidator() *Validator {
