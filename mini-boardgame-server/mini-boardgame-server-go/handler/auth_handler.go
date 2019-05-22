@@ -4,10 +4,8 @@ import (
 	"github.com/XDean/MiniBoardgame/config"
 	_const "github.com/XDean/MiniBoardgame/const"
 	"github.com/XDean/MiniBoardgame/model"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"time"
 )
 
 func SignUp(c echo.Context) error {
@@ -28,7 +26,14 @@ func SignUp(c echo.Context) error {
 		Roles:    []model.Role{{Name: _const.ROLE_USER}},
 	}
 	if err := user.CreateAccount(GetDB(c)); err == nil {
-		return c.JSON(http.StatusCreated, M("Sign up success"))
+		if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
+			return c.JSON(http.StatusCreated, J{
+				"message": "Sign up success",
+				"token":   t,
+			})
+		} else {
+			return err
+		}
 	} else {
 		return err
 	}
@@ -49,14 +54,7 @@ func Login(c echo.Context) error {
 	user := new(model.User)
 	if err := user.FindByUsername(GetDB(c), param.Username); err == nil {
 		if user.MatchPassword(param.Password) {
-			token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
-				User: *user,
-				StandardClaims: jwt.StandardClaims{
-					Subject:   "access token",
-					ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-				},
-			})
-			if t, err := token.SignedString([]byte(config.Global.Security.Key)); err == nil {
+			if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
 				return c.JSON(http.StatusOK, J{
 					"message": "Login success",
 					"token":   t,

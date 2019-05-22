@@ -2,10 +2,12 @@ package model
 
 import (
 	"errors"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"time"
 )
 
 type User struct {
@@ -28,6 +30,11 @@ type Profile struct {
 	Nickname  string
 	Male      bool
 	AvatarURL string
+}
+
+type Claims struct {
+	jwt.StandardClaims
+	User User
 }
 
 func (user *User) FindByID(db *gorm.DB, id uint) error {
@@ -103,4 +110,14 @@ func UserExistByUsername(db *gorm.DB, username string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func (user *User) GenerateToken(key string) (string, error) {
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
+		User: *user,
+		StandardClaims: jwt.StandardClaims{
+			Subject:   "access token",
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+		},
+	}).SignedString([]byte(key))
 }

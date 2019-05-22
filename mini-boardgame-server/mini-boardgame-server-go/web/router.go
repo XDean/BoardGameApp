@@ -8,7 +8,11 @@ import (
 
 func InitRouter(e *echo.Echo) {
 	e.GET("/ping", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, "pong")
+		if user, err := handler.GetCurrentUser(c); err == nil {
+			return c.JSON(http.StatusOK, "hello "+user.Username)
+		} else {
+			return c.JSON(http.StatusOK, "pong")
+		}
 	})
 
 	loginGroup := e.Group("/auth")

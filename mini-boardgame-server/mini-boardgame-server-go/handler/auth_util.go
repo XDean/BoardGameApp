@@ -18,11 +18,6 @@ func GetCurrentUser(c echo.Context) (*model.User, error) {
 	return nil, errors.New("not authorized")
 }
 
-type Claims struct {
-	jwt.StandardClaims
-	User model.User
-}
-
 func AuthMiddleware() echo.MiddlewareFunc {
 	return middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey: []byte(config.Global.Security.Key),
