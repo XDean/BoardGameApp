@@ -3,9 +3,11 @@ package handler
 import (
 	"github.com/XDean/MiniBoardgame/config"
 	_const "github.com/XDean/MiniBoardgame/const"
+	"github.com/XDean/MiniBoardgame/middleware"
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"time"
 )
 
 func SignUp(c echo.Context) error {
@@ -27,6 +29,7 @@ func SignUp(c echo.Context) error {
 	}
 	if err := user.CreateAccount(GetDB(c)); err == nil {
 		if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
+			c.SetCookie(generateTokenCookie(t))
 			return c.JSON(http.StatusCreated, J{
 				"message": "Sign up success",
 				"token":   t,
@@ -55,6 +58,7 @@ func Login(c echo.Context) error {
 	if err := user.FindByUsername(GetDB(c), param.Username); err == nil {
 		if user.MatchPassword(param.Password) {
 			if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
+				c.SetCookie(generateTokenCookie(t))
 				return c.JSON(http.StatusOK, J{
 					"message": "Login success",
 					"token":   t,
@@ -65,4 +69,13 @@ func Login(c echo.Context) error {
 		}
 	}
 	return echo.NewHTTPError(http.StatusUnauthorized, "Bad Credentials")
+}
+
+func generateTokenCookie(token string) *http.Cookie {
+	return &http.Cookie{
+		Path:    "/",
+		Name:    middleware.JwtKey,
+		Value:   token,
+		Expires: time.Now().Add(2 * time.Hour),
+	}
 }

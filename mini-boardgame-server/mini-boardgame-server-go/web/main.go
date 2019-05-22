@@ -3,6 +3,7 @@ package web
 import (
 	"github.com/XDean/MiniBoardgame/config"
 	"github.com/XDean/MiniBoardgame/handler"
+	myMiddleware "github.com/XDean/MiniBoardgame/middleware"
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -10,21 +11,25 @@ import (
 )
 
 func Run() {
-	config.Global.Load("./config-dev.yml")
+	// Load Config
+	err := config.Global.Load("./config-dev.yml")
+	if err != nil {
+		log.Fatal("Config load fail", err)
+	}
+	// Load DB
+	db, err := model.LoadFromConfig()
+	if err != nil {
+		log.Fatal("Database can't be loaded from config", err)
+	}
 
+	// Init echo
 	e := echo.New()
 	e.Validator = handler.NewValidator()
 
-	if config.Global.Debug {
-		e.Use(middleware.Logger())
-	}
+	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-
-	db, err := model.LoadFromConfig()
-	if err != nil {
-		panic("Database can't be loaded from config: " + err.Error())
-	}
-	e.Use(handler.DatabaseContextMiddleware(db))
+	e.Use(myMiddleware.DbContext(db))
+	e.Use(myMiddleware.Jwt())
 
 	InitRouter(e)
 

@@ -2,7 +2,7 @@ package _const
 
 // context keys
 const (
-	USER     = "USER"     // uint
+	USER     = "USER"     // *model.User
 	DATABASE = "DATABASE" // *gorm.DB
 )
 
