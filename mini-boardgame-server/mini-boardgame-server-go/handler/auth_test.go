@@ -9,13 +9,13 @@ func TestSignUp(t *testing.T) {
 	TestHttp{
 		test:    t,
 		handler: SignUp,
-		req: Request{
+		request: Request{
 			Body: J{
 				"username": USERNAME,
 				"password": USERPWD,
 			},
 		},
-		res: Response{
+		response: Response{
 			Code: http.StatusCreated,
 		},
 	}.Run()
@@ -23,12 +23,12 @@ func TestSignUp(t *testing.T) {
 	TestHttp{
 		test:    t,
 		handler: SignUp,
-		req: Request{
+		request: Request{
 			Body: J{
 				"something": "wrong",
 			},
 		},
-		res: Response{
+		response: Response{
 			Code:  http.StatusBadRequest,
 			Error: true,
 		},
@@ -37,13 +37,13 @@ func TestSignUp(t *testing.T) {
 	TestHttp{
 		test:    t,
 		handler: SignUp,
-		req: Request{
+		request: Request{
 			Body: J{
 				"username": "_",
 				"password": "@#$",
 			},
 		},
-		res: Response{
+		response: Response{
 			Code:  http.StatusBadRequest,
 			Error: true,
 		},
@@ -54,7 +54,7 @@ func TestLogin(t *testing.T) {
 	TestHttp{
 		test:    t,
 		handler: Login,
-		req: Request{
+		request: Request{
 			Body: J{
 				"username": USERNAME,
 				"password": USERPWD,
@@ -68,13 +68,13 @@ func TestLogin(t *testing.T) {
 	TestHttp{
 		test:    t,
 		handler: Login,
-		req: Request{
+		request: Request{
 			Body: J{
 				"username": "wrong",
 				"password": "pwd123456",
 			},
 		},
-		res: Response{
+		response: Response{
 			Code:  http.StatusUnauthorized,
 			Error: true,
 		},
@@ -83,13 +83,13 @@ func TestLogin(t *testing.T) {
 	TestHttp{
 		test:    t,
 		handler: Login,
-		req: Request{
+		request: Request{
 			Body: J{
 				"username": "username",
 				"password": "wrong",
 			},
 		},
-		res: Response{
+		response: Response{
 			Code:  http.StatusUnauthorized,
 			Error: true,
 		},
@@ -98,12 +98,12 @@ func TestLogin(t *testing.T) {
 	TestHttp{
 		test:    t,
 		handler: Login,
-		req: Request{
+		request: Request{
 			Body: J{
 				"wrong": "wrong",
 			},
 		},
-		res: Response{
+		response: Response{
 			Code:  http.StatusBadRequest,
 			Error: true,
 		},

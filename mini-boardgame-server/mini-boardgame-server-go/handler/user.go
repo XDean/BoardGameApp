@@ -10,6 +10,7 @@ import (
 func GetUser(c echo.Context) error {
 	if user, err := GetCurrentUser(c); err == nil {
 		return c.JSON(http.StatusOK, J{
+			"id":       user.ID,
 			"username": user.Username,
 			"role":     user.GetRoleStrings(),
 		})
@@ -24,6 +25,7 @@ func GetUserById(c echo.Context) error {
 		user := new(model.User)
 		if err := user.FindByID(GetDB(c), uint(id)); err == nil {
 			return c.JSON(http.StatusOK, J{
+				"id":       user.ID,
 				"username": user.Username,
 				"role":     user.GetRoleStrings(),
 			})
@@ -31,6 +33,6 @@ func GetUserById(c echo.Context) error {
 			return err
 		}
 	} else {
-		return echo.NewHTTPError(http.StatusBadRequest, "Unrecognized ID: "+idParam)
+		return echo.NewHTTPError(http.StatusBadRequest, "No such user id: "+idParam)
 	}
 }
