@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 	}
 	defer db.Close()
 
-	err = model.ConfigDB(db)
+	db, err = model.ConfigDB(db)
 	if err != nil {
 		panic(err)
 	}

@@ -44,13 +44,15 @@ func Jwt() echo.MiddlewareFunc {
 				return key, nil
 			})
 			if err == nil && token.Valid {
-				claims := token.Claims.(*model.Claims)
-				user := model.User{
-					ID:       claims.UserID,
-					Username: claims.Username,
+				if claims, ok := token.Claims.(*model.Claims); ok {
+					user := &model.User{
+						ID:       claims.UserID,
+						Username: claims.Username,
+					}
+					user.SetRoles(claims.Roles)
+					c.Set(_const.USER, user)
+					return next(c)
 				}
-				user.SetRoles(claims.Roles)
-				c.Set(_const.USER, user)
 			}
 			return &echo.HTTPError{
 				Code:     http.StatusUnauthorized,

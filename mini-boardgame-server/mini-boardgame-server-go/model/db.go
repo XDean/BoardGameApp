@@ -16,10 +16,10 @@ func LoadFromConfig() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return db, ConfigDB(db)
+	return ConfigDB(db)
 }
 
-func ConfigDB(database *gorm.DB) error {
+func ConfigDB(database *gorm.DB) (*gorm.DB, error) {
 	database.SetLogger(&log.GormLogger{
 		Name:   "DB",
 		Logger: log.Global,
@@ -28,13 +28,13 @@ func ConfigDB(database *gorm.DB) error {
 	// foreign key constraint is disable in SQLite by default, should enable it first
 	err := database.Exec("PRAGMA foreign_keys=ON;").Error
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Db.ShowSQL(true)
-	database.LogMode(config.Global.Debug)
+	database = database.LogMode(config.Global.Debug)
 	database = database.Set("gorm:auto_preload", true)
 
 	err = database.AutoMigrate(new(User), new(Role), new(Profile), new(Room), new(Player)).Error
-	return err
+	return database, err
 }
