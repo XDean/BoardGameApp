@@ -8,7 +8,7 @@ import (
 	"gopkg.in/resty.v1"
 )
 
-type WechatAuthInfo struct {
+type wechatAuthInfo struct {
 	OpenId       string `json:"openid"`
 	SessionKey   string `json:"session_key"`
 	UnionId      string `json:"unionid"`
@@ -30,7 +30,7 @@ var wechatOpenIdProvider = OpenIdProvider{
 		}).Get(config.Global.Wechat.AuthUrl)
 		if err == nil {
 			body := response.Body()
-			info := new(WechatAuthInfo)
+			info := new(wechatAuthInfo)
 			err = json.Unmarshal(body, info)
 			if err == nil {
 				switch info.ErrorCode {

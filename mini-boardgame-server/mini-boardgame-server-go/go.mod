@@ -8,6 +8,7 @@ require (
 	github.com/dlclark/regexp2 v1.1.6
 	github.com/go-playground/locales v0.12.1 // indirect
 	github.com/go-playground/universal-translator v0.16.0 // indirect
+	github.com/jarcoal/httpmock v1.0.4
 	github.com/jinzhu/gorm v1.9.8
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.1.5
