@@ -22,6 +22,7 @@ func InitRouter(e *echo.Echo) {
 	authored := apiGroup.Group("")
 	authored.Use(middleware.Authorized())
 	authored.GET("/user", handler.GetUser)
+	authored.GET("/user/:id", handler.GetUserById)
 
 	admin := authored.Group("")
 	admin.Use(middleware.AuthRole(_const.ROLE_ADMIN))
