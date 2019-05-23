@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"testing"
 )
@@ -42,6 +43,18 @@ func TestSignUp(t *testing.T) {
 				"username": "_",
 				"password": "@#$",
 			},
+		},
+		response: Response{
+			Code:  http.StatusBadRequest,
+			Error: true,
+		},
+	}.Run()
+
+	TestHttp{
+		test:    t,
+		handler: SignUp,
+		request: Request{
+			Method: echo.POST,
 		},
 		response: Response{
 			Code:  http.StatusBadRequest,

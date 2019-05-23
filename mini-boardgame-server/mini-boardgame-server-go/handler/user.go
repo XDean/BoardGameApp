@@ -30,9 +30,9 @@ func GetUserById(c echo.Context) error {
 				"role":     user.GetRoleStrings(),
 			})
 		} else {
-			return err
+			return DBNotFound(err, "No such user")
 		}
 	} else {
-		return echo.NewHTTPError(http.StatusBadRequest, "No such user id: "+idParam)
+		return echo.NewHTTPError(http.StatusBadRequest, "Unrecognized id: "+idParam)
 	}
 }

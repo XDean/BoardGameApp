@@ -77,4 +77,38 @@ func TestGetUserById(t *testing.T) {
 			WithLogin(t, USER),
 		},
 	}.Run()
+
+	TestHttp{
+		test:    t,
+		handler: GetUserById,
+		request: Request{
+			Params: Params{
+				"id": "wrong",
+			},
+		},
+		response: Response{
+			Code:  http.StatusBadRequest,
+			Error: true,
+		},
+		setups: []Setup{
+			WithLogin(t, USER),
+		},
+	}.Run()
+
+	TestHttp{
+		test:    t,
+		handler: GetUserById,
+		request: Request{
+			Params: Params{
+				"id": strconv.Itoa(ADMINID),
+			},
+		},
+		response: Response{
+			Code:  http.StatusNotFound,
+			Error: true,
+		},
+		setups: []Setup{
+			WithLogin(t, USER),
+		},
+	}.Run()
 }
