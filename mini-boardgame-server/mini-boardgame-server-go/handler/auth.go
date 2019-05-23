@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/XDean/MiniBoardgame/config"
 	_const "github.com/XDean/MiniBoardgame/const"
+	"github.com/XDean/MiniBoardgame/handler/openid"
 	"github.com/XDean/MiniBoardgame/middleware"
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/labstack/echo/v4"
@@ -95,8 +96,12 @@ func LoginOpenid(c echo.Context, param LoginParam) error {
 	if param.Provider == "" || param.Token == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Provider and token are required")
 	}
-
-	return nil
+	openid, err := openid.Get(param.Provider, param.Token)
+	if err == nil {
+		user := model.User{}
+	} else {
+		return err
+	}
 }
 
 func generateTokenCookie(token string) *http.Cookie {

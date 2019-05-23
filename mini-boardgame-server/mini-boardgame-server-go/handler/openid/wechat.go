@@ -2,10 +2,11 @@ package openid
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/XDean/MiniBoardgame/config"
+	"github.com/labstack/echo/v4"
 	"gopkg.in/resty.v1"
+	"net/http"
 )
 
 type wechatAuthInfo struct {
@@ -38,16 +39,16 @@ var wechatOpenIdProvider = OpenIdProvider{
 					return info.OpenId, nil
 				case -1:
 					if try > 5 {
-						return "", errors.New("Server busy, try again later")
+						return "", echo.NewHTTPError(http.StatusServiceUnavailable, "Server busy, try again later")
 					} else {
 						goto TRY
 					}
 				case 40029:
-					return "", errors.New("Wrong wechat mini boardgame token")
+					return "", echo.NewHTTPError(http.StatusUnauthorized, "Wrong wechat mini boardgame token")
 				case 45011:
-					return "", errors.New("Wechat server limited")
+					return "", echo.NewHTTPError(http.StatusTooManyRequests, "Wechat server limited")
 				default:
-					return "", errors.New(fmt.Sprintf("Unknown error code: %d", info.ErrorCode))
+					return "", echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Unknown error code: %d", info.ErrorCode))
 				}
 			} else {
 				return "", err
