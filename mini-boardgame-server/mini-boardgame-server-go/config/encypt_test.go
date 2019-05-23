@@ -1,15 +1,21 @@
 package config
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 var key = "123456"
 
+func TestGenerate(t *testing.T) {
+	fmt.Println(EncryptString("data-here", "key-here"))
+}
+
 func TestDecrypt(t *testing.T) {
 	encrypted := Encrypt([]byte("abc"), key)
-	decrypted := Decrypt(encrypted, key)
+	decrypted, err := Decrypt(encrypted, key)
+	assert.NoError(t, err)
 	assert.Equal(t, "abc", string(decrypted))
 }
 
@@ -27,19 +33,15 @@ func TestDecode(t *testing.T) {
 	input := Config{
 		Debug: true,
 		Wechat: Wechat{
-			AppId:     encryptString("appid"),
-			AppSecret: encryptString("appseceret"),
+			AppId:     EncryptString("appid", key),
+			AppSecret: EncryptString("appseceret", key),
 		},
 		Security: Security{
-			Key: encryptString("key"),
+			Key: EncryptString("key", key),
 		},
 	}
 
 	err := Decode(&input, key)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, input)
-}
-
-func encryptString(s string) string {
-	return "ENC~" + string(Encrypt([]byte(s), key))
 }

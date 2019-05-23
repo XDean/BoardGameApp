@@ -5,7 +5,9 @@ import (
 	"crypto/cipher"
 	"crypto/md5"
 	"crypto/rand"
+	"encoding/base64"
 	"encoding/hex"
+	"errors"
 	"io"
 	"reflect"
 	"strings"
@@ -30,7 +32,11 @@ func Decode(obj interface{}, key string) error {
 		case reflect.String:
 			str := field.String()
 			if strings.HasPrefix(str, "ENC~") {
-				field.SetString(string(Decrypt([]byte(str[4:]), key)))
+				text, err := Decrypt(str[4:], key)
+				if err != nil {
+					return err
+				}
+				field.SetString(string(text))
 			}
 		case reflect.Struct:
 			err := Decode(field, key)
@@ -42,7 +48,7 @@ func Decode(obj interface{}, key string) error {
 	return nil
 }
 
-func Encrypt(data []byte, passphrase string) []byte {
+func Encrypt(data []byte, passphrase string) string {
 	block, err := aes.NewCipher([]byte(createHash(passphrase)))
 	if err != nil {
 		panic(err.Error())
@@ -55,10 +61,15 @@ func Encrypt(data []byte, passphrase string) []byte {
 	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
 		panic(err.Error())
 	}
-	return gcm.Seal(nonce, nonce, data, nil)
+	seal := gcm.Seal(nonce, nonce, data, nil)
+	return base64.StdEncoding.EncodeToString(seal)
 }
 
-func Decrypt(data []byte, passphrase string) []byte {
+func Decrypt(text string, passphrase string) ([]byte, error) {
+	data, err := base64.StdEncoding.DecodeString(text)
+	if err != nil {
+		return nil, errors.New("Invalid text to decrypt")
+	}
 	key := []byte(createHash(passphrase))
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -74,7 +85,11 @@ func Decrypt(data []byte, passphrase string) []byte {
 	if err != nil {
 		panic(err.Error())
 	}
-	return plaintext
+	return plaintext, nil
+}
+
+func EncryptString(s string, key string) string {
+	return "ENC~" + string(Encrypt([]byte(s), key))
 }
 
 func createHash(key string) string {
