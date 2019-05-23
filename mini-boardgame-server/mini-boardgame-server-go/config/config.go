@@ -14,6 +14,7 @@ type Config struct {
 	Debug    bool
 	Security Security
 	DB       DB
+	Wechat   Wechat
 }
 
 type Security struct {
@@ -24,6 +25,12 @@ type Security struct {
 type DB struct {
 	Dialect string
 	URL     string
+}
+
+type Wechat struct {
+	AppId     string
+	AppSecret string
+	AuthUrl   string
 }
 
 // Init configuration instance

@@ -69,6 +69,23 @@ func TestLogin(t *testing.T) {
 		handler: Login,
 		request: Request{
 			Body: J{
+				"type": "wrong",
+			},
+		},
+		response: Response{
+			Code:  http.StatusBadRequest,
+			Error: true,
+		},
+	}.Run()
+}
+
+func TestLoginPassword(t *testing.T) {
+	TestHttp{
+		test:    t,
+		handler: Login,
+		request: Request{
+			Body: J{
+				"type":     "password",
 				"username": USERNAME,
 				"password": USERPWD,
 			},

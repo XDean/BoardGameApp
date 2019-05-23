@@ -12,8 +12,8 @@ import (
 
 func SignUp(c echo.Context) error {
 	type Param struct {
-		Username string `json:"username" validate:"required,regexp=USERNAME"`
-		Password string `json:"password" validate:"required,regexp=PASSWORD"`
+		Username string `json:"username" form:"username" query:"username" validate:"required,regexp=USERNAME"`
+		Password string `json:"password" form:"password" query:"password" validate:"required,regexp=PASSWORD"`
 	}
 	param := new(Param)
 	if err := c.Bind(param); err != nil {
@@ -42,17 +42,37 @@ func SignUp(c echo.Context) error {
 	}
 }
 
+type LoginParam struct {
+	Type     string `json:"type" form:"type" query:"type"`
+	Username string `json:"username" form:"username" query:"username"`
+	Password string `json:"password" form:"password" query:"password"`
+	Provider string `json:"provider" form:"provider" query:"provider"`
+	Token    string `json:"token" form:"token" query:"token"`
+}
+
 func Login(c echo.Context) error {
-	type Param struct {
-		Username string `json:"username" validate:"required"`
-		Password string `json:"password" validate:"required"`
-	}
-	param := new(Param)
+	param := new(LoginParam)
 	if err := c.Bind(param); err != nil {
 		return err
 	}
 	if err := c.Validate(param); err != nil {
 		return err
+	}
+	switch param.Type {
+	case "openid":
+		return LoginOpenid(c, *param)
+	case "password":
+		fallthrough
+	case "":
+		return LoginPassword(c, *param)
+	default:
+		return echo.NewHTTPError(http.StatusBadRequest, "Unknown login type: "+param.Type)
+	}
+}
+
+func LoginPassword(c echo.Context, param LoginParam) error {
+	if param.Username == "" || param.Password == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Username and password are required")
 	}
 	user := new(model.User)
 	if err := user.FindByUsername(GetDB(c), param.Username); err == nil {
@@ -69,6 +89,14 @@ func Login(c echo.Context) error {
 		}
 	}
 	return echo.NewHTTPError(http.StatusUnauthorized, "Bad Credentials")
+}
+
+func LoginOpenid(c echo.Context, param LoginParam) error {
+	if param.Provider == "" || param.Token == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Provider and token are required")
+	}
+
+	return nil
 }
 
 func generateTokenCookie(token string) *http.Cookie {
