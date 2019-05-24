@@ -16,6 +16,7 @@ func InitRouter(e *echo.Echo) {
 	loginGroup := e.Group("/auth")
 	loginGroup.GET("/signup", handler.SignUp)
 	loginGroup.GET("/login", handler.Login)
+	loginGroup.GET("/logout", handler.Logout, middleware.Authorized())
 
 	apiGroup := e.Group("/api")
 

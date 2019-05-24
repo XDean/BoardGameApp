@@ -96,11 +96,11 @@ func LoginOpenid(c echo.Context, param LoginParam) error {
 	if param.Provider == "" || param.Token == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Provider and token are required")
 	}
-	openid, err := openid.Get(param.Provider, param.Token)
+	oid, err := openid.Get(param.Provider, param.Token)
 	if err == nil {
 		user := &model.User{
-			Username: openid + "@" + param.Provider,
-			Password: openid,
+			Username: oid + "@" + param.Provider,
+			Password: oid,
 			Roles:    []model.Role{{Name: _const.ROLE_USER}},
 		}
 		db := GetDB(c)
@@ -129,6 +129,16 @@ func LoginOpenid(c echo.Context, param LoginParam) error {
 	} else {
 		return err
 	}
+}
+
+func Logout(c echo.Context) error {
+	// TODO use refresh token
+	c.SetCookie(&http.Cookie{
+		Path:    "/",
+		Name:    middleware.JwtKey,
+		Expires: time.Now(),
+	})
+	return c.JSON(http.StatusOK, M("Logout success"))
 }
 
 func generateTokenCookie(token string) *http.Cookie {
