@@ -38,11 +38,15 @@ func validRegexp(fl validator.FieldLevel) bool {
 
 	switch field.Kind() {
 	case reflect.String:
+		str := field.String()
+		if str == "" {
+			return true
+		}
 		if regex, find := REGEX[param]; find {
-			isMatch, _ := regex.MatchString(field.String())
+			isMatch, _ := regex.MatchString(str)
 			return isMatch
 		} else {
-			panic(fmt.Sprintf("Bad regex key %v", field.String()))
+			panic(fmt.Sprintf("Bad regex key %v", str))
 		}
 	default:
 		panic(fmt.Sprintf("Bad field type %T", field.Interface()))

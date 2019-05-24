@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/XDean/MiniBoardgame/model"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"testing"
@@ -136,6 +137,40 @@ func TestLoginPassword(t *testing.T) {
 		response: Response{
 			Code:  http.StatusBadRequest,
 			Error: true,
+		},
+	}.Run()
+}
+
+func TestLoginOpenid(t *testing.T) {
+	TestHttp{
+		test:    t,
+		handler: Login,
+		request: Request{
+			Body: J{
+				"type":     "openid",
+				"provider": "test",
+				"token":    "token",
+			},
+		},
+		setups: []Setup{
+			WithOpenid(),
+		},
+	}.Run()
+	TestHttp{
+		test:    t,
+		handler: Login,
+		request: Request{
+			Body: J{
+				"type":     "openid",
+				"provider": "test",
+				"token":    "token",
+			},
+		},
+		setups: []Setup{
+			WithOpenid(),
+			WithUser(t, &model.User{
+				Username: "token@test",
+			}),
 		},
 	}.Run()
 }

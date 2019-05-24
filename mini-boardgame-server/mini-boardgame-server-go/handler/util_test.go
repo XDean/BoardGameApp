@@ -2,7 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	_const "github.com/XDean/MiniBoardgame/const"
+	"github.com/XDean/MiniBoardgame/handler/openid"
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -81,6 +83,25 @@ func WithUser(t *testing.T, user *model.User) Setup {
 func WithLogin(t *testing.T, user *model.User) Setup {
 	return func(c echo.Context) {
 		c.Set(_const.USER, user)
+	}
+}
+
+func WithOpenid() Setup {
+	return func(c echo.Context) {
+		openid.Providers = map[string]openid.OpenIdProvider{
+			"test": openid.OpenIdProvider{
+				Name: "test",
+				Auth: func(token string) (string, error) {
+					return token, nil
+				},
+			},
+			"test-fail": openid.OpenIdProvider{
+				Name: "test",
+				Auth: func(token string) (string, error) {
+					return "", errors.New("openid fail")
+				},
+			},
+		}
 	}
 }
 

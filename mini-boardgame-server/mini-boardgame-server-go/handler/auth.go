@@ -45,7 +45,7 @@ func SignUp(c echo.Context) error {
 
 type LoginParam struct {
 	Type     string `json:"type" form:"type" query:"type"`
-	Username string `json:"username" form:"username" query:"username"`
+	Username string `json:"username" form:"username" query:"username" validate:"regexp=USERNAME"`
 	Password string `json:"password" form:"password" query:"password"`
 	Provider string `json:"provider" form:"provider" query:"provider"`
 	Token    string `json:"token" form:"token" query:"token"`
@@ -98,7 +98,34 @@ func LoginOpenid(c echo.Context, param LoginParam) error {
 	}
 	openid, err := openid.Get(param.Provider, param.Token)
 	if err == nil {
-		user := model.User{}
+		user := &model.User{
+			Username: openid + "@" + param.Provider,
+			Password: openid,
+			Roles:    []model.Role{{Name: _const.ROLE_USER}},
+		}
+		db := GetDB(c)
+		yes, err := model.UserExistByUsername(db, user.Username)
+		if err != nil {
+			return err
+		}
+		if yes {
+			if err := user.FindByUsername(db, user.Username); err != nil {
+				return err
+			}
+		} else {
+			if err := user.CreateAccount(db); err != nil {
+				return err
+			}
+		}
+		if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
+			c.SetCookie(generateTokenCookie(t))
+			return c.JSON(http.StatusOK, J{
+				"message": "Login success",
+				"token":   t,
+			})
+		} else {
+			return err
+		}
 	} else {
 		return err
 	}
