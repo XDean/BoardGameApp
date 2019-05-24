@@ -16,12 +16,11 @@ func LoadFromConfig() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ConfigDB(db)
+	return Configure(db)
 }
 
-func ConfigDB(database *gorm.DB) (*gorm.DB, error) {
-	database.SetLogger(&log.GormLogger{
-		Name:   "DB",
+func Configure(database *gorm.DB) (*gorm.DB, error) {
+	database.SetLogger(&log.GormLogrusLogger{
 		Logger: log.Global,
 	})
 

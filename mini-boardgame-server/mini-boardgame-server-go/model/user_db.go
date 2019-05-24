@@ -47,7 +47,7 @@ func (user *User) CreateAccount(db *gorm.DB) error {
 }
 
 func (user *User) ChangePassword(db *gorm.DB, old, new string) error {
-	if user.MatchPassword(old) {
+	if !user.MatchPassword(old) {
 		return errors.New("Password not correct")
 	}
 	if newPassword, err := bcrypt.GenerateFromPassword([]byte(new), 10); err == nil {
@@ -60,20 +60,27 @@ func (user *User) ChangePassword(db *gorm.DB, old, new string) error {
 
 func UserExistById(db *gorm.DB, id uint) (bool, error) {
 	user := new(User)
-	if err := user.FindByID(db, id); gorm.IsRecordNotFoundError(err) {
-		return false, nil
-	} else {
-		return false, err
+	err := user.FindByID(db, id)
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return false, nil
+		} else {
+			return false, err
+		}
 	}
 	return true, nil
 }
 
 func UserExistByUsername(db *gorm.DB, username string) (bool, error) {
 	user := new(User)
-	if err := user.FindByUsername(db, username); gorm.IsRecordNotFoundError(err) {
-		return false, nil
+	err := user.FindByUsername(db, username)
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return false, nil
+		} else {
+			return false, err
+		}
 	} else {
-		return false, err
+		return true, nil
 	}
-	return true, nil
 }

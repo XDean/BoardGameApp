@@ -1,19 +1,16 @@
-package handler
+package model
 
 import (
 	"fmt"
 	"github.com/XDean/MiniBoardgame/config"
 	"github.com/XDean/MiniBoardgame/log"
-	"github.com/XDean/MiniBoardgame/model"
 	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo/v4"
 	"io/ioutil"
 	"os"
 	"testing"
 )
 
-var echoContext *echo.Echo
-var dbContext *gorm.DB
+var testDB *gorm.DB
 
 func TestMain(m *testing.M) {
 	config.Global.Debug = true
@@ -29,15 +26,12 @@ func TestMain(m *testing.M) {
 	}
 	defer db.Close()
 
-	db, err = model.Configure(db)
+	db, err = Configure(db)
 	if err != nil {
 		panic(err)
 	}
 	db.SetLogger(log.GormStdLogger{})
-
-	dbContext = db
-	echoContext = echo.New()
-	echoContext.Validator = NewValidator()
+	testDB = db
 
 	result := m.Run()
 
