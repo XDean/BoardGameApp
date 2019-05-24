@@ -19,15 +19,6 @@ type Role struct {
 	Name   string
 }
 
-type Profile struct {
-	ID        uint `gorm:"primary_key"`
-	UserID    uint `gorm:"unique;not null"`
-	User      User
-	Nickname  string
-	Male      bool
-	AvatarURL string
-}
-
 func (user *User) GetRoleStrings() []string {
 	roles := make([]string, len(user.Roles))
 	for i, role := range user.Roles {

@@ -26,10 +26,6 @@ func (user *User) Save(db *gorm.DB) error {
 	return db.Save(user).Error
 }
 
-func (profile *Profile) Save(db *gorm.DB) error {
-	return db.Save(profile).Error
-}
-
 func (user *User) CreateAccount(db *gorm.DB) error {
 	if encoded, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10); err == nil {
 		user.Password = string(encoded)
