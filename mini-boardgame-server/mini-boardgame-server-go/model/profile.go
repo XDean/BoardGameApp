@@ -1,9 +1,25 @@
 package model
 
+type Sex uint8
+
+const (
+	Unknown Sex = 0
+	Male    Sex = 1
+	Female  Sex = 2
+)
+
 type Profile struct {
-	ID        uint `gorm:"primary_key"`
-	UserID    uint `gorm:"unique;not null"`
+	UserID    uint `gorm:"primary_key"`
 	Nickname  string
-	Male      bool
+	Sex       Sex
 	AvatarURL string
+}
+
+func EmptyProfile(id uint) Profile {
+	return Profile{
+		UserID:    id,
+		Nickname:  "Undefined",
+		Sex:       Unknown,
+		AvatarURL: "",
+	}
 }

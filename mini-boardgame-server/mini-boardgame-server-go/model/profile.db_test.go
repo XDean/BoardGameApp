@@ -9,7 +9,7 @@ func NewProfile() *Profile {
 	return &Profile{
 		UserID:    USERID,
 		Nickname:  "test-nickname",
-		Male:      true,
+		Sex:       Male,
 		AvatarURL: "test-url",
 	}
 }
