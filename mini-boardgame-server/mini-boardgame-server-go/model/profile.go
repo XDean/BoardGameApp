@@ -15,8 +15,8 @@ type Profile struct {
 	AvatarURL string
 }
 
-func EmptyProfile(id uint) Profile {
-	return Profile{
+func EmptyProfile(id uint) *Profile {
+	return &Profile{
 		UserID:    id,
 		Nickname:  "Undefined",
 		Sex:       Unknown,

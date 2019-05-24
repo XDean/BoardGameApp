@@ -44,6 +44,18 @@ var (
 			},
 		},
 	}
+	USER_PROFILE = &model.Profile{
+		UserID:    USERID,
+		Sex:       model.Male,
+		Nickname:  "usernick",
+		AvatarURL: "userurl",
+	}
+	ADMIN_PROFILE = &model.Profile{
+		UserID:    USERID,
+		Sex:       model.Male,
+		Nickname:  "adminname",
+		AvatarURL: "adminurl",
+	}
 )
 
 type (
@@ -76,6 +88,13 @@ type (
 func WithUser(t *testing.T, user *model.User) Setup {
 	return func(c echo.Context) {
 		err := user.CreateAccount(GetDB(c))
+		assert.NoError(t, err)
+	}
+}
+
+func WithProfile(t *testing.T, profile *model.Profile) Setup {
+	return func(c echo.Context) {
+		err := profile.Save(GetDB(c))
 		assert.NoError(t, err)
 	}
 }
