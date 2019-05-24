@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	_const "github.com/XDean/MiniBoardgame/const"
-	"github.com/XDean/MiniBoardgame/handler/openid"
 	"github.com/XDean/MiniBoardgame/model"
+	"github.com/XDean/MiniBoardgame/web/handler/openid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -89,13 +89,13 @@ func WithLogin(t *testing.T, user *model.User) Setup {
 func WithOpenid() Setup {
 	return func(c echo.Context) {
 		openid.Providers = map[string]openid.OpenIdProvider{
-			"test": openid.OpenIdProvider{
+			"test": {
 				Name: "test",
 				Auth: func(token string) (string, error) {
 					return token, nil
 				},
 			},
-			"test-fail": openid.OpenIdProvider{
+			"test-fail": {
 				Name: "test",
 				Auth: func(token string) (string, error) {
 					return "", errors.New("openid fail")

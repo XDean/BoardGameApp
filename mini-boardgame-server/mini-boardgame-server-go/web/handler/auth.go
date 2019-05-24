@@ -3,9 +3,9 @@ package handler
 import (
 	"github.com/XDean/MiniBoardgame/config"
 	_const "github.com/XDean/MiniBoardgame/const"
-	"github.com/XDean/MiniBoardgame/handler/openid"
-	"github.com/XDean/MiniBoardgame/middleware"
 	"github.com/XDean/MiniBoardgame/model"
+	"github.com/XDean/MiniBoardgame/web/handler/openid"
+	"github.com/XDean/MiniBoardgame/web/middleware"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"time"

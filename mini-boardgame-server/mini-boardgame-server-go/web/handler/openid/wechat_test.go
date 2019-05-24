@@ -21,28 +21,33 @@ func TestWechat(t *testing.T) {
 	var err error
 
 	httpmock.Reset()
-	register(t, 0)
+	err = register(t, 0)
+	assert.NoError(t, err)
 	openid, err = wechatOpenIdProvider.Auth("")
 	assert.NoError(t, err)
 	assert.Equal(t, "openid", openid)
 
 	httpmock.Reset()
-	register(t, 40029)
+	err = register(t, 40029)
+	assert.NoError(t, err)
 	openid, err = wechatOpenIdProvider.Auth("")
 	assert.Error(t, err)
 
 	httpmock.Reset()
-	register(t, 45011)
+	err = register(t, 45011)
+	assert.NoError(t, err)
 	openid, err = wechatOpenIdProvider.Auth("")
 	assert.Error(t, err)
 
 	httpmock.Reset()
-	register(t, 10000000)
+	err = register(t, 10000000)
+	assert.NoError(t, err)
 	openid, err = wechatOpenIdProvider.Auth("")
 	assert.Error(t, err)
 
 	httpmock.Reset()
-	register(t, -1)
+	err = register(t, -1)
+	assert.NoError(t, err)
 	openid, err = wechatOpenIdProvider.Auth("")
 	assert.Error(t, err)
 

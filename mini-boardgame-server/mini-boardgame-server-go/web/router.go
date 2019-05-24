@@ -2,8 +2,8 @@ package web
 
 import (
 	_const "github.com/XDean/MiniBoardgame/const"
-	"github.com/XDean/MiniBoardgame/handler"
-	"github.com/XDean/MiniBoardgame/middleware"
+	"github.com/XDean/MiniBoardgame/web/handler"
+	"github.com/XDean/MiniBoardgame/web/middleware"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )

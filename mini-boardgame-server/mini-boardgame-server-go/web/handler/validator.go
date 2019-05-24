@@ -23,7 +23,7 @@ func (cv *Validator) Validate(i interface{}) error {
 
 func NewValidator() *Validator {
 	v := validator.New()
-	v.RegisterValidation("regexp", validRegexp)
+	_ = v.RegisterValidation("regexp", validRegexp)
 	return &Validator{Validator: v}
 }
 
