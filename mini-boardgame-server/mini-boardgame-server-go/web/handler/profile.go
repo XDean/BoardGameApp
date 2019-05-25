@@ -11,10 +11,8 @@ import (
 func GetProfile(c echo.Context) error {
 	if user, err := GetCurrentUser(c); err == nil {
 		profile := model.EmptyProfile(user.ID)
-		if err := profile.FindByUserID(GetDB(c), user.ID); err == nil {
+		if err := profile.FindByUserID(GetDB(c), user.ID); err == nil || gorm.IsRecordNotFoundError(err) {
 			return c.JSON(http.StatusOK, profile)
-		} else if gorm.IsRecordNotFoundError(err) {
-			return c.JSON(http.StatusNoContent, profile)
 		} else {
 			return err
 		}
@@ -29,10 +27,8 @@ func GetProfileById(c echo.Context) error {
 		user := new(model.User)
 		if err := user.FindByID(GetDB(c), uint(id)); err == nil {
 			profile := model.EmptyProfile(user.ID)
-			if err := profile.FindByUserID(GetDB(c), user.ID); err == nil {
+			if err := profile.FindByUserID(GetDB(c), user.ID); err == nil || gorm.IsRecordNotFoundError(err) {
 				return c.JSON(http.StatusOK, profile)
-			} else if gorm.IsRecordNotFoundError(err) {
-				return c.JSON(http.StatusNoContent, profile)
 			} else {
 				return err
 			}

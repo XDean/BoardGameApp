@@ -25,7 +25,6 @@ func TestGetProfile(t *testing.T) {
 		test:    t,
 		handler: GetProfile,
 		response: Response{
-			Code: http.StatusNoContent,
 			Body: model.EmptyProfile(USERID),
 		},
 		setups: []Setup{
@@ -93,9 +92,6 @@ func TestGetProfileById(t *testing.T) {
 			Params: Params{
 				"id": strconv.Itoa(USERID),
 			},
-		},
-		response: Response{
-			Code: http.StatusNoContent,
 		},
 		setups: []Setup{
 			WithUser(t, USER),
