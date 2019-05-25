@@ -28,11 +28,11 @@ func GetProfileById(c echo.Context) error {
 	if id, err := strconv.Atoi(idParam); err == nil {
 		user := new(model.User)
 		if err := user.FindByID(GetDB(c), uint(id)); err == nil {
-			profile := new(model.Profile)
-			if err := profile.FindByUserID(GetDB(c), user.ID); err != nil {
-				return c.JSON(http.StatusOK, *profile)
+			profile := model.EmptyProfile(user.ID)
+			if err := profile.FindByUserID(GetDB(c), user.ID); err == nil {
+				return c.JSON(http.StatusOK, profile)
 			} else if gorm.IsRecordNotFoundError(err) {
-				return c.JSON(http.StatusNoContent, model.EmptyProfile(user.ID))
+				return c.JSON(http.StatusNoContent, profile)
 			} else {
 				return err
 			}
@@ -47,7 +47,7 @@ func GetProfileById(c echo.Context) error {
 func UpdateProfile(c echo.Context) error {
 	type Param struct {
 		Nickname  string    `json:"nickname" query:"nickname" form:"nickname"`
-		Sex       model.Sex `json:"male" query:"male" form:"male"`
+		Sex       model.Sex `json:"sex" query:"sex" form:"sex"`
 		AvatarURL string    `json:"avatarurl" query:"avatarurl" form:"avatarurl"`
 	}
 	param := new(Param)
@@ -59,7 +59,7 @@ func UpdateProfile(c echo.Context) error {
 	}
 	if user, err := GetCurrentUser(c); err == nil {
 		profile := model.EmptyProfile(user.ID)
-		if err := profile.FindByUserID(GetDB(c), user.ID); err != nil || gorm.IsRecordNotFoundError(err) {
+		if err := profile.FindByUserID(GetDB(c), user.ID); err == nil || gorm.IsRecordNotFoundError(err) {
 			if param.Nickname != "" {
 				profile.Nickname = param.Nickname
 			}

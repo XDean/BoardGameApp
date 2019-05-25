@@ -6,6 +6,7 @@ import (
 	_const "github.com/XDean/MiniBoardgame/const"
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/XDean/MiniBoardgame/web/handler/openid"
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -82,6 +83,7 @@ type (
 		Body        interface{}
 		Error       bool
 		ErrorDetail string
+		Extra       func(*gorm.DB, *httptest.ResponseRecorder)
 	}
 )
 
@@ -192,7 +194,12 @@ func (t TestHttp) Run() {
 		var js []byte
 		js, err = json.Marshal(t.response.Body)
 		assert.NoError(t.test, err)
-		assert.JSONEq(t.test, rec.Body.String(), string(js))
+		assert.JSONEq(t.test, string(js), rec.Body.String())
+	}
+
+	// extra
+	if t.response.Extra != nil {
+		t.response.Extra(tx, rec)
 	}
 }
 
