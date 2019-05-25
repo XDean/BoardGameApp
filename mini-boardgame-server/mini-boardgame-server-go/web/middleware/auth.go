@@ -31,10 +31,15 @@ func AuthRole(targetRole string) echo.MiddlewareFunc {
 						return next(context)
 					}
 				}
-			}
-			return &echo.HTTPError{
-				Code:    http.StatusUnauthorized,
-				Message: "You are not " + targetRole,
+				return &echo.HTTPError{
+					Code:    http.StatusForbidden,
+					Message: "You are not " + targetRole,
+				}
+			} else {
+				return &echo.HTTPError{
+					Code:    http.StatusUnauthorized,
+					Message: "You are not authorized",
+				}
 			}
 		}
 	}

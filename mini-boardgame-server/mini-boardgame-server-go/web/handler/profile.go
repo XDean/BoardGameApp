@@ -66,7 +66,7 @@ func UpdateProfile(c echo.Context) error {
 				profile.Sex = param.Sex
 			}
 			if err := profile.Save(GetDB(c)); err == nil {
-				return c.JSON(http.StatusAccepted, M("Update success"))
+				return c.JSON(http.StatusOK, profile)
 			} else {
 				return err
 			}

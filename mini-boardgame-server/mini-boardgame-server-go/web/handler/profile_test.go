@@ -130,7 +130,12 @@ func TestUpdateProfile(t *testing.T) {
 			},
 		},
 		response: Response{
-			Code: http.StatusAccepted,
+			Body: model.Profile{
+				UserID:    USERID,
+				Nickname:  "new",
+				Sex:       model.Female,
+				AvatarURL: "new-url",
+			},
 			Extra: func(db *gorm.DB, recorder *httptest.ResponseRecorder) {
 				profile := new(model.Profile)
 				err := profile.FindByUserID(db, USERID)
