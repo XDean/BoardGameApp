@@ -14,7 +14,7 @@ func (r *Room) delete(db *gorm.DB) error {
 }
 
 func (r *Room) FindByID(db *gorm.DB, id uint) error {
-	defer r.Normalize()
+	defer r.normalize()
 	return db.Where("id = ?", id).Find(r).Error
 }
 
@@ -22,13 +22,13 @@ func FindRoomsByGame(db *gorm.DB, game string, bound RowBound) ([]*Room, error) 
 	rooms := make([]*Room, 0)
 	err := db.Where("game_name = ?", game).Limit(bound.Limit).Offset(bound.Offset).Find(&rooms).Error
 	for _, room := range rooms {
-		room.Normalize()
+		room.normalize()
 	}
 	return rooms, err
 }
 
 func (r *Room) CreateByHost(db *gorm.DB, host *User) error {
-	defer r.Normalize()
+	defer r.normalize()
 	r.CreatedTime = time.Now()
 	r.Players = []*Player{
 		{

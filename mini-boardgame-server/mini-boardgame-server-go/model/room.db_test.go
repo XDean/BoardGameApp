@@ -12,14 +12,15 @@ func TestRoom_CreateByHost(t *testing.T) {
 	defer db.Rollback()
 
 	player := new(Player)
-	err := player.FindByUserID(db, USERID)
+	err := player.GetByUserID(db, USERID)
 	assert.NoError(t, err)
 	assert.Equal(t, Player{
-		UserID: USERID,
-		RoomID: 0,
-		Room:   nil,
-		State:  OUT_OF_GAME,
-		Seat:   0,
+		UserID:      USERID,
+		RoomID:      0,
+		Room:        nil,
+		State:       OUT_OF_GAME,
+		StateString: OUT_OF_GAME.String(),
+		Seat:        0,
 	}, *player)
 
 	room := &Room{
@@ -32,7 +33,7 @@ func TestRoom_CreateByHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, room.Players[0].Room, room)
 
-	err = player.FindByUserID(db, USERID)
+	err = player.GetByUserID(db, USERID)
 	assert.NoError(t, err)
 	assert.Equal(t, player.Room.Players[0], player)
 	assert.Equal(t, ROOMID, player.RoomID)

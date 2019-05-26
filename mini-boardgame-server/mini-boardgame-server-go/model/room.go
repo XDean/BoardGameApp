@@ -11,8 +11,9 @@ type Room struct {
 	Players     []*Player
 }
 
-func (r *Room) Normalize() {
+func (r *Room) normalize() {
 	for _, player := range r.Players {
 		player.Room = r
+		player.normalize()
 	}
 }

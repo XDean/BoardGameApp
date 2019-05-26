@@ -28,6 +28,7 @@ func Run() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(myMiddleware.BreakErrorRecover())
 	e.Use(myMiddleware.DbContext(db))
 	e.Use(myMiddleware.Jwt())
 
