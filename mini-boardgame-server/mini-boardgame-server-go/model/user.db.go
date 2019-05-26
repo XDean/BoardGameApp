@@ -9,20 +9,14 @@ import (
 )
 
 func (user *User) FindByID(db *gorm.DB, id uint) error {
-	if err := db.Where("id = ?", id).Find(user).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Where("id = ?", id).Find(user).Error
 }
 
 func (user *User) FindByUsername(db *gorm.DB, username string) error {
-	if err := db.Where("username = ?", username).Find(user).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Where("username = ?", username).Find(user).Error
 }
 
-func (user *User) Save(db *gorm.DB) error {
+func (user *User) save(db *gorm.DB) error {
 	return db.Save(user).Error
 }
 
@@ -48,7 +42,7 @@ func (user *User) ChangePassword(db *gorm.DB, old, new string) error {
 	}
 	if newPassword, err := bcrypt.GenerateFromPassword([]byte(new), 10); err == nil {
 		user.Password = string(newPassword)
-		return user.Save(db)
+		return user.save(db)
 	} else {
 		return err
 	}

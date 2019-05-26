@@ -45,7 +45,7 @@ func TestUser_FindByID(t *testing.T) {
 	err := user.FindByID(db, USERID)
 	assert.Error(t, err)
 
-	err = NewUser().Save(db)
+	err = NewUser().save(db)
 	assert.NoError(t, err)
 	err = user.FindByID(db, USERID)
 	assert.NoError(t, err)
@@ -59,7 +59,7 @@ func TestUser_FindByUsername(t *testing.T) {
 	err := user.FindByUsername(db, USERNAME)
 	assert.Error(t, err)
 
-	err = NewUser().Save(db)
+	err = NewUser().save(db)
 	assert.NoError(t, err)
 	err = user.FindByUsername(db, USERNAME)
 	assert.NoError(t, err)

@@ -1,22 +1,33 @@
 package model
 
-import (
-	"time"
+type PlayerState uint
+
+const (
+	OUT_OF_GAME PlayerState = 0
+	NOT_READY   PlayerState = 1
+	READY       PlayerState = 2
+	HOST        PlayerState = 3
 )
 
-type Room struct {
-	ID          uint `gorm:"primary_key"`
-	GameName    string
-	PlayerCount uint8
-	RoomName    string
-	CreatedTime time.Time
-	Players     []Player
+type Player struct {
+	UserID uint        `gorm:"primary_key"`
+	RoomID uint        `gorm:"default:0"`
+	Room   *Room       `gorm:"-"` //gorm can't handle this, need put manually
+	State  PlayerState `gorm:"default:0"`
+	Seat   uint        `gorm:"default:0"`
 }
 
-type Player struct {
-	ID     uint `gorm:"primary_key"`
-	UserID uint
-	RoomID uint
-	Seat   uint8
-	Ready  bool
+func (s PlayerState) String() string {
+	switch s {
+	case OUT_OF_GAME:
+		return "OUT_OF_GAME"
+	case NOT_READY:
+		return "NOT_READY"
+	case READY:
+		return "READY"
+	case HOST:
+		return "HOST"
+	default:
+		return "Unknown"
+	}
 }
