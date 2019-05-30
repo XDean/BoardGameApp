@@ -51,4 +51,13 @@ func TestRoom_CreateByHost(t *testing.T) {
 	rooms, err := FindRoomsByGame(db, "game", Unbound)
 	assert.NoError(t, err)
 	assert.Len(t, rooms, 1)
+
+	room = new(Room)
+	err = room.FindByUserID(db, USERID)
+	assert.NoError(t, err)
+	assert.Equal(t, room.Players[0].Room, room)
+	assert.Equal(t, ROOMID, room.ID)
+	assert.Equal(t, "game", room.GameName)
+	assert.Equal(t, "room", room.RoomName)
+
 }

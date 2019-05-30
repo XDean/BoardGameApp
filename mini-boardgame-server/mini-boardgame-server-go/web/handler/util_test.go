@@ -57,6 +57,11 @@ var (
 		Nickname:  "adminname",
 		AvatarURL: "adminurl",
 	}
+	ROOM = &model.Room{
+		GameName:    "game name",
+		RoomName:    "room name",
+		PlayerCount: 3,
+	}
 )
 
 type (
@@ -104,6 +109,20 @@ func WithProfile(t *testing.T, profile *model.Profile) Setup {
 func WithLogin(t *testing.T, user *model.User) Setup {
 	return func(c echo.Context) {
 		c.Set(_const.USER, user)
+	}
+}
+
+func WithRoom(t *testing.T, room *model.Room) Setup {
+	return func(c echo.Context) {
+		user, err := GetCurrentUser(c)
+
+		player := new(model.Player)
+		err = player.GetByUserID(GetDB(c), user.ID)
+		assert.NoError(t, err)
+
+		assert.NoError(t, err)
+		err = room.CreateByHost(GetDB(c), user)
+		assert.NoError(t, err)
 	}
 }
 
@@ -173,7 +192,19 @@ func (t TestHttp) Run() {
 	}
 
 	// handle
-	err = t.handler(c)
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				e, ok := r.(model.BreakError)
+				if !ok {
+					panic(r)
+				}
+				err = e.Actual
+			}
+		}()
+		err = t.handler(c)
+	}()
+	echoContext.HTTPErrorHandler(err, c)
 
 	// assert error
 	if t.response.Error {
@@ -181,7 +212,6 @@ func (t TestHttp) Run() {
 		if t.response.ErrorDetail != "" {
 			assert.EqualError(t.test, err, t.response.ErrorDetail)
 		}
-		echoContext.HTTPErrorHandler(err, c)
 	} else {
 		assert.NoError(t.test, err)
 	}

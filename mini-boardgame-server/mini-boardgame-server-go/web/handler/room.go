@@ -25,7 +25,7 @@ func CreateRoom(c echo.Context) error {
 	MustNoError(err)
 
 	if player.RoomID != 0 {
-		return c.JSON(http.StatusMethodNotAllowed, M("You have in a room"))
+		return echo.NewHTTPError(http.StatusMethodNotAllowed, "You have been in a room")
 	}
 
 	room := new(model.Room)
@@ -35,5 +35,17 @@ func CreateRoom(c echo.Context) error {
 	err = room.CreateByHost(db, user)
 	MustNoError(err)
 
+	return c.JSON(http.StatusOK, room)
+}
+
+func GetRoom(c echo.Context) error {
+	user, err := GetCurrentUser(c)
+	MustNoError(err)
+
+	room := new(model.Room)
+	err = room.FindByUserID(GetDB(c), user.ID)
+	if err != nil {
+		return DBNotFound(err, "You are not in a room")
+	}
 	return c.JSON(http.StatusOK, room)
 }

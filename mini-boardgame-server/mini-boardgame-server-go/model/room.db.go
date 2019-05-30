@@ -18,6 +18,11 @@ func (r *Room) FindByID(db *gorm.DB, id uint) error {
 	return db.Where("id = ?", id).Find(r).Error
 }
 
+func (r *Room) FindByUserID(db *gorm.DB, id uint) error {
+	defer r.normalize()
+	return db.Joins("INNER JOIN players ON players.room_id = rooms.id").Where("players.user_id = ?", id).Find(r).Error
+}
+
 func FindRoomsByGame(db *gorm.DB, game string, bound RowBound) ([]*Room, error) {
 	rooms := make([]*Room, 0)
 	err := db.Where("game_name = ?", game).Limit(bound.Limit).Offset(bound.Offset).Find(&rooms).Error
