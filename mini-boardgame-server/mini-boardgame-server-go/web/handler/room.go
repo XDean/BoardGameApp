@@ -35,7 +35,7 @@ func CreateRoom(c echo.Context) error {
 	err = room.CreateByHost(db, player)
 	MustNoError(err)
 
-	return c.JSON(http.StatusOK, room)
+	return c.JSON(http.StatusOK, roomJson(room))
 }
 
 func GetRoom(c echo.Context) error {
@@ -47,5 +47,29 @@ func GetRoom(c echo.Context) error {
 	if err != nil {
 		return DBNotFound(err, "You are not in a room")
 	}
-	return c.JSON(http.StatusOK, room)
+	return c.JSON(http.StatusOK, roomJson(room))
+}
+
+func roomJson(room *model.Room) interface{} {
+	players := make([]interface{}, 0)
+	for _, player := range room.Players {
+		players = append(players, roomPlayerJson(player))
+	}
+	return J{
+		"ID":          room.ID,
+		"GameName":    room.GameName,
+		"RoomName":    room.RoomName,
+		"PlayerCount": room.PlayerCount,
+		"CreatedTime": room.CreatedTime,
+		"Players":     players,
+	}
+}
+
+func roomPlayerJson(player *model.Player) interface{} {
+	return J{
+		"UserID":      player.UserID,
+		"State":       player.State,
+		"StateString": player.State.String(),
+		"Seat":        player.Seat,
+	}
 }

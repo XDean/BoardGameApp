@@ -15,7 +15,7 @@ func GetPlayer(c echo.Context) error {
 	err = player.GetByUserID(GetDB(c), user.ID)
 	MustNoError(err)
 
-	return c.JSON(http.StatusOK, PlayerJson(player))
+	return c.JSON(http.StatusOK, playerJson(player))
 }
 
 func GetPlayerByID(c echo.Context) error {
@@ -24,18 +24,18 @@ func GetPlayerByID(c echo.Context) error {
 		player := new(model.Player)
 		err = player.GetByUserID(GetDB(c), uint(id))
 		MustNoError(err)
-		return c.JSON(http.StatusOK, PlayerJson(player))
+		return c.JSON(http.StatusOK, playerJson(player))
 	} else {
 		return echo.NewHTTPError(http.StatusBadRequest, "Unrecognized id: "+idParam)
 	}
 }
 
-func PlayerJson(p *model.Player) interface{} {
+func playerJson(p *model.Player) interface{} {
 	return J{
 		"UserID":      p.UserID,
 		"State":       p.State,
 		"StateString": p.State.String(),
+		"RoomId":      p.RoomID,
 		"Seat":        p.Seat,
-		"Room":        p.Room,
 	}
 }

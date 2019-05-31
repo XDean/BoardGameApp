@@ -5,6 +5,7 @@ import (
 	"errors"
 	_const "github.com/XDean/MiniBoardgame/const"
 	"github.com/XDean/MiniBoardgame/model"
+	"github.com/XDean/MiniBoardgame/util"
 	"github.com/XDean/MiniBoardgame/web/handler/openid"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
@@ -22,6 +23,7 @@ const (
 	ADMINID   = 2
 	ADMINNAME = "adminname"
 	ADMINPWD  = "admin123456"
+	ROOMID    = 1
 )
 
 var (
@@ -58,6 +60,7 @@ var (
 		AvatarURL: "adminurl",
 	}
 	ROOM = &model.Room{
+		ID:          ROOMID,
 		GameName:    "game name",
 		RoomName:    "room name",
 		PlayerCount: 3,
@@ -146,7 +149,49 @@ func WithOpenid() Setup {
 	}
 }
 
+func initVars() {
+	USER = &model.User{
+		ID:       USERID,
+		Username: USERNAME,
+		Password: USERPWD,
+		Roles: []model.Role{
+			{
+				Name: _const.ROLE_USER,
+			},
+		},
+	}
+	ADMIN = &model.User{
+		ID:       ADMINID,
+		Username: ADMINNAME,
+		Password: ADMINPWD,
+		Roles: []model.Role{
+			{
+				Name: _const.ROLE_ADMIN,
+			},
+		},
+	}
+	USER_PROFILE = &model.Profile{
+		UserID:    USERID,
+		Sex:       model.Male,
+		Nickname:  "usernick",
+		AvatarURL: "userurl",
+	}
+	ADMIN_PROFILE = &model.Profile{
+		UserID:    USERID,
+		Sex:       model.Male,
+		Nickname:  "adminname",
+		AvatarURL: "adminurl",
+	}
+	ROOM = &model.Room{
+		ID:          ROOMID,
+		GameName:    "game name",
+		RoomName:    "room name",
+		PlayerCount: 3,
+	}
+}
+
 func (t TestHttp) Run() {
+	initVars()
 	// prepare request and response
 	t.request = defaultRequest(t.request)
 	t.response = defaultResponse(t.response)
@@ -222,10 +267,12 @@ func (t TestHttp) Run() {
 
 	// assert body
 	if t.response.Body != nil {
-		var js []byte
-		js, err = json.Marshal(t.response.Body)
+		actualResponse := make(J)
+		err := json.Unmarshal(rec.Body.Bytes(), &actualResponse)
 		assert.NoError(t.test, err)
-		assert.JSONEq(t.test, string(js), rec.Body.String())
+		if ok, err := util.StructContain(actualResponse, t.response.Body); !ok {
+			assert.Fail(t.test, "Body: "+err.Error())
+		}
 	}
 
 	// extra

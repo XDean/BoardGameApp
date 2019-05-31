@@ -15,12 +15,11 @@ func TestRoom_CreateByHost(t *testing.T) {
 	err := player.GetByUserID(db, USERID)
 	assert.NoError(t, err)
 	assert.Equal(t, Player{
-		UserID:      USERID,
-		RoomID:      0,
-		Room:        nil,
-		State:       OUT_OF_GAME,
-		StateString: OUT_OF_GAME.String(),
-		Seat:        0,
+		UserID: USERID,
+		RoomID: 0,
+		Room:   nil,
+		State:  OUT_OF_GAME,
+		Seat:   0,
 	}, *player)
 
 	room := &Room{

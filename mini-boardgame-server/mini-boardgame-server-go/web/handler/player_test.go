@@ -17,7 +17,7 @@ func TestGetPlayer(t *testing.T) {
 				"State":       model.HOST,
 				"StateString": model.HOST.String(),
 				"Seat":        0,
-				"Room":        ROOM,
+				"RoomId":      ROOMID,
 			},
 		},
 		setups: []Setup{
@@ -36,7 +36,7 @@ func TestGetPlayer(t *testing.T) {
 				"State":       model.OUT_OF_GAME,
 				"StateString": model.OUT_OF_GAME.String(),
 				"Seat":        0,
-				"Room":        nil,
+				"RoomId":      0,
 			},
 		},
 		setups: []Setup{
@@ -61,7 +61,7 @@ func TestGetPlayerByID(t *testing.T) {
 				"State":       model.OUT_OF_GAME,
 				"StateString": model.OUT_OF_GAME.String(),
 				"Seat":        0,
-				"Room":        nil,
+				"RoomId":      0,
 			},
 		},
 		setups: []Setup{

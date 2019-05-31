@@ -11,8 +11,8 @@ const (
 
 type Player struct {
 	UserID uint        `gorm:"primary_key"`
-	RoomID uint        `gorm:"default:0" json:"-"`
-	Room   *Room       `gorm:"-" json:"-"` //gorm can't handle this, need put manually
+	RoomID uint        `gorm:"default:0"`
+	Room   *Room       `gorm:"-"` //gorm can't handle this, need put manually
 	State  PlayerState `gorm:"default:0"`
 	Seat   uint        `gorm:"default:0"`
 }

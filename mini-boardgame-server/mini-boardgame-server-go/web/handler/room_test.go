@@ -66,7 +66,20 @@ func TestGetRoom(t *testing.T) {
 		test:    t,
 		handler: GetRoom,
 		response: Response{
-			Body: ROOM,
+			Body: J{
+				"ID":          ROOMID,
+				"GameName":    ROOM.GameName,
+				"RoomName":    ROOM.RoomName,
+				"PlayerCount": ROOM.PlayerCount,
+				"Players": []J{
+					{
+						"UserID":      USERID,
+						"State":       model.HOST,
+						"StateString": model.HOST.String(),
+						"Seat":        0,
+					},
+				},
+			},
 		},
 		setups: []Setup{
 			WithUser(t, USER),
