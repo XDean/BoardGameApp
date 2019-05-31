@@ -1,0 +1,486 @@
+{
+  "front-version": "2.19.2",
+  "version": 3,
+  "nodes": [
+    {
+      "type": "Project",
+      "description": "",
+      "id": "4e8b906a-502e-45b2-b6ce-eb16f3d4c473",
+      "lastModified": "2019-05-31T10:34:41.547+08:00",
+      "name": "mini-boardgame"
+    },
+    {
+      "type": "Service",
+      "description": "",
+      "id": "d6f91f6c-ee57-4b59-9132-a27ce7243282",
+      "lastModified": "2019-05-31T10:22:51.000+08:00",
+      "name": "1. Auth",
+      "parentId": "4e8b906a-502e-45b2-b6ce-eb16f3d4c473"
+    },
+    {
+      "uriEditor": true,
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": [
+            {
+              "enabled": true,
+              "name": "type",
+              "value": "password"
+            },
+            {
+              "enabled": true,
+              "name": "username",
+              "value": "user1"
+            },
+            {
+              "enabled": true,
+              "name": "password",
+              "value": "password123"
+            }
+          ]
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/auth/login"
+      },
+      "id": "44190e5c-d240-44e2-9e98-77cfa85f06c5",
+      "lastModified": "2019-05-31T10:27:35.853+08:00",
+      "name": "Login",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|101148860420940940652"
+      },
+      "parentId": "d6f91f6c-ee57-4b59-9132-a27ce7243282"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/auth/logout"
+      },
+      "id": "7587fdbf-6552-4b39-a263-636567ea7b52",
+      "lastModified": "2019-05-31T10:26:47.204+08:00",
+      "name": "Logout",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|101148860420940940652"
+      },
+      "parentId": "d6f91f6c-ee57-4b59-9132-a27ce7243282"
+    },
+    {
+      "uriEditor": true,
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": [
+            {
+              "enabled": true,
+              "name": "username",
+              "value": "user1"
+            },
+            {
+              "enabled": true,
+              "name": "password",
+              "value": "password123"
+            }
+          ]
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/auth/signup"
+      },
+      "id": "9761545d-0f98-447d-9aa4-f81daf6c240d",
+      "lastModified": "2019-05-31T10:21:23.771+08:00",
+      "name": "Signup",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|101148860420940940652"
+      },
+      "parentId": "d6f91f6c-ee57-4b59-9132-a27ce7243282"
+    },
+    {
+      "type": "Service",
+      "id": "11fa8e56-c62a-4b32-a895-3f1dc19918df",
+      "lastModified": "2019-05-31T10:22:57.147+08:00",
+      "name": "2. User",
+      "parentId": "4e8b906a-502e-45b2-b6ce-eb16f3d4c473"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/api/user"
+      },
+      "id": "08d57130-70ce-46e8-a782-224e65130504",
+      "lastModified": "2019-05-31T10:21:56.351+08:00",
+      "name": "Get",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|101148860420940940652"
+      },
+      "parentId": "11fa8e56-c62a-4b32-a895-3f1dc19918df"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/api/user/11"
+      },
+      "id": "fed5131b-3421-49f2-a580-7a939589b5f9",
+      "lastModified": "2019-05-31T10:22:24.968+08:00",
+      "name": "GetByID",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|101148860420940940652"
+      },
+      "parentId": "11fa8e56-c62a-4b32-a895-3f1dc19918df"
+    },
+    {
+      "type": "Service",
+      "id": "8669c198-ebf1-4821-92fe-49bab682779d",
+      "lastModified": "2019-05-31T10:22:54.158+08:00",
+      "name": "3. Profile",
+      "parentId": "4e8b906a-502e-45b2-b6ce-eb16f3d4c473"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/api/user/profile"
+      },
+      "id": "2ead14eb-d95e-420b-8a85-10fbdf35df51",
+      "lastModified": "2019-05-31T10:23:23.655+08:00",
+      "name": "Get",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|101148860420940940652"
+      },
+      "parentId": "8669c198-ebf1-4821-92fe-49bab682779d"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/api/user/profile/3"
+      },
+      "id": "44453aae-e5e0-444d-bc4b-dd820b478569",
+      "lastModified": "2019-05-31T10:23:37.503+08:00",
+      "name": "GetByID",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|101148860420940940652"
+      },
+      "parentId": "8669c198-ebf1-4821-92fe-49bab682779d"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc5789",
+        "name": "PATCH"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\n  \"nickname\":\"my-name\",\n  \"sex\": 2,\n  \"avatarurl\":\"my-url\"\n}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": [
+            {
+              "enabled": true,
+              "name": "",
+              "value": ""
+            },
+            {
+              "enabled": true,
+              "name": "",
+              "value": ""
+            },
+            {
+              "enabled": true,
+              "name": "",
+              "value": ""
+            }
+          ]
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/api/user/profile"
+      },
+      "id": "150a003f-3570-4a25-a729-fe06068c9621",
+      "lastModified": "2019-05-31T10:25:55.863+08:00",
+      "name": "Update",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|101148860420940940652"
+      },
+      "parentId": "8669c198-ebf1-4821-92fe-49bab682779d"
+    },
+    {
+      "type": "Service",
+      "id": "61b37fea-d8f6-423a-ab25-f6785b3bfcec",
+      "lastModified": "2019-05-31T10:28:00.306+08:00",
+      "name": "4. Room",
+      "parentId": "4e8b906a-502e-45b2-b6ce-eb16f3d4c473"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "requestBody": true,
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.3",
+        "name": "POST"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true,
+        "textBody": "{\n  \"game_name\":\"my-game\",\n  \"room_name\":\"my-room\",\n  \"player_count\":3\n}"
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/api/room"
+      },
+      "id": "f4c811d5-4fdf-468c-99ef-004bfce0b3de",
+      "lastModified": "2019-05-31T10:29:06.378+08:00",
+      "name": "Create",
+      "headers": [
+        {
+          "enabled": true,
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaInfo": {
+        "ownerId": "google-oauth2|101148860420940940652"
+      },
+      "parentId": "61b37fea-d8f6-423a-ab25-f6785b3bfcec"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/api/room"
+      },
+      "id": "ab48e76c-1ce3-4f76-a150-235d14525062",
+      "lastModified": "2019-05-31T10:29:22.287+08:00",
+      "name": "Get",
+      "headers": [],
+      "metaInfo": {
+        "ownerId": "google-oauth2|101148860420940940652"
+      },
+      "parentId": "61b37fea-d8f6-423a-ab25-f6785b3bfcec"
+    },
+    {
+      "type": "Context",
+      "id": "d857ad5a-7085-4734-a80d-b03c64a86805",
+      "lastModified": "2019-05-31T10:18:35.309+08:00",
+      "name": "dev",
+      "variables": [
+        {
+          "enabled": true,
+          "name": "base-url",
+          "value": "127.0.0.1"
+        }
+      ]
+    }
+  ]
+}
