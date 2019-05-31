@@ -31,11 +31,20 @@ func structContain(prefix string, big interface{}, small interface{}) (ok bool, 
 			return false, "Expect non-null but actual null"
 		}
 	}
+	if reflect.DeepEqual(big, small) {
+		return true, ""
+	}
 	bv := reflect.ValueOf(big)
 	sv := reflect.ValueOf(small)
-	if bv.Kind() != sv.Kind() {
-		return false, fmt.Sprintf("Expect %T but %T", small, big)
-	}
+	//if bv.Kind() != sv.Kind() {
+	//	return false, fmt.Sprintf("Expect %T but %T", small, big)
+	//}
+	defer func() {
+		if r := recover(); r != nil {
+			ok = false
+			err = fmt.Sprintf("Expect %T but %T", small, big)
+		}
+	}()
 	switch sv.Kind() {
 	case reflect.Struct:
 		bt := bv.Type()
@@ -84,11 +93,54 @@ func structContain(prefix string, big interface{}, small interface{}) (ok bool, 
 			}
 		}
 		return true, ""
-	default:
-		if big == small {
+	case reflect.Int,
+		reflect.Int8,
+		reflect.Int16,
+		reflect.Int32,
+		reflect.Int64,
+		reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64,
+		reflect.Float32,
+		reflect.Float64:
+		bf := getValueNumber(bv)
+		sf := getValueNumber(sv)
+		if bf == sf {
 			return true, ""
 		} else {
 			return false, fmt.Sprintf("Expect %v but %v", small, big)
 		}
+	case reflect.Complex64,
+		reflect.Complex128:
+		bf := bv.Complex()
+		sf := sv.Complex()
+		if bf == sf {
+			return true, ""
+		} else {
+			return false, fmt.Sprintf("Expect %v but %v", small, big)
+		}
+	default:
+		return false, fmt.Sprintf("Expect '%v' (%T) but '%v' (%T)", small, small, big, big)
 	}
+}
+
+func getValueNumber(v reflect.Value) (f float64) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				func() {
+					defer func() {
+						if r := recover(); r != nil {
+							f = float64(v.Float())
+						}
+					}()
+					f = float64(v.Uint())
+				}()
+			}
+		}()
+		f = float64(v.Int())
+	}()
+	return
 }
