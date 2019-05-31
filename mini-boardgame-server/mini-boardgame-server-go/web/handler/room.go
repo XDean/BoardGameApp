@@ -32,7 +32,7 @@ func CreateRoom(c echo.Context) error {
 	room.GameName = param.GameName
 	room.RoomName = param.RoomName
 	room.PlayerCount = param.PlayerCount
-	err = room.CreateByHost(db, user)
+	err = room.CreateByHost(db, player)
 	MustNoError(err)
 
 	return c.JSON(http.StatusOK, room)

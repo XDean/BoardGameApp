@@ -32,14 +32,15 @@ func FindRoomsByGame(db *gorm.DB, game string, bound RowBound) ([]*Room, error) 
 	return rooms, err
 }
 
-func (r *Room) CreateByHost(db *gorm.DB, host *User) error {
+func (r *Room) CreateByHost(db *gorm.DB, host *Player) error {
 	defer r.normalize()
+	host.State = HOST
+	host.Seat = 0
+	host.normalize()
+
 	r.CreatedTime = time.Now()
 	r.Players = []*Player{
-		{
-			UserID: host.ID,
-			State:  HOST,
-		},
+		host,
 	}
 	return db.Save(r).Error
 }

@@ -29,7 +29,7 @@ func TestRoom_CreateByHost(t *testing.T) {
 		RoomName:    "room",
 		PlayerCount: 3,
 	}
-	err = room.CreateByHost(db, NewUser())
+	err = room.CreateByHost(db, NewPlayer())
 	assert.NoError(t, err)
 	assert.Equal(t, room.Players[0].Room, room)
 

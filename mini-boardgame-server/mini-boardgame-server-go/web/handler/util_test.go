@@ -115,13 +115,14 @@ func WithLogin(t *testing.T, user *model.User) Setup {
 func WithRoom(t *testing.T, room *model.Room) Setup {
 	return func(c echo.Context) {
 		user, err := GetCurrentUser(c)
+		assert.NoError(t, err)
 
 		player := new(model.Player)
 		err = player.GetByUserID(GetDB(c), user.ID)
 		assert.NoError(t, err)
 
 		assert.NoError(t, err)
-		err = room.CreateByHost(GetDB(c), user)
+		err = room.CreateByHost(GetDB(c), player)
 		assert.NoError(t, err)
 	}
 }
