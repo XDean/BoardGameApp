@@ -47,6 +47,7 @@ func UpdateProfile(c echo.Context) error {
 		AvatarURL string    `json:"avatarurl" query:"avatarurl" form:"avatarurl"`
 	}
 	param := new(Param)
+
 	if err := c.Bind(param); err != nil {
 		return err
 	}
