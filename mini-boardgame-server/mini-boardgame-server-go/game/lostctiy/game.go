@@ -31,6 +31,10 @@ type (
 	}
 )
 
+var (
+	EMPTY_CARD = Card{-1}
+)
+
 func NewStandardGame() *Game {
 	deck := make([]Card, CARD*COLOR)
 	for i := range deck {

@@ -14,22 +14,22 @@ type (
 	}
 )
 
-func (g *Game) Play(player int, event Event) error {
+func (g *Game) Play(player int, event Event) (Card, error) {
 	if g.Current != player {
-		return errors.New("You are not current player")
+		return EMPTY_CARD, errors.New("You are not current player")
 	}
 	if event.Drop && !event.FromDeck && (event.Card.Color() == event.Color) {
-		return errors.New("You can't draw the drop card immediatly")
+		return EMPTY_CARD, errors.New("You can't draw the drop card immediatly")
 	}
 	if !g.hasCard(player, event.Card) {
-		return errors.New("You don't have the card to play")
+		return EMPTY_CARD, errors.New("You don't have the card to play")
 	}
 	cards := g.Board[player][event.Card.Color()]
 	if !event.Drop && len(cards) > 0 && cards[0].Point() > event.Card.Point() {
-		return errors.New("You can't play the card because you already have a lagrer one")
+		return EMPTY_CARD, errors.New("You can't play the card because you already have a lagrer one")
 	}
 	if !event.FromDeck && len(g.Drop[event.Color]) == 0 {
-		return errors.New("No card to draw in this color's drop area")
+		return EMPTY_CARD, errors.New("No card to draw in this color's drop area")
 	}
 	// TODO Check deck has card
 	if event.Drop {
@@ -38,11 +38,10 @@ func (g *Game) Play(player int, event Event) error {
 		g.PlayCard(player, event.Card)
 	}
 	if event.FromDeck {
-		g.DrawCard(player)
+		return g.DrawCard(player, 1)[0], nil
 	} else {
-		g.DrawDropCard(player, event.Color)
+		return g.DrawDropCard(player, event.Color), nil
 	}
-	return nil
 }
 
 func (g *Game) PlayCard(player int, card Card) {
@@ -57,10 +56,10 @@ func (g *Game) DropCard(player int, card Card) {
 	}
 }
 
-func (g *Game) DrawCard(player int) Card {
-	card := g.Deck[0]
-	g.Deck = g.Deck[1:]
-	g.Hand[player] = append(g.Hand[player], card)
+func (g *Game) DrawCard(player int, count int) []Card {
+	card := g.Deck[:count]
+	g.Deck = g.Deck[count:]
+	g.Hand[player] = append(g.Hand[player], card...)
 	return card
 }
 
