@@ -4,44 +4,43 @@ import "errors"
 
 type (
 	// Events
-	PlayCard struct {
+	Event struct {
+		// Play card
 		Card Card
 		Drop bool
-	}
-
-	DrawCard struct {
+		// Draw card
 		FromDeck bool // Or from drop
 		Color    int  // Only available when from deck
 	}
 )
 
-func (g *Game) Play(player int, play PlayCard, draw DrawCard) error {
+func (g *Game) Play(player int, event Event) error {
 	if g.Current != player {
 		return errors.New("You are not current player")
 	}
-	if play.Drop && !draw.FromDeck && (play.Card.Color() == draw.Color) {
+	if event.Drop && !event.FromDeck && (event.Card.Color() == event.Color) {
 		return errors.New("You can't draw the drop card immediatly")
 	}
-	if !g.hasCard(player, play.Card) {
+	if !g.hasCard(player, event.Card) {
 		return errors.New("You don't have the card to play")
 	}
-	cards := g.Board[player][play.Card.Color()]
-	if !play.Drop && len(cards) > 0 && cards[0].Point() > play.Card.Point() {
+	cards := g.Board[player][event.Card.Color()]
+	if !event.Drop && len(cards) > 0 && cards[0].Point() > event.Card.Point() {
 		return errors.New("You can't play the card because you already have a lagrer one")
 	}
-	if !draw.FromDeck && len(g.Drop[draw.Color]) == 0 {
+	if !event.FromDeck && len(g.Drop[event.Color]) == 0 {
 		return errors.New("No card to draw in this color's drop area")
 	}
 	// TODO Check deck has card
-	if play.Drop {
-		g.DropCard(player, play.Card)
+	if event.Drop {
+		g.DropCard(player, event.Card)
 	} else {
-		g.PlayCard(player, play.Card)
+		g.PlayCard(player, event.Card)
 	}
-	if draw.FromDeck {
+	if event.FromDeck {
 		g.DrawCard(player)
 	} else {
-		g.DrawDropCard(player, draw.Color)
+		g.DrawDropCard(player, event.Color)
 	}
 	return nil
 }
