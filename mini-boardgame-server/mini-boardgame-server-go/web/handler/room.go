@@ -73,3 +73,15 @@ func roomPlayerJson(player *model.Player) interface{} {
 		"Seat":        player.Seat,
 	}
 }
+
+func SwapSeat(c echo.Context) error {
+	user, err := GetCurrentUser(c)
+	MustNoError(err)
+
+	room := new(model.Room)
+	err = room.FindByUserID(GetDB(c), user.ID)
+	if err != nil {
+		return DBNotFound(err, "You are not in a room")
+	}
+
+}

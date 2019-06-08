@@ -29,11 +29,11 @@ func InitRouter(e *echo.Echo) {
 	authored.GET("/user/profile/:id", handler.GetProfileById)
 	authored.PATCH("/user/profile", handler.UpdateProfile)
 
-	authored.POST("/room", handler.CreateRoom)
-	authored.GET("/room", handler.GetRoom)
-
 	authored.GET("/player", handler.GetPlayer)
 	authored.GET("/player/:id", handler.GetPlayerByID)
+
+	authored.POST("/room", handler.CreateRoom)
+	authored.GET("/room", handler.GetRoom, middleware.AuthRoom())
 
 	admin := authored.Group("/admin")
 	admin.Use(middleware.AuthRole(_const.ROLE_ADMIN))
