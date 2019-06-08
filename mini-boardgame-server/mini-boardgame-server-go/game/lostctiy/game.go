@@ -1,30 +1,14 @@
 package lostctiy
 
-import "math/rand"
-
-type (
-	Card int
-
-	Config struct {
-		DevelopPoint int
-		BonusCount   int
-		BonusPoint   int
-	}
-
-	Game struct {
-		Deck  []Card     // [index]
-		Board [][][]Card // [player][color][index]
-		Drop  [][]Card   // [color][index]
-		Hand  [][]Card   // [player][index]
-	}
+import (
+	"github.com/thoas/go-funk"
+	"math/rand"
 )
 
-var (
-	//DefaultConfig = Config{
-	//	DevelopPoint: 20,
-	//	BonusCount:   8,
-	//	BonusPoint:   20,
-	//}
+const (
+	DEVELOP_POINT = 20
+	BONUS_COUNT   = 8
+	BONUS_POINT   = 20
 
 	PLAYER      = 2
 	COLOR       = 5
@@ -33,10 +17,24 @@ var (
 	CARD_POINT  = CARD - CARD_DOUBLE
 )
 
+type (
+	Card struct {
+		int
+	}
+
+	Game struct {
+		Current int
+		Deck    []Card     // [index] from 0 (top)
+		Board   [][][]Card // [player][color][index] from 0 (oldest)
+		Drop    [][]Card   // [color][index] from 0 (oldest)
+		Hand    [][]Card   // [player][index] no order, by default 0 (oldest)
+	}
+)
+
 func NewStandardGame() *Game {
 	deck := make([]Card, CARD*COLOR)
 	for i := range deck {
-		deck[i] = Card(i)
+		deck[i] = Card{i}
 	}
 	rand.Shuffle(len(deck), func(i, j int) { deck[i], deck[j] = deck[j], deck[i] })
 
@@ -66,17 +64,30 @@ func NewStandardGame() *Game {
 }
 
 func (c Card) Color() int {
-	return int(c) / CARD
+	return c.int / CARD
 }
 
 func (c Card) Point() int {
 	if c.IsDouble() {
 		return 0
 	} else {
-		return int(c) - CARD_DOUBLE + 2
+		return c.int - CARD_DOUBLE + 2
 	}
 }
 
 func (c Card) IsDouble() bool {
-	return int(c) < CARD_DOUBLE
+	return c.int < CARD_DOUBLE
+}
+
+func (g *Game) hasCard(player int, card Card) bool {
+	return funk.Contains(g.Hand[player], card)
+}
+
+func (g *Game) removeHandCard(player int, card Card) bool {
+	index := funk.IndexOf(g.Hand[player], card)
+	if index != -1 {
+		g.Hand = append(g.Hand[:index], g.Hand[index+1:]...)
+		return true
+	}
+	return false
 }
