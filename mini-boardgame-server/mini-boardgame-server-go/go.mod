@@ -16,7 +16,7 @@ require (
 	github.com/leodido/go-urn v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.2.0
 	github.com/stretchr/testify v1.3.0
-	github.com/xdean/goex v0.0.0-20190613011249-78ea31ae003b
+	github.com/xdean/goex v0.0.0-20190613012111-f8af801e0e3c
 	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734
 	gopkg.in/d4l3k/messagediff.v1 v1.2.1
 	gopkg.in/go-playground/assert.v1 v1.2.1

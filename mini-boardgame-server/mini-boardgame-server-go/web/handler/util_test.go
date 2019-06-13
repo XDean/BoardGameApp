@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/xdean/goex/xecho"
 	"github.com/xdean/goex/xgo"
 	"net/http"
 	"net/http/httptest"
@@ -267,11 +268,15 @@ func (t TestHttp) Run() {
 
 	// assert body
 	if t.response.Body != nil {
-		actualResponse := make(J)
+		actualResponse := make(xecho.J)
 		err := json.Unmarshal(rec.Body.Bytes(), &actualResponse)
 		assert.NoError(t.test, err)
 		if ok, err := xgo.StructContain(actualResponse, t.response.Body); !ok {
-			assert.Fail(t.test, "Body: "+err.Error())
+			if err == nil {
+				assert.Fail(t.test, "Body not as expected: ", t.response.Body)
+			} else {
+				assert.Fail(t.test, "Body: "+err.Error())
+			}
 		}
 	}
 

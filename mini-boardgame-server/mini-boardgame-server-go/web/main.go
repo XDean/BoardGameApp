@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"github.com/xdean/goex/xecho"
 )
 
 func Run() {
@@ -28,7 +29,7 @@ func Run() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(myMiddleware.BreakErrorRecover())
+	e.Use(xecho.BreakErrorRecover())
 	e.Use(myMiddleware.DbContext(db))
 	e.Use(myMiddleware.Jwt())
 

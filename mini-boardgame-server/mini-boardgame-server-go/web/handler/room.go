@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/labstack/echo/v4"
+	"github.com/xdean/goex/xecho"
 	"net/http"
 )
 
@@ -13,16 +14,16 @@ func CreateRoom(c echo.Context) error {
 		PlayerCount uint   `json:"player_count" query:"player_count" form:"player_count" validate:"required"`
 	}
 	param := new(Param)
-	BindAndValidate(c, param)
+	xecho.MustBindAndValidate(c, param)
 
 	user, err := GetCurrentUser(c)
-	MustNoError(err)
+	xecho.MustNoError(err)
 
 	db := GetDB(c)
 
 	player := new(model.Player)
 	err = player.GetByUserID(db, user.ID)
-	MustNoError(err)
+	xecho.MustNoError(err)
 
 	if player.RoomID != 0 {
 		return echo.NewHTTPError(http.StatusMethodNotAllowed, "You have been in a room")
@@ -33,14 +34,14 @@ func CreateRoom(c echo.Context) error {
 	room.RoomName = param.RoomName
 	room.PlayerCount = param.PlayerCount
 	err = room.CreateByHost(db, player)
-	MustNoError(err)
+	xecho.MustNoError(err)
 
 	return c.JSON(http.StatusOK, roomJson(room))
 }
 
 func GetRoom(c echo.Context) error {
 	user, err := GetCurrentUser(c)
-	MustNoError(err)
+	xecho.MustNoError(err)
 
 	room := new(model.Room)
 	err = room.FindByUserID(GetDB(c), user.ID)
@@ -55,7 +56,7 @@ func roomJson(room *model.Room) interface{} {
 	for _, player := range room.Players {
 		players = append(players, roomPlayerJson(player))
 	}
-	return J{
+	return xecho.J{
 		"ID":          room.ID,
 		"GameName":    room.GameName,
 		"RoomName":    room.RoomName,
@@ -66,7 +67,7 @@ func roomJson(room *model.Room) interface{} {
 }
 
 func roomPlayerJson(player *model.Player) interface{} {
-	return J{
+	return xecho.J{
 		"UserID":      player.UserID,
 		"State":       player.State,
 		"StateString": player.State.String(),
