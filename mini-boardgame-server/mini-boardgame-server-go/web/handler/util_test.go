@@ -5,11 +5,11 @@ import (
 	"errors"
 	_const "github.com/XDean/MiniBoardgame/const"
 	"github.com/XDean/MiniBoardgame/model"
-	"github.com/XDean/MiniBoardgame/util"
 	"github.com/XDean/MiniBoardgame/web/handler/openid"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/xdean/goex/xgo"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -270,7 +270,7 @@ func (t TestHttp) Run() {
 		actualResponse := make(J)
 		err := json.Unmarshal(rec.Body.Bytes(), &actualResponse)
 		assert.NoError(t.test, err)
-		if ok, err := util.StructContain(actualResponse, t.response.Body); !ok {
+		if ok, err := xgo.StructContain(actualResponse, t.response.Body); !ok {
 			assert.Fail(t.test, "Body: "+err.Error())
 		}
 	}
