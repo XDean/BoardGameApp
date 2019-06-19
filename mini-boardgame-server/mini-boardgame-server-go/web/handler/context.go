@@ -15,6 +15,13 @@ func GetCurrentUser(c echo.Context) (*model.User, error) {
 	return nil, echo.NewHTTPError(http.StatusUnauthorized, "You are not authorized")
 }
 
+func GetCurrentRoom(c echo.Context) (*model.Room, error) {
+	if user, ok := c.Get(_const.ROOM).(*model.Room); ok {
+		return user, nil
+	}
+	return nil, echo.NewHTTPError(http.StatusUnauthorized, "You are not in a room")
+}
+
 func GetDB(e echo.Context) *gorm.DB {
 	if db, ok := e.Get(_const.DATABASE).(*gorm.DB); ok {
 		return db

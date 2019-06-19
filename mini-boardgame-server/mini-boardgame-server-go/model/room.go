@@ -17,3 +17,12 @@ func (r *Room) normalize() {
 		player.normalize()
 	}
 }
+
+func (r *Room) FindPlayerBySeat(seat uint) (*Player, bool) {
+	for _, p := range r.Players {
+		if seat == p.Seat {
+			return p, true
+		}
+	}
+	return nil, false
+}

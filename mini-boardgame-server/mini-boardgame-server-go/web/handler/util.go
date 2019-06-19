@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
 )
 
 type J map[string]interface{}
@@ -35,5 +36,14 @@ func BindAndValidate(c echo.Context, param interface{}) {
 func MustNoError(err error) {
 	if err != nil {
 		panic(model.BreakError{Actual: err})
+	}
+}
+
+func IntParam(c echo.Context, name string) int {
+	param := c.Param(name)
+	if i, err := strconv.Atoi(param); err == nil {
+		return i
+	} else {
+		panic(model.BreakError{echo.NewHTTPError(http.StatusBadRequest, "Unrecognized param '"+name+"': "+param)})
 	}
 }

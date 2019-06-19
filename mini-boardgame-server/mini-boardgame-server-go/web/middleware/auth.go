@@ -53,9 +53,12 @@ func AuthRoom() echo.MiddlewareFunc {
 				if user, ok := context.Get(_const.USER).(*model.User); ok {
 					room := new(model.Room)
 					err := room.FindByUserID(db, user.ID)
-					if err != nil {
-						return echo.NewHTTPError(http.StatusBadRequest, "You are not in a room")
+					if gorm.IsRecordNotFoundError(err) {
+						return echo.NewHTTPError(http.StatusNotFound, "You are not in a room")
+					} else {
+						return err
 					}
+					context.Set(_const.ROOM, room)
 					return next(context)
 				} else {
 					return echo.NewHTTPError(http.StatusUnauthorized, "You are not authorized")

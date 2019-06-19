@@ -39,14 +39,8 @@ func CreateRoom(c echo.Context) error {
 }
 
 func GetRoom(c echo.Context) error {
-	user, err := GetCurrentUser(c)
+	room, err := GetCurrentRoom(c)
 	MustNoError(err)
-
-	room := new(model.Room)
-	err = room.FindByUserID(GetDB(c), user.ID)
-	if err != nil {
-		return DBNotFound(err, "You are not in a room")
-	}
 	return c.JSON(http.StatusOK, roomJson(room))
 }
 
@@ -78,10 +72,18 @@ func SwapSeat(c echo.Context) error {
 	user, err := GetCurrentUser(c)
 	MustNoError(err)
 
-	room := new(model.Room)
-	err = room.FindByUserID(GetDB(c), user.ID)
-	if err != nil {
-		return DBNotFound(err, "You are not in a room")
-	}
+	room, err := GetCurrentRoom(c)
+	MustNoError(err)
 
+	targetSeat := IntParam(c, "seat")
+	if player, ok := room.FindPlayerBySeat(uint(targetSeat)); ok {
+		if player.UserID == user.ID {
+			return echo.NewHTTPError(http.StatusBadRequest, "Can't swap seat with yourself")
+		}
+		//TODO
+		// go swap()
+	} else {
+		// TODO  there is no player, go to the seat directly
+	}
+	return nil
 }
