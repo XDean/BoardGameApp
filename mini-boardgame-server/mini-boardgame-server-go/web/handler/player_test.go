@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/XDean/MiniBoardgame/model"
+	"github.com/xdean/goex/xecho"
 	"net/http"
 	"strconv"
 	"testing"
@@ -12,7 +13,7 @@ func TestGetPlayer(t *testing.T) {
 		test:    t,
 		handler: GetPlayer,
 		response: Response{
-			Body: J{
+			Body: xecho.J{
 				"UserID":      USERID,
 				"State":       model.HOST,
 				"StateString": model.HOST.String(),
@@ -31,7 +32,7 @@ func TestGetPlayer(t *testing.T) {
 		test:    t,
 		handler: GetPlayer,
 		response: Response{
-			Body: J{
+			Body: xecho.J{
 				"UserID":      USERID,
 				"State":       model.OUT_OF_GAME,
 				"StateString": model.OUT_OF_GAME.String(),
@@ -56,7 +57,7 @@ func TestGetPlayerByID(t *testing.T) {
 			},
 		},
 		response: Response{
-			Body: J{
+			Body: xecho.J{
 				"UserID":      USERID,
 				"State":       model.OUT_OF_GAME,
 				"StateString": model.OUT_OF_GAME.String(),

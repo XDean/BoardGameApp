@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/labstack/echo/v4"
+	"github.com/xdean/goex/xecho"
 	"net/http"
 	"testing"
 )
@@ -12,7 +13,7 @@ func TestSignUp(t *testing.T) {
 		test:    t,
 		handler: SignUp,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"username": USERNAME,
 				"password": USERPWD,
 			},
@@ -26,7 +27,7 @@ func TestSignUp(t *testing.T) {
 		test:    t,
 		handler: SignUp,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"something": "wrong",
 			},
 		},
@@ -40,7 +41,7 @@ func TestSignUp(t *testing.T) {
 		test:    t,
 		handler: SignUp,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"username": "_",
 				"password": "@#$",
 			},
@@ -69,7 +70,7 @@ func TestLogin(t *testing.T) {
 		test:    t,
 		handler: Login,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"type": "wrong",
 			},
 		},
@@ -85,7 +86,7 @@ func TestLoginPassword(t *testing.T) {
 		test:    t,
 		handler: Login,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"type":     "password",
 				"username": USERNAME,
 				"password": USERPWD,
@@ -100,7 +101,7 @@ func TestLoginPassword(t *testing.T) {
 		test:    t,
 		handler: Login,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"username": "wrong",
 				"password": "pwd123456",
 			},
@@ -115,7 +116,7 @@ func TestLoginPassword(t *testing.T) {
 		test:    t,
 		handler: Login,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"username": "username",
 				"password": "wrong",
 			},
@@ -130,7 +131,7 @@ func TestLoginPassword(t *testing.T) {
 		test:    t,
 		handler: Login,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"wrong": "wrong",
 			},
 		},
@@ -146,7 +147,7 @@ func TestLoginOpenid(t *testing.T) {
 		test:    t,
 		handler: Login,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"type":     "openid",
 				"provider": "test",
 				"token":    "token",
@@ -160,7 +161,7 @@ func TestLoginOpenid(t *testing.T) {
 		test:    t,
 		handler: Login,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"type":     "openid",
 				"provider": "test",
 				"token":    "token",

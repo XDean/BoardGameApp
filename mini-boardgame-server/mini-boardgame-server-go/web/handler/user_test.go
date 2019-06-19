@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/xdean/goex/xecho"
 	"net/http"
 	"strconv"
 	"testing"
@@ -11,7 +12,7 @@ func TestGetUser(t *testing.T) {
 		test:    t,
 		handler: GetUser,
 		response: Response{
-			Body: J{
+			Body: xecho.J{
 				"id":       USER.ID,
 				"username": USER.Username,
 				"role":     USER.GetRoleStrings(),
@@ -45,7 +46,7 @@ func TestGetUserById(t *testing.T) {
 			},
 		},
 		response: Response{
-			Body: J{
+			Body: xecho.J{
 				"id":       USER.ID,
 				"username": USER.Username,
 				"role":     USER.GetRoleStrings(),
@@ -66,7 +67,7 @@ func TestGetUserById(t *testing.T) {
 			},
 		},
 		response: Response{
-			Body: J{
+			Body: xecho.J{
 				"id":       ADMIN.ID,
 				"username": ADMIN.Username,
 				"role":     ADMIN.GetRoleStrings(),

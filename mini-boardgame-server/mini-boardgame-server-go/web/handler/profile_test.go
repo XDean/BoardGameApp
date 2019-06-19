@@ -4,6 +4,7 @@ import (
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
+	"github.com/xdean/goex/xecho"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -123,7 +124,7 @@ func TestUpdateProfile(t *testing.T) {
 		test:    t,
 		handler: UpdateProfile,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"nickname":  "new",
 				"sex":       model.Female,
 				"avatarurl": "new-url",

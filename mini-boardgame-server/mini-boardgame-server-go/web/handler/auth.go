@@ -7,6 +7,7 @@ import (
 	"github.com/XDean/MiniBoardgame/web/handler/openid"
 	"github.com/XDean/MiniBoardgame/web/middleware"
 	"github.com/labstack/echo/v4"
+	"github.com/xdean/goex/xecho"
 	"net/http"
 	"time"
 )
@@ -31,7 +32,7 @@ func SignUp(c echo.Context) error {
 	if err := user.CreateAccount(GetDB(c)); err == nil {
 		if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
 			c.SetCookie(generateTokenCookie(t))
-			return c.JSON(http.StatusCreated, J{
+			return c.JSON(http.StatusCreated, xecho.J{
 				"message": "Sign up success",
 				"token":   t,
 			})
@@ -80,7 +81,7 @@ func LoginPassword(c echo.Context, param LoginParam) error {
 		if user.MatchPassword(param.Password) {
 			if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
 				c.SetCookie(generateTokenCookie(t))
-				return c.JSON(http.StatusOK, J{
+				return c.JSON(http.StatusOK, xecho.J{
 					"message": "Login success",
 					"token":   t,
 				})
@@ -119,7 +120,7 @@ func LoginOpenid(c echo.Context, param LoginParam) error {
 		}
 		if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
 			c.SetCookie(generateTokenCookie(t))
-			return c.JSON(http.StatusOK, J{
+			return c.JSON(http.StatusOK, xecho.J{
 				"message": "Login success",
 				"token":   t,
 			})
@@ -138,7 +139,7 @@ func Logout(c echo.Context) error {
 		Name:    middleware.JwtKey,
 		Expires: time.Now(),
 	})
-	return c.JSON(http.StatusOK, M("Logout success"))
+	return c.JSON(http.StatusOK, xecho.M("Logout success"))
 }
 
 func generateTokenCookie(token string) *http.Cookie {

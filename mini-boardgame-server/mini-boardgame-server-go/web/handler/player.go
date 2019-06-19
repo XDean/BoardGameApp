@@ -3,17 +3,18 @@ package handler
 import (
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/labstack/echo/v4"
+	"github.com/xdean/goex/xecho"
 	"net/http"
 	"strconv"
 )
 
 func GetPlayer(c echo.Context) error {
 	user, err := GetCurrentUser(c)
-	MustNoError(err)
+	xecho.MustNoError(err)
 
 	player := new(model.Player)
 	err = player.GetByUserID(GetDB(c), user.ID)
-	MustNoError(err)
+	xecho.MustNoError(err)
 
 	return c.JSON(http.StatusOK, playerJson(player))
 }
@@ -23,7 +24,7 @@ func GetPlayerByID(c echo.Context) error {
 	if id, err := strconv.Atoi(idParam); err == nil {
 		player := new(model.Player)
 		err = player.GetByUserID(GetDB(c), uint(id))
-		MustNoError(err)
+		xecho.MustNoError(err)
 		return c.JSON(http.StatusOK, playerJson(player))
 	} else {
 		return echo.NewHTTPError(http.StatusBadRequest, "Unrecognized id: "+idParam)
@@ -31,7 +32,7 @@ func GetPlayerByID(c echo.Context) error {
 }
 
 func playerJson(p *model.Player) interface{} {
-	return J{
+	return xecho.J{
 		"UserID":      p.UserID,
 		"State":       p.State,
 		"StateString": p.State.String(),

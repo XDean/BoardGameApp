@@ -4,6 +4,7 @@ import (
 	"github.com/XDean/MiniBoardgame/model"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
+	"github.com/xdean/goex/xecho"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,7 +15,7 @@ func TestCreateRoom(t *testing.T) {
 		test:    t,
 		handler: CreateRoom,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"game_name":    "game name",
 				"room_name":    "room name",
 				"player_count": 3,
@@ -43,7 +44,7 @@ func TestCreateRoomExist(t *testing.T) {
 		test:    t,
 		handler: CreateRoom,
 		request: Request{
-			Body: J{
+			Body: xecho.J{
 				"game_name":    "game name",
 				"room_name":    "room name",
 				"player_count": 3,
@@ -66,12 +67,12 @@ func TestGetRoom(t *testing.T) {
 		test:    t,
 		handler: GetRoom,
 		response: Response{
-			Body: J{
+			Body: xecho.J{
 				"ID":          ROOMID,
 				"GameName":    ROOM.GameName,
 				"RoomName":    ROOM.RoomName,
 				"PlayerCount": ROOM.PlayerCount,
-				"Players": []J{
+				"Players": []xecho.J{
 					{
 						"UserID":      USERID,
 						"State":       model.HOST,
