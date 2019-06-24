@@ -4,23 +4,26 @@ import "fmt"
 
 const (
 	// type
-	TIAO int = iota
+	TIAO CardType = iota
 	TONG
 	WAN
 	ZI
 	HUA
-
+)
+const (
 	// zi
-	Z_DONG int = iota
+	Z_DONG int = iota + 1
 	Z_NAN
 	Z_XI
 	Z_BEI
 	Z_ZHONG
 	Z_FA
 	Z_BAI
+)
 
+const (
 	// hua
-	H_CHUN int = iota
+	H_CHUN int = iota + 1
 	H_XIA
 	H_QIU
 	H_DONG
@@ -31,14 +34,34 @@ const (
 )
 
 type (
-	Point int
-	Card  struct {
-		Type  int
+	CardType int
+	Card     struct {
+		Type  CardType
 		Point int
 	}
 )
 
+func (c Card) isValid() bool {
+	switch c.Type {
+	case TIAO:
+		fallthrough
+	case TONG:
+		fallthrough
+	case WAN:
+		return c.Point > 0 && c.Point < 10
+	case ZI:
+		return c.Point > 0 && c.Point < 8
+	case HUA:
+		return c.Point > 0 && c.Point < 9
+	default:
+		return false
+	}
+}
+
 func (c Card) String() string {
+	if !c.isValid() {
+		return "[无效牌]"
+	}
 	switch c.Type {
 	case TIAO:
 		return fmt.Sprintf("%d条", c.Point)
@@ -83,5 +106,5 @@ func (c Card) String() string {
 			return "菊"
 		}
 	}
-	return "[无效牌]"
+	panic("never happen")
 }
