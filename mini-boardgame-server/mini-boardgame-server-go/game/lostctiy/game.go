@@ -59,12 +59,15 @@ func NewStandardGame() *Game {
 	for i := range board {
 		hand[i] = make([]Card, 0)
 	}
-	return &Game{
+	g := &Game{
 		Deck:  deck,
 		Board: board,
 		Drop:  drop,
 		Hand:  hand,
 	}
+	g.DrawCard(0, 7)
+	g.DrawCard(1, 7)
+	return g
 }
 
 func (c Card) Color() int {
