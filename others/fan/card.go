@@ -8,7 +8,6 @@ const (
 	TONG
 	WAN
 	ZI
-	HUA
 )
 const (
 	// zi
@@ -21,18 +20,6 @@ const (
 	Z_BAI
 )
 
-const (
-	// hua
-	H_CHUN int = iota + 1
-	H_XIA
-	H_QIU
-	H_DONG
-	H_MEI
-	H_LAN
-	H_ZHU
-	H_JU
-)
-
 type (
 	CardType int
 	Card     struct {
@@ -40,6 +27,23 @@ type (
 		Point int
 	}
 )
+
+func (c Card) isTTW() bool {
+	return c.Type == TIAO || c.Type == TONG || c.Type == WAN
+}
+
+func (c Card) isZi() bool {
+	return c.Type == ZI
+}
+
+func (c Card) Copy() Card {
+	return c
+}
+
+func (c Card) NextPoint() Card {
+	c.Point++
+	return c
+}
 
 func (c Card) isValid() bool {
 	switch c.Type {
@@ -51,8 +55,6 @@ func (c Card) isValid() bool {
 		return c.Point > 0 && c.Point < 10
 	case ZI:
 		return c.Point > 0 && c.Point < 8
-	case HUA:
-		return c.Point > 0 && c.Point < 9
 	default:
 		return false
 	}
@@ -60,7 +62,7 @@ func (c Card) isValid() bool {
 
 func (c Card) String() string {
 	if !c.isValid() {
-		return "[无效牌]"
+		return fmt.Sprintf("[无效牌 %d %d]", c.Type, c.Point)
 	}
 	switch c.Type {
 	case TIAO:
@@ -85,25 +87,6 @@ func (c Card) String() string {
 			return "发"
 		case Z_BAI:
 			return "白"
-		}
-	case HUA:
-		switch c.Point {
-		case H_CHUN:
-			return "春"
-		case H_XIA:
-			return "夏"
-		case H_QIU:
-			return "秋"
-		case H_DONG:
-			return "冬"
-		case H_MEI:
-			return "梅"
-		case H_LAN:
-			return "兰"
-		case H_ZHU:
-			return "竹"
-		case H_JU:
-			return "菊"
 		}
 	}
 	panic("never happen")
