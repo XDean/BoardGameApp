@@ -197,7 +197,7 @@ func ssyFind(cards Cards, card Card) (bool, Group, Cards) {
 	var extra bool
 	for card, count := range cards {
 		if count > 1 {
-			if extra {
+			if extra || count > 2 {
 				return false, Group{}, nil
 			} else {
 				extra = true
