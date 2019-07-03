@@ -2,7 +2,7 @@ package fan
 
 type (
 	Hand struct {
-		Public  Cards
+		Public  []Group
 		Private Cards
 		Last    Card
 		ZiMo    bool

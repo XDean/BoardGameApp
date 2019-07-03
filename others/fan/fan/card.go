@@ -1,6 +1,8 @@
 package fan
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	// type
@@ -31,7 +33,8 @@ type (
 		Type  CardType
 		Point int
 	}
-	Cards []Card
+	Cards      map[Card]int
+	CardFilter func(Card) bool
 )
 
 func (c Card) isTBW() bool {
@@ -103,12 +106,81 @@ func (c Card) String() string {
 	panic("never happen")
 }
 
-func (c Cards) Find(filter func(Card) bool) Cards {
-	result := make(Cards, 0)
-	for _, card := range c {
+func (c Cards) Size() int {
+	i := 0
+	for _, v := range c {
+		i += v
+	}
+	return i
+}
+
+func (c Cards) Find(filter CardFilter) Cards {
+	result := make(Cards)
+	for card, count := range c {
 		if filter(card) {
-			result = append(result, card)
+			result[card] = count
 		}
 	}
 	return result
+}
+
+func (c Cards) Copy() Cards {
+	return c.Find(func(card Card) bool {
+		return true
+	})
+}
+
+func (c Cards) Remove(toRemove Cards) Cards {
+	result := c.Copy()
+	for card, count := range toRemove {
+		c[card] -= count
+		if c[card] < 0 {
+			panic("Can't have card less than 0")
+		}
+	}
+	return result
+}
+
+func (c Cards) MoveTo(target Cards, card Card, count int) {
+	c[card] -= count
+	target[card] += count
+}
+
+func PointIs(point int) CardFilter {
+	return func(card Card) bool {
+		return card.Point == point
+	}
+}
+
+func PointNear(point, near int) CardFilter {
+	return func(card Card) bool {
+		return Abs(card.Point-point) <= near
+	}
+}
+
+func TypeIs(t CardType) CardFilter {
+	return func(card Card) bool {
+		return card.Type == t
+	}
+}
+
+func CardIs(c Card) CardFilter {
+	return func(card Card) bool {
+		return card == c
+	}
+}
+
+func (c Cards) IsValid() bool {
+	for _, v := range c {
+		if v < 0 {
+			return false
+		}
+	}
+	return true
+}
+func Abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
