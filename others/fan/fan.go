@@ -1,14 +1,28 @@
-package fan
+package main
 
-type Fan struct {
-	Name   string
-	Fan    int
-	Match  func(hand Hand) bool
-	Ignore []string
-}
+const (
+	F_COMMON FanType = iota
+	F_HU
+	F_EXTRA
+)
 
-type ExtraFan struct {
-	Name   string
-	Fan    int
-	Ignore []string
-}
+type (
+	FanType int
+	Fan     struct {
+		Name   string
+		Fan    int
+		Type   FanType
+		Ignore []string
+		Match  func(hand Hand) bool
+	}
+)
+
+var (
+	DA_SAN_YUAN = Fan{
+		Name: "大三元",
+		Fan:  88,
+		Match: func(hand Hand) bool {
+			return true
+		},
+	}
+)

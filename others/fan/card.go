@@ -1,11 +1,11 @@
-package fan
+package main
 
 import "fmt"
 
 const (
 	// type
 	TIAO CardType = iota
-	TONG
+	BING
 	WAN
 	ZI
 )
@@ -20,6 +20,10 @@ const (
 	Z_BAI
 )
 
+var (
+	ALL_ZI = []int{Z_DONG, Z_NAN, Z_XI, Z_BEI, Z_ZHONG, Z_FA, Z_BAI}
+)
+
 type (
 	CardType int
 	Card     struct {
@@ -28,8 +32,8 @@ type (
 	}
 )
 
-func (c Card) isTTW() bool {
-	return c.Type == TIAO || c.Type == TONG || c.Type == WAN
+func (c Card) isTBW() bool {
+	return c.Type == TIAO || c.Type == BING || c.Type == WAN
 }
 
 func (c Card) isZi() bool {
@@ -45,11 +49,16 @@ func (c Card) NextPoint() Card {
 	return c
 }
 
+func (c Card) Next(i int) Card {
+	c.Point += i
+	return c
+}
+
 func (c Card) isValid() bool {
 	switch c.Type {
 	case TIAO:
 		fallthrough
-	case TONG:
+	case BING:
 		fallthrough
 	case WAN:
 		return c.Point > 0 && c.Point < 10
@@ -67,7 +76,7 @@ func (c Card) String() string {
 	switch c.Type {
 	case TIAO:
 		return fmt.Sprintf("%d条", c.Point)
-	case TONG:
+	case BING:
 		return fmt.Sprintf("%d筒", c.Point)
 	case WAN:
 		return fmt.Sprintf("%d万", c.Point)
