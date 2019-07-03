@@ -177,3 +177,39 @@ func qbkFind(cards Cards, card Card) (bool, Group, Cards) {
 		Cards: use,
 	}, left
 }
+
+func qxbkFind(cards Cards, card Card) (bool, Group, Cards) {
+	if ok, group, left := qbkFind(cards, card); ok {
+		if group.Cards.Find(TypeIs(ZI)).Size() == 7 {
+			group.Type = QI_XING_BU_KAO
+			return true, group, left
+		}
+	}
+	return false, Group{}, nil
+}
+
+func ssyFind(cards Cards, card Card) (bool, Group, Cards) {
+	if cards.Size() != 14 {
+		return false, Group{}, nil
+	}
+	left := cards.Copy()
+	use := Cards{}
+	var extra bool
+	for card, count := range cards {
+		if count > 1 {
+			if extra {
+				return false, Group{}, nil
+			} else {
+				extra = true
+			}
+		}
+		if !card.isZi() && card.Point != 1 && card.Point != 9 {
+			return false, Group{}, nil
+		}
+		left.MoveTo(use, card, count)
+	}
+	return true, Group{
+		Type:  SHI_SAN_YAO,
+		Cards: use,
+	}, left
+}
