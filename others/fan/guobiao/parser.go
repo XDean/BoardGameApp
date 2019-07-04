@@ -60,6 +60,9 @@ func Parse(str string) (Hand, error) {
 		case '明':
 			newPublicType = MING_GANG
 		case '摸':
+			if mode != mode_last {
+				return hand, parseError(i, "非法的自摸")
+			}
 			if hand.ZiMo {
 				return hand, parseError(i, "冗余的自摸")
 			}
