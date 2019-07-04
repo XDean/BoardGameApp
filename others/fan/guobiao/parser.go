@@ -1,4 +1,4 @@
-package fan
+package guobiao
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"sort"
 	"strings"
 )
-
-// Ct123 b456, DDDZZw555, w5
 
 const (
 	mode_public = iota

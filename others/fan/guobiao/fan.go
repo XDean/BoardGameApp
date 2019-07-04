@@ -1,4 +1,4 @@
-package fan
+package guobiao
 
 type (
 	Fan struct {

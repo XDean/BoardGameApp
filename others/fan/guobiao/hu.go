@@ -1,4 +1,4 @@
-package fan
+package guobiao
 
 func FindHu(hand Hand) []GroupHand {
 	result := make([]GroupHand, 0)

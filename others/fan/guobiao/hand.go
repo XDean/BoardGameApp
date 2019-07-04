@@ -1,4 +1,4 @@
-package fan
+package guobiao
 
 type (
 	Hand struct {
