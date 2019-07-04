@@ -83,6 +83,44 @@ func (c Card) isValid() bool {
 	}
 }
 
+func (t CardType) String() string {
+	switch t {
+	case TIAO:
+		return "条"
+	case BING:
+		return "饼"
+	case WAN:
+		return "万"
+	case ZI:
+		return "字"
+	}
+	panic("never happen")
+}
+
+func (c Card) FormatPoint() rune {
+	if c.Type == ZI {
+		switch c.Point {
+		case Z_DONG:
+			return '东'
+		case Z_NAN:
+			return '南'
+		case Z_XI:
+			return '西'
+		case Z_BEI:
+			return '北'
+		case Z_ZHONG:
+			return '中'
+		case Z_FA:
+			return '发'
+		case Z_BAI:
+			return '白'
+		}
+		panic("never happen")
+	} else {
+		return rune(c.Point)
+	}
+}
+
 func (c Card) String() string {
 	if !c.isValid() {
 		return fmt.Sprintf("[无效牌 %d %d]", c.Type, c.Point)
@@ -91,7 +129,7 @@ func (c Card) String() string {
 	case TIAO:
 		return fmt.Sprintf("%d条", c.Point)
 	case BING:
-		return fmt.Sprintf("%d筒", c.Point)
+		return fmt.Sprintf("%d饼", c.Point)
 	case WAN:
 		return fmt.Sprintf("%d万", c.Point)
 	case ZI:
@@ -187,6 +225,17 @@ func (c Cards) IsValid() bool {
 	}
 	return true
 }
+
+func (c Cards) ToArray() []Card {
+	result := make([]Card, 0)
+	for card, count := range c {
+		for i := 0; i < count; i++ {
+			result = append(result, card)
+		}
+	}
+	return result
+}
+
 func Abs(x int) int {
 	if x < 0 {
 		return -x

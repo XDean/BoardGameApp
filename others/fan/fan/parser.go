@@ -3,6 +3,8 @@ package fan
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"sort"
+	"strings"
 )
 
 // Ct123 b456, DDDZZw555, w5
@@ -48,7 +50,7 @@ func Parse(str string) (Hand, error) {
 			}
 		case '条':
 			cardType = TIAO
-		case '饼':
+		case '饼', '筒':
 			cardType = BING
 		case '万':
 			cardType = WAN
@@ -134,6 +136,64 @@ func Parse(str string) (Hand, error) {
 		return hand, parseError(len(str), "牌数应为14张")
 	}
 	return hand, nil
+}
+
+func Format(hand Hand) string {
+	builder := strings.Builder{}
+	for _, g := range hand.Public {
+		switch g.Type {
+		case CHI:
+			builder.WriteRune('吃')
+		case PENG:
+			builder.WriteRune('碰')
+		case MING_GANG:
+			builder.WriteRune('明')
+		case AN_GANG:
+			builder.WriteRune('暗')
+		}
+		for card, _ := range g.Cards {
+			if card.Type != ZI {
+				builder.WriteString(card.Type.String())
+			}
+		}
+		for card, count := range g.Cards {
+			for i := 0; i < count; i++ {
+				builder.WriteRune(card.FormatPoint())
+			}
+		}
+		builder.WriteRune(' ')
+	}
+
+	builder.WriteString(",")
+
+	privateCards := hand.Private.ToArray()
+	sort.Slice(privateCards, func(i, j int) bool {
+		t := privateCards[i].Type - privateCards[j].Type
+		if t < 0 {
+			return true
+		} else if t == 0 {
+			return privateCards[i].Point < privateCards[j].Point
+		} else {
+			return false
+		}
+	})
+	currentType := ZI
+	for _, card := range privateCards {
+		if card.Type != ZI && card.Type != currentType {
+			builder.WriteRune(' ')
+			builder.WriteString(card.Type.String())
+		}
+		builder.WriteRune(card.FormatPoint())
+	}
+	builder.WriteString(" , ")
+	if hand.ZiMo {
+		builder.WriteRune('摸')
+	}
+	if hand.Last.Type != ZI {
+		builder.WriteString(hand.Last.Type.String())
+	}
+	builder.WriteRune(hand.Last.FormatPoint())
+	return builder.String()
 }
 
 func parseError(index int, message string) error {
