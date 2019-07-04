@@ -12,22 +12,22 @@ var (
 	CHI = GroupType{
 		Public:    true,
 		CardCount: 3,
-		Find:      noFind,
+		Find:      chiFind,
 	}
 	PENG = GroupType{
 		Public:    true,
 		CardCount: 3,
-		Find:      noFind,
+		Find:      pengFind,
 	}
 	MING_GANG = GroupType{
 		Public:    true,
 		CardCount: 4,
-		Find:      noFind,
+		Find:      mgFind,
 	}
 	AN_GANG = GroupType{
 		Public:    true,
 		CardCount: 4,
-		Find:      noFind,
+		Find:      agFind,
 	}
 
 	KE = GroupType{
@@ -44,31 +44,63 @@ var (
 	ZU_HE_LONG = GroupType{
 		Public:    false,
 		CardCount: 9,
+		Find:      zhlFind,
 	}
 
 	QI_DUI = GroupType{
 		Public:    false,
 		CardCount: 14,
+		Find:      qiduiFind,
 	}
 
 	QUAN_BU_KAO = GroupType{
 		Public:    false,
 		CardCount: 14,
+		Find:      qbkFind,
 	}
 
 	QI_XING_BU_KAO = GroupType{
 		Public:    false,
 		CardCount: 14,
+		Find:      qxbkFind,
 	}
 
 	SHI_SAN_YAO = GroupType{
 		Public:    false,
 		CardCount: 14,
+		Find:      ssyFind,
 	}
 )
 
-func noFind(cards Cards, card Card) (bool, Group, Cards) {
+func chiFind(cards Cards, card Card) (bool, Group, Cards) {
+	b, group, i := shunFind(cards, card)
+	group.Type = CHI
+	return b, group, i
+}
+
+func pengFind(cards Cards, card Card) (bool, Group, Cards) {
+	b, group, i := keFind(cards, card)
+	group.Type = PENG
+	return b, group, i
+}
+
+func mgFind(cards Cards, card Card) (bool, Group, Cards) {
+	left := cards.Copy()
+	use := Cards{}
+	left.MoveTo(use, card, 4)
+	if left.IsValid() {
+		return true, Group{
+			Type:  MING_GANG,
+			Cards: use,
+		}, left
+	}
 	return false, Group{}, nil
+}
+
+func agFind(cards Cards, card Card) (bool, Group, Cards) {
+	b, group, i := mgFind(cards, card)
+	group.Type = AN_GANG
+	return b, group, i
 }
 
 func keFind(cards Cards, card Card) (bool, Group, Cards) {

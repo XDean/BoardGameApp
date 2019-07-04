@@ -24,7 +24,16 @@ const (
 )
 
 var (
-	ALL_ZI = []int{Z_DONG, Z_NAN, Z_XI, Z_BEI, Z_ZHONG, Z_FA, Z_BAI}
+	ALL_ZI   = []int{Z_DONG, Z_NAN, Z_XI, Z_BEI, Z_ZHONG, Z_FA, Z_BAI}
+	NIL_CARD = Card{Type: ZI, Point: -1}
+
+	DONG_CARD  = Card{Type: ZI, Point: Z_DONG}
+	NAN_CARD   = Card{Type: ZI, Point: Z_NAN}
+	XI_CARD    = Card{Type: ZI, Point: Z_XI}
+	BEI_CARD   = Card{Type: ZI, Point: Z_BEI}
+	ZHONG_CARD = Card{Type: ZI, Point: Z_ZHONG}
+	FA_CARD    = Card{Type: ZI, Point: Z_FA}
+	BAI_CARD   = Card{Type: ZI, Point: Z_BAI}
 )
 
 type (
