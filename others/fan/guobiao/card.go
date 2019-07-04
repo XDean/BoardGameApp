@@ -2,6 +2,7 @@ package guobiao
 
 import (
 	"fmt"
+	"sort"
 )
 
 const (
@@ -117,7 +118,7 @@ func (c Card) FormatPoint() rune {
 		}
 		panic("never happen")
 	} else {
-		return rune(c.Point)
+		return rune(c.Point + '0')
 	}
 }
 
@@ -234,6 +235,21 @@ func (c Cards) ToArray() []Card {
 		}
 	}
 	return result
+}
+
+func (c Cards) ToSortedArray() []Card {
+	array := c.ToArray()
+	sort.Slice(array, func(i, j int) bool {
+		t := array[i].Type - array[j].Type
+		if t < 0 {
+			return true
+		} else if t == 0 {
+			return array[i].Point < array[j].Point
+		} else {
+			return false
+		}
+	})
+	return array
 }
 
 func Abs(x int) int {

@@ -2,73 +2,90 @@ package guobiao
 
 type (
 	GroupType struct {
+		Name      string
 		Public    bool
 		CardCount int
-		Find      func(cards Cards, card Card) (bool, Group, Cards)
 	}
 )
+
+func (gt GroupType) Find(cards Cards, card Card) (bool, Group, Cards) {
+	switch gt {
+	case CHI:
+		return chiFind(cards, card)
+	case PENG:
+		return pengFind(cards, card)
+	case MING_GANG:
+		return mgFind(cards, card)
+	case AN_GANG:
+		return agFind(cards, card)
+	case KE:
+		return keFind(cards, card)
+	case SHUN:
+		return shunFind(cards, card)
+	case ZU_HE_LONG:
+		return zhlFind(cards, card)
+	case QUAN_BU_KAO:
+		return qbkFind(cards, card)
+	case QI_XING_BU_KAO:
+		return qxbkFind(cards, card)
+	case QI_DUI:
+		return qiduiFind(cards, card)
+	case SHI_SAN_YAO:
+		return ssyFind(cards, card)
+	}
+	panic("never happen")
+}
 
 var (
 	CHI = GroupType{
 		Public:    true,
 		CardCount: 3,
-		Find:      chiFind,
 	}
 	PENG = GroupType{
 		Public:    true,
 		CardCount: 3,
-		Find:      pengFind,
 	}
 	MING_GANG = GroupType{
 		Public:    true,
 		CardCount: 4,
-		Find:      mgFind,
 	}
 	AN_GANG = GroupType{
 		Public:    true,
 		CardCount: 4,
-		Find:      agFind,
 	}
 
 	KE = GroupType{
 		Public:    false,
 		CardCount: 3,
-		Find:      keFind,
 	}
 	SHUN = GroupType{
 		Public:    false,
 		CardCount: 3,
-		Find:      shunFind,
 	}
 
 	ZU_HE_LONG = GroupType{
 		Public:    false,
 		CardCount: 9,
-		Find:      zhlFind,
 	}
 
 	QI_DUI = GroupType{
 		Public:    false,
 		CardCount: 14,
-		Find:      qiduiFind,
 	}
 
 	QUAN_BU_KAO = GroupType{
 		Public:    false,
 		CardCount: 14,
-		Find:      qbkFind,
 	}
 
 	QI_XING_BU_KAO = GroupType{
 		Public:    false,
 		CardCount: 14,
-		Find:      qxbkFind,
 	}
 
 	SHI_SAN_YAO = GroupType{
 		Public:    false,
 		CardCount: 14,
-		Find:      ssyFind,
 	}
 )
 

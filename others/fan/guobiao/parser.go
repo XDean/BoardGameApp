@@ -3,7 +3,6 @@ package guobiao
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"sort"
 	"strings"
 )
 
@@ -34,7 +33,7 @@ func Parse(str string) (Hand, error) {
 		switch c {
 		case ' ', '\t':
 			continue
-		case ',':
+		case ',', '，':
 			switch mode {
 			case mode_public:
 				if publicType.Public || publicCards.Size() != 0 {
@@ -83,7 +82,7 @@ func Parse(str string) (Hand, error) {
 			if cardType == ZI {
 				return hand, parseError(i, "未指定牌类型")
 			}
-			newCard = Card{Type: cardType, Point: int(c)}
+			newCard = Card{Type: cardType, Point: int(c) - '0'}
 		}
 		if newPublicType.Public {
 			if mode != mode_public {
@@ -100,12 +99,17 @@ func Parse(str string) (Hand, error) {
 			case mode_public:
 				if publicType.Public {
 					publicCards[newCard] += 1
+					match := false
 					if publicCards.Size() == publicType.CardCount {
-						if ok, group, _ := publicType.Find(publicCards, newCard); ok {
-							hand.Public = append(hand.Public, group)
-							publicType = QI_XING_BU_KAO
-							publicCards = Cards{}
-						} else {
+						for card, _ := range publicCards {
+							if ok, group, _ := publicType.Find(publicCards, card); ok {
+								hand.Public = append(hand.Public, group)
+								match = true
+								publicType = QI_XING_BU_KAO
+								publicCards = Cards{}
+							}
+						}
+						if !match {
 							return hand, parseError(i, "错误的牌组合")
 						}
 					}
@@ -153,33 +157,24 @@ func Format(hand Hand) string {
 			if card.Type != ZI {
 				builder.WriteString(card.Type.String())
 			}
+			break
 		}
-		for card, count := range g.Cards {
-			for i := 0; i < count; i++ {
-				builder.WriteRune(card.FormatPoint())
-			}
+		for _, card := range g.Cards.ToSortedArray() {
+			builder.WriteRune(card.FormatPoint())
 		}
 		builder.WriteRune(' ')
 	}
 
 	builder.WriteString(",")
 
-	privateCards := hand.Private.ToArray()
-	sort.Slice(privateCards, func(i, j int) bool {
-		t := privateCards[i].Type - privateCards[j].Type
-		if t < 0 {
-			return true
-		} else if t == 0 {
-			return privateCards[i].Point < privateCards[j].Point
-		} else {
-			return false
-		}
-	})
 	currentType := ZI
-	for _, card := range privateCards {
-		if card.Type != ZI && card.Type != currentType {
+	for _, card := range hand.Private.ToSortedArray() {
+		if card.Type != currentType {
 			builder.WriteRune(' ')
-			builder.WriteString(card.Type.String())
+			if card.Type != ZI {
+				builder.WriteString(card.Type.String())
+			}
+			currentType = card.Type
 		}
 		builder.WriteRune(card.FormatPoint())
 	}
