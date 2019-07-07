@@ -35,6 +35,8 @@ var (
 	ZHONG_CARD = Card{Type: ZI, Point: Z_ZHONG}
 	FA_CARD    = Card{Type: ZI, Point: Z_FA}
 	BAI_CARD   = Card{Type: ZI, Point: Z_BAI}
+
+	TYPE_TBW = []CardType{TIAO, BING, WAN}
 )
 
 type (
@@ -250,6 +252,40 @@ func (c Cards) ToSortedArray() []Card {
 		}
 	})
 	return array
+}
+
+func (c Cards) Equals(o Cards) bool {
+	if c.Size() != o.Size() {
+		return false
+	}
+	for card, count := range c {
+		if o[card] != count {
+			return false
+		}
+	}
+	return true
+}
+
+func (c Cards) FindCard(compare func(old, new Card) bool) Card {
+	result := NIL_CARD
+	for card, _ := range c {
+		if result == NIL_CARD || compare(result, card) {
+			result = card
+		}
+	}
+	return result
+}
+
+func (c Cards) FindMaxPoint() Card {
+	return c.FindCard(func(old, new Card) bool {
+		return new.Point > old.Point
+	})
+}
+
+func (c Cards) FindMinPoint() Card {
+	return c.FindCard(func(old, new Card) bool {
+		return new.Point < old.Point
+	})
 }
 
 func Abs(x int) int {

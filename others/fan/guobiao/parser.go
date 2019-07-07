@@ -18,9 +18,9 @@ func Parse(str string) (Hand, error) {
 	mode := mode_public
 
 	publicCards := Cards{}
-	publicType := QI_XING_BU_KAO
+	publicType := GT_QI_XING_BU_KAO
 
-	newPublicType := QI_XING_BU_KAO
+	newPublicType := GT_QI_XING_BU_KAO
 	newCard := NIL_CARD
 
 	hand := Hand{
@@ -52,13 +52,13 @@ func Parse(str string) (Hand, error) {
 		case '万':
 			cardType = WAN
 		case '吃':
-			newPublicType = CHI
+			newPublicType = GT_CHI
 		case '碰':
-			newPublicType = PENG
+			newPublicType = GT_PENG
 		case '暗':
-			newPublicType = AN_GANG
+			newPublicType = GT_AN_GANG
 		case '明':
-			newPublicType = MING_GANG
+			newPublicType = GT_MING_GANG
 		case '摸':
 			if mode != mode_last {
 				return hand, parseError(i, "非法的自摸")
@@ -95,7 +95,7 @@ func Parse(str string) (Hand, error) {
 				return hand, parseError(i, "重复吃碰杠")
 			}
 			publicType = newPublicType
-			newPublicType = QI_XING_BU_KAO
+			newPublicType = GT_QI_XING_BU_KAO
 		}
 		if newCard != NIL_CARD {
 			switch mode {
@@ -108,7 +108,7 @@ func Parse(str string) (Hand, error) {
 							if ok, group, _ := publicType.Find(publicCards, card); ok {
 								hand.Public = append(hand.Public, group)
 								match = true
-								publicType = QI_XING_BU_KAO
+								publicType = GT_QI_XING_BU_KAO
 								publicCards = Cards{}
 							}
 						}
@@ -147,13 +147,13 @@ func Format(hand Hand) string {
 	builder := strings.Builder{}
 	for _, g := range hand.Public {
 		switch g.Type {
-		case CHI:
+		case GT_CHI:
 			builder.WriteRune('吃')
-		case PENG:
+		case GT_PENG:
 			builder.WriteRune('碰')
-		case MING_GANG:
+		case GT_MING_GANG:
 			builder.WriteRune('明')
-		case AN_GANG:
+		case GT_AN_GANG:
 			builder.WriteRune('暗')
 		}
 		for card, _ := range g.Cards {

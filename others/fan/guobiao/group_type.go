@@ -10,80 +10,80 @@ type (
 
 func (gt GroupType) Find(cards Cards, card Card) (bool, Group, Cards) {
 	switch gt {
-	case CHI:
+	case GT_CHI:
 		return chiFind(cards, card)
-	case PENG:
+	case GT_PENG:
 		return pengFind(cards, card)
-	case MING_GANG:
+	case GT_MING_GANG:
 		return mgFind(cards, card)
-	case AN_GANG:
+	case GT_AN_GANG:
 		return agFind(cards, card)
-	case KE:
+	case GT_KE:
 		return keFind(cards, card)
-	case SHUN:
+	case GT_SHUN:
 		return shunFind(cards, card)
-	case ZU_HE_LONG:
+	case GT_ZU_HE_LONG:
 		return zhlFind(cards, card)
-	case QUAN_BU_KAO:
+	case GT_QUAN_BU_KAO:
 		return qbkFind(cards, card)
-	case QI_XING_BU_KAO:
+	case GT_QI_XING_BU_KAO:
 		return qxbkFind(cards, card)
-	case QI_DUI:
+	case GT_QI_DUI:
 		return qiduiFind(cards, card)
-	case SHI_SAN_YAO:
+	case GT_SHI_SAN_YAO:
 		return ssyFind(cards, card)
 	}
 	panic("never happen")
 }
 
 var (
-	CHI = GroupType{
+	GT_CHI = GroupType{
 		Public:    true,
 		CardCount: 3,
 	}
-	PENG = GroupType{
+	GT_PENG = GroupType{
 		Public:    true,
 		CardCount: 3,
 	}
-	MING_GANG = GroupType{
+	GT_MING_GANG = GroupType{
 		Public:    true,
 		CardCount: 4,
 	}
-	AN_GANG = GroupType{
+	GT_AN_GANG = GroupType{
 		Public:    true,
 		CardCount: 4,
 	}
 
-	KE = GroupType{
+	GT_KE = GroupType{
 		Public:    false,
 		CardCount: 3,
 	}
-	SHUN = GroupType{
+	GT_SHUN = GroupType{
 		Public:    false,
 		CardCount: 3,
 	}
 
-	ZU_HE_LONG = GroupType{
+	GT_ZU_HE_LONG = GroupType{
 		Public:    false,
 		CardCount: 9,
 	}
 
-	QI_DUI = GroupType{
+	GT_QI_DUI = GroupType{
 		Public:    false,
 		CardCount: 14,
 	}
 
-	QUAN_BU_KAO = GroupType{
+	GT_QUAN_BU_KAO = GroupType{
 		Public:    false,
 		CardCount: 14,
 	}
 
-	QI_XING_BU_KAO = GroupType{
+	GT_QI_XING_BU_KAO = GroupType{
 		Public:    false,
 		CardCount: 14,
 	}
 
-	SHI_SAN_YAO = GroupType{
+	GT_SHI_SAN_YAO = GroupType{
 		Public:    false,
 		CardCount: 14,
 	}
@@ -91,13 +91,13 @@ var (
 
 func chiFind(cards Cards, card Card) (bool, Group, Cards) {
 	b, group, i := shunFind(cards, card)
-	group.Type = CHI
+	group.Type = GT_CHI
 	return b, group, i
 }
 
 func pengFind(cards Cards, card Card) (bool, Group, Cards) {
 	b, group, i := keFind(cards, card)
-	group.Type = PENG
+	group.Type = GT_PENG
 	return b, group, i
 }
 
@@ -107,7 +107,7 @@ func mgFind(cards Cards, card Card) (bool, Group, Cards) {
 	left.MoveTo(use, card, 4)
 	if left.IsValid() {
 		return true, Group{
-			Type:  MING_GANG,
+			Type:  GT_MING_GANG,
 			Cards: use,
 		}, left
 	}
@@ -116,7 +116,7 @@ func mgFind(cards Cards, card Card) (bool, Group, Cards) {
 
 func agFind(cards Cards, card Card) (bool, Group, Cards) {
 	b, group, i := mgFind(cards, card)
-	group.Type = AN_GANG
+	group.Type = GT_AN_GANG
 	return b, group, i
 }
 
@@ -126,7 +126,7 @@ func keFind(cards Cards, card Card) (bool, Group, Cards) {
 	left.MoveTo(use, card, 3)
 	if left.IsValid() {
 		return true, Group{
-			Type:  KE,
+			Type:  GT_KE,
 			Cards: use,
 		}, left
 	}
@@ -144,7 +144,7 @@ func shunFind(cards Cards, card Card) (bool, Group, Cards) {
 	left.MoveTo(use, card.Next(2), 1)
 	if left.IsValid() {
 		return true, Group{
-			Type:  SHUN,
+			Type:  GT_SHUN,
 			Cards: use,
 		}, left
 	}
@@ -175,7 +175,7 @@ func zhlFind(cards Cards, card Card) (bool, Group, Cards) {
 					left.MoveTo(use, w.Next(6), 1)
 					if left[card] > 0 && left.IsValid() {
 						return true, Group{
-							Type:  ZU_HE_LONG,
+							Type:  GT_ZU_HE_LONG,
 							Cards: use,
 						}, left
 					}
@@ -196,7 +196,7 @@ func qiduiFind(cards Cards, card Card) (bool, Group, Cards) {
 		}
 	}
 	return true, Group{
-		Type:  QI_DUI,
+		Type:  GT_QI_DUI,
 		Cards: cards.Copy(),
 	}, Cards{}
 }
@@ -222,7 +222,7 @@ func qbkFind(cards Cards, card Card) (bool, Group, Cards) {
 		left.MoveTo(use, card, 1)
 	}
 	return true, Group{
-		Type:  QUAN_BU_KAO,
+		Type:  GT_QUAN_BU_KAO,
 		Cards: use,
 	}, left
 }
@@ -230,7 +230,7 @@ func qbkFind(cards Cards, card Card) (bool, Group, Cards) {
 func qxbkFind(cards Cards, card Card) (bool, Group, Cards) {
 	if ok, group, left := qbkFind(cards, card); ok {
 		if group.Cards.Find(TypeIs(ZI)).Size() == 7 {
-			group.Type = QI_XING_BU_KAO
+			group.Type = GT_QI_XING_BU_KAO
 			return true, group, left
 		}
 	}
@@ -258,7 +258,7 @@ func ssyFind(cards Cards, card Card) (bool, Group, Cards) {
 		left.MoveTo(use, card, count)
 	}
 	return true, Group{
-		Type:  SHI_SAN_YAO,
+		Type:  GT_SHI_SAN_YAO,
 		Cards: use,
 	}, left
 }
