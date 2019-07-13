@@ -7,6 +7,10 @@ type (
 	}
 )
 
+func (g Group) isJiang() bool {
+	return g.Type == GT_JIANG
+}
+
 func (g Group) isShunZi() bool {
 	return g.Type == GT_SHUN || g.Type == GT_CHI
 }

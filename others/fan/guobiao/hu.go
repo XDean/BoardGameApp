@@ -29,6 +29,15 @@ func findGroup(cards Cards) [][]Group {
 				return [][]Group{{group}}
 			}
 		}
+		if cards.Size()%3 == 2 {
+			if ok, group, left := GT_JIANG.Find(cards, card); ok {
+				leftGroups := findGroup(left)
+				for i, g := range leftGroups {
+					leftGroups[i] = append(g, group)
+				}
+				return leftGroups
+			}
+		}
 		for _, t := range []GroupType{GT_ZU_HE_LONG, GT_KE, GT_SHUN} {
 			if ok, group, left := t.Find(cards, card); ok {
 				leftGroups := findGroup(left)

@@ -116,7 +116,7 @@ var (
 			if hand.Last.Point != 3 && hand.Last.Point != 7 {
 				return false
 			}
-			return !hand.Groups.HasGroupPair(func(a Group, b Group) bool {
+			return !hand.FindLastGroup().HasGroupPair(func(a Group, b Group) bool {
 				if a.Cards.Find(CardIs(hand.Last)).Size() > 0 && b.Cards.Find(CardIs(hand.Last)).Size() > 0 {
 					aMax := a.Cards.FindMaxPoint()
 					bMax := b.Cards.FindMaxPoint()
@@ -126,6 +126,44 @@ var (
 				}
 				return false
 			})
+		},
+	}
+	KAN_ZHANG = Fan{
+		Name: "坎张",
+		Fan:  1,
+		Match: func(hand GroupHand) bool {
+
+			return hand.FindLastGroup().HasGroup(func(g Group) bool {
+				return g.isShunZi() && g.Cards.FindMinPoint().Point == hand.Last.Point-1
+			}) && !hand.Groups.HasGroupPair(func(a Group, b Group) bool {
+				if a.Cards.Find(CardIs(hand.Last)).Size() > 0 && b.Cards.Find(CardIs(hand.Last)).Size() > 0 {
+					aMax := a.Cards.FindMaxPoint()
+					bMax := b.Cards.FindMaxPoint()
+					if Abs(aMax.Point-bMax.Point) == 1 {
+						return true
+					}
+				}
+				return false
+			})
+		},
+	}
+
+	DAN_DIAO_JIANG = Fan{
+		Name: "单调将",
+		Fan:  1,
+		Match: func(hand GroupHand) bool {
+
+			return hand.FindLastGroup().HasGroup(func(g Group) bool {
+				return g.isJiang()
+			})
+		},
+	}
+
+	ZI_MO = Fan{
+		Name: "自摸",
+		Fan:  1,
+		Match: func(hand GroupHand) bool {
+			return hand.ZiMo
 		},
 	}
 )

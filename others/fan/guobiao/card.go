@@ -164,6 +164,10 @@ func (c Cards) Size() int {
 	return i
 }
 
+func (c Cards) HasCard(card Card) bool {
+	return c.Find(CardIs(card)).Size() > 0
+}
+
 func (c Cards) Find(filter CardFilter) Cards {
 	result := make(Cards)
 	for card, count := range c {

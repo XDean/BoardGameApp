@@ -18,6 +18,8 @@ func (gt GroupType) Find(cards Cards, card Card) (bool, Group, Cards) {
 		return mgFind(cards, card)
 	case GT_AN_GANG:
 		return agFind(cards, card)
+	case GT_JIANG:
+		return jiangFind(cards, card)
 	case GT_KE:
 		return keFind(cards, card)
 	case GT_SHUN:
@@ -54,6 +56,10 @@ var (
 		CardCount: 4,
 	}
 
+	GT_JIANG = GroupType{
+		Public:    false,
+		CardCount: 2,
+	}
 	GT_KE = GroupType{
 		Public:    false,
 		CardCount: 3,
@@ -118,6 +124,19 @@ func agFind(cards Cards, card Card) (bool, Group, Cards) {
 	b, group, i := mgFind(cards, card)
 	group.Type = GT_AN_GANG
 	return b, group, i
+}
+
+func jiangFind(cards Cards, card Card) (bool, Group, Cards) {
+	left := cards.Copy()
+	use := Cards{}
+	left.MoveTo(use, card, 2)
+	if left.IsValid() {
+		return true, Group{
+			Type:  GT_JIANG,
+			Cards: use,
+		}, left
+	}
+	return false, Group{}, nil
 }
 
 func keFind(cards Cards, card Card) (bool, Group, Cards) {

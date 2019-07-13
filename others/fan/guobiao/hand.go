@@ -57,7 +57,9 @@ func (h GroupHand) FindLastGroup() Groups {
 	result := make(Groups, 0)
 	for _, g := range h.Groups {
 		if g.Cards.Find(CardIs(h.Last)).Size() > 0 {
-			result = append(result, g)
+			if !g.Type.Public {
+				result = append(result, g)
+			}
 		}
 	}
 	return result
