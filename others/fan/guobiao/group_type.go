@@ -40,56 +40,68 @@ func (gt GroupType) Find(cards Cards, card Card) (bool, Group, Cards) {
 
 var (
 	GT_CHI = GroupType{
+		Name:      "吃",
 		Public:    true,
 		CardCount: 3,
 	}
 	GT_PENG = GroupType{
+		Name:      "碰",
 		Public:    true,
 		CardCount: 3,
 	}
 	GT_MING_GANG = GroupType{
+		Name:      "明杠",
 		Public:    true,
 		CardCount: 4,
 	}
 	GT_AN_GANG = GroupType{
+		Name:      "暗杠",
 		Public:    true,
 		CardCount: 4,
 	}
 
 	GT_JIANG = GroupType{
+		Name:      "将",
 		Public:    false,
 		CardCount: 2,
 	}
 	GT_KE = GroupType{
+		Name:      "刻",
 		Public:    false,
 		CardCount: 3,
 	}
 	GT_SHUN = GroupType{
+		Name:      "顺",
 		Public:    false,
 		CardCount: 3,
 	}
 
 	GT_ZU_HE_LONG = GroupType{
+		Name:      "组合龙",
 		Public:    false,
 		CardCount: 9,
 	}
 
 	GT_QI_DUI = GroupType{
+		Name:      "七对",
 		Public:    false,
 		CardCount: 14,
 	}
 
 	GT_QUAN_BU_KAO = GroupType{
+		Name:      "全不靠",
 		Public:    false,
 		CardCount: 14,
 	}
 
 	GT_QI_XING_BU_KAO = GroupType{
+		Name:      "七星不靠",
 		Public:    false,
 		CardCount: 14,
 	}
 
 	GT_SHI_SAN_YAO = GroupType{
+		Name:      "十三幺",
 		Public:    false,
 		CardCount: 14,
 	}

@@ -23,7 +23,10 @@ func FindHu(hand Hand) []GroupHand {
 }
 
 func findGroup(cards Cards) [][]Group {
-	for card, _ := range cards {
+	for card, count := range cards {
+		if count == 0 {
+			continue
+		}
 		for _, t := range []GroupType{GT_SHI_SAN_YAO, GT_QI_XING_BU_KAO, GT_QUAN_BU_KAO, GT_QI_DUI} {
 			if ok, group, _ := t.Find(cards, card); ok {
 				return [][]Group{{group}}
@@ -47,8 +50,6 @@ func findGroup(cards Cards) [][]Group {
 				return leftGroups
 			}
 		}
-
-		break
 	}
-	return nil
+	return [][]Group{[]Group{}}
 }

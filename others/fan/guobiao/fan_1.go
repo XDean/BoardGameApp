@@ -1,6 +1,20 @@
 package guobiao
 
 var (
+	ALL_1_FAN = []Fan{
+		QUE_YI_MEN,
+		WU_ZI,
+		YI_BAN_GAO,
+		LIAN_LIU,
+		LAO_SHAO_FU,
+		XI_XIANG_FENG,
+		YAO_JIU_KE,
+		MING_GANG,
+		BIAN_ZHANG,
+		KAN_ZHANG,
+		DAN_DIAO_JIANG,
+		ZI_MO,
+	}
 	QUE_YI_MEN = Fan{
 		Name: "缺一门",
 		Fan:  1,

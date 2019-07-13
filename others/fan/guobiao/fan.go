@@ -1,5 +1,7 @@
 package guobiao
 
+import "fmt"
+
 type (
 	Fan struct {
 		Name   string
@@ -7,6 +9,7 @@ type (
 		Ignore []string
 		Match  func(hand GroupHand) bool
 	}
+	Fans []Fan
 
 	ExtraFan struct {
 		Name   string
@@ -15,7 +18,11 @@ type (
 	}
 )
 
-func CalcFan(hand GroupHand) []Fan {
+func (f Fan) String() string {
+	return fmt.Sprintf("%s(%d)", f.Name, f.Fan)
+}
+
+func CalcGroupFan(hand GroupHand) Fans {
 	result := make([]Fan, 0)
 	ignore := make(map[string]bool, 0)
 	for _, f := range ALL_FAN {
@@ -32,6 +39,16 @@ func CalcFan(hand GroupHand) []Fan {
 	return result
 }
 
+func (f Fans) Fan() int {
+	sum := 0
+	for _, fan := range f {
+		sum += fan.Fan
+	}
+	return sum
+}
+
 var (
-	ALL_FAN []Fan
+	ALL_FAN = append(
+		[]Fan{},
+		ALL_1_FAN...)
 )
