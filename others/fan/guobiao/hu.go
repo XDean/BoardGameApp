@@ -13,7 +13,7 @@ func FindHu(hand Hand) []GroupHand {
 	}
 	for _, groups := range findGroup(hand.Private) {
 		result = append(result, GroupHand{
-			Groups: groups,
+			Groups: append(hand.Public, groups...),
 			Cards:  cards,
 			Last:   hand.Last,
 			ZiMo:   hand.ZiMo,

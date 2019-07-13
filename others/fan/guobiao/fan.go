@@ -49,6 +49,6 @@ func (f Fans) Fan() int {
 
 var (
 	ALL_FAN = append(
-		[]Fan{},
+		ALL_2_FAN,
 		ALL_1_FAN...)
 )

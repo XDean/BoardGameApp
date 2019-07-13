@@ -26,3 +26,7 @@ func (g Group) isGang() bool {
 func (g Group) isAnKe() bool {
 	return g.Type == GT_KE || g.Type == GT_AN_GANG
 }
+
+func (g Group) isChiPengMing() bool {
+	return g.Type == GT_CHI || g.Type == GT_PENG || g.Type == GT_MING_GANG
+}

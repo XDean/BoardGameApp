@@ -194,7 +194,7 @@ func zhlFind(cards Cards, card Card) (bool, Group, Cards) {
 					b := Card{Type: BING, Point: bing}
 					w := Card{Type: WAN, Point: wan}
 					left := cards.Copy()
-					use := cards
+					use := Cards{}
 					left.MoveTo(use, t, 1)
 					left.MoveTo(use, t.Next(3), 1)
 					left.MoveTo(use, t.Next(6), 1)

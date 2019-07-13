@@ -57,6 +57,14 @@ func (c Card) isZi() bool {
 	return c.Type == ZI
 }
 
+func (c Card) isZFB() bool {
+	return c.Type == ZI && (c.Point == Z_ZHONG || c.Point == Z_FA || c.Point == Z_BAI)
+}
+
+func (c Card) isFeng() bool {
+	return c.Type == ZI && (c.Point == Z_DONG || c.Point == Z_NAN || c.Point == Z_XI || c.Point == Z_BEI)
+}
+
 func (c Card) Copy() Card {
 	return c
 }
@@ -178,6 +186,15 @@ func (c Cards) Find(filter CardFilter) Cards {
 	return result
 }
 
+func (c Cards) Has(filter CardFilter) bool {
+	for card, _ := range c {
+		if filter(card) {
+			return true
+		}
+	}
+	return false
+}
+
 func (c Cards) Copy() Cards {
 	return c.Find(func(card Card) bool {
 		return true
@@ -198,6 +215,18 @@ func (c Cards) Remove(toRemove Cards) Cards {
 func (c Cards) MoveTo(target Cards, card Card, count int) {
 	c[card] -= count
 	target[card] += count
+}
+
+func (f CardFilter) Or(o CardFilter) CardFilter {
+	return func(card Card) bool {
+		return f(card) || o(card)
+	}
+}
+
+func (f CardFilter) And(o CardFilter) CardFilter {
+	return func(card Card) bool {
+		return f(card) && o(card)
+	}
 }
 
 func PointIs(point int) CardFilter {
