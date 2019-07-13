@@ -315,7 +315,7 @@ func (c Cards) FindMaxPoint() Card {
 	})
 }
 
-func (c Cards) FindMinPoint() Card {
+func (c Cards) FindMinPointCard() Card {
 	return c.FindCard(func(old, new Card) bool {
 		return new.Point < old.Point
 	})

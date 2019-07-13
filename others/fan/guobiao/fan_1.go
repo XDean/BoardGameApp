@@ -148,7 +148,7 @@ var (
 		Match: func(hand GroupHand) bool {
 
 			return hand.FindLastGroup().HasGroup(func(g Group) bool {
-				return g.isShunZi() && g.Cards.FindMinPoint().Point == hand.Last.Point-1
+				return g.isShunZi() && g.Cards.FindMinPointCard().Point == hand.Last.Point-1
 			}) && !hand.Groups.HasGroupPair(func(a Group, b Group) bool {
 				if a.Cards.Find(CardIs(hand.Last)).Size() > 0 && b.Cards.Find(CardIs(hand.Last)).Size() > 0 {
 					aMax := a.Cards.FindMaxPoint()

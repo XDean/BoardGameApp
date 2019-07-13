@@ -43,7 +43,7 @@ var (
 		Fan:  2,
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.HasGroup(func(g Group) bool {
-				return g.isKeZi() && g.Cards.FindMinPoint().isZFB()
+				return g.isKeZi() && g.Cards.FindMinPointCard().isZFB()
 			})
 		},
 	}
@@ -67,7 +67,7 @@ var (
 		Fan:  2,
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.HasGroupPair(func(a Group, b Group) bool {
-				return a.isKeZi() && b.isKeZi() && a.Cards.FindMinPoint() == b.Cards.FindMinPoint()
+				return a.isKeZi() && b.isKeZi() && a.Cards.FindMinPointCard().Point == b.Cards.FindMinPointCard().Point
 			})
 		},
 	}

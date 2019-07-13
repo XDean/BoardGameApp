@@ -23,6 +23,7 @@ func FindHu(hand Hand) []GroupHand {
 }
 
 func findGroup(cards Cards) [][]Group {
+	result := make([][]Group, 0)
 	for card, count := range cards {
 		if count == 0 {
 			continue
@@ -38,7 +39,7 @@ func findGroup(cards Cards) [][]Group {
 				for i, g := range leftGroups {
 					leftGroups[i] = append(g, group)
 				}
-				return leftGroups
+				result = append(result, leftGroups...)
 			}
 		}
 		for _, t := range []GroupType{GT_ZU_HE_LONG, GT_KE, GT_SHUN} {
@@ -47,8 +48,11 @@ func findGroup(cards Cards) [][]Group {
 				for i, g := range leftGroups {
 					leftGroups[i] = append(g, group)
 				}
-				return leftGroups
+				result = append(result, leftGroups...)
 			}
+		}
+		if len(result) != 0 {
+			return result
 		}
 	}
 	return [][]Group{[]Group{}}
