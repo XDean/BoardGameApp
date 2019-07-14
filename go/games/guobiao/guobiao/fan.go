@@ -48,7 +48,17 @@ func (f Fans) Sum() int {
 }
 
 var (
-	ALL_FAN = append(
+	ALL_FAN = appendFan(
+		ALL_4_FAN,
 		ALL_2_FAN,
-		ALL_1_FAN...)
+		ALL_1_FAN,
+	)
 )
+
+func appendFan(fans ...[]Fan) []Fan {
+	result := make([]Fan, 0)
+	for _, v := range fans {
+		result = append(result, v...)
+	}
+	return result
+}
