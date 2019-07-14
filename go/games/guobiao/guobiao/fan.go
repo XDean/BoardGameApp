@@ -39,7 +39,7 @@ func CalcGroupFan(hand GroupHand) Fans {
 	return result
 }
 
-func (f Fans) Fan() int {
+func (f Fans) Sum() int {
 	sum := 0
 	for _, fan := range f {
 		sum += fan.Fan

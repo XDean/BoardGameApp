@@ -1,4 +1,4 @@
-module github.com/xdean/miniboardgame/others/fan
+module github.com/xdean/miniboardgame
 
 go 1.12
 

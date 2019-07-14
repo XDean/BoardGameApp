@@ -7,7 +7,7 @@ func CalcFan(hand Hand) Fans {
 	for _, h := range FindHu(hand) {
 		fmt.Println(h)
 		fan := CalcGroupFan(h)
-		if fan.Fan() > max.Fan() {
+		if fan.Sum() > max.Sum() {
 			max = fan
 		}
 	}
