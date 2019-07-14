@@ -75,7 +75,7 @@ var (
 		Fan:    8,
 		Ignore: []string{QUE_YI_MEN.Name},
 		Match: func(hand GroupHand) bool {
-			return hand.Cards.Find(CardIn(cardTuiBuDao)).Size() == hand.Cards.Size()
+			return hand.Cards.All(CardIn(cardTuiBuDao))
 		},
 	}
 

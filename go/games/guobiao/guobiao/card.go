@@ -186,6 +186,10 @@ func (c Cards) Find(filter CardFilter) Cards {
 	return result
 }
 
+func (c Cards) All(filter CardFilter) bool {
+	return c.Find(filter).Size() == c.Size()
+}
+
 func (c Cards) Has(filter CardFilter) bool {
 	for card, _ := range c {
 		if filter(card) {
