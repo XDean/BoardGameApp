@@ -140,6 +140,9 @@ func Parse(str string) (Hand, error) {
 	if hand.CardCount() != 14 {
 		return hand, parseError(len(str), "牌数应为14张")
 	}
+	if !hand.Private.HasCard(hand.Last) {
+		return hand, parseError(len(str), "胡牌不存在")
+	}
 	return hand, nil
 }
 
