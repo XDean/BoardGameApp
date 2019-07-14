@@ -53,6 +53,20 @@ func (gs Groups) HasGroup(match func(Group) bool) bool {
 	return false
 }
 
+func (gs Groups) FindGroup(match func(Group) bool) Groups {
+	result := make(Groups, 0)
+	for _, g := range gs {
+		if match(g) {
+			result = append(result, g)
+		}
+	}
+	return result
+}
+
+func (gs Groups) Size() int {
+	return len(gs)
+}
+
 func (h GroupHand) FindLastGroup() Groups {
 	result := make(Groups, 0)
 	for _, g := range h.Groups {
