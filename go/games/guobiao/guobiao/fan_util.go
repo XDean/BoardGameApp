@@ -2,22 +2,35 @@ package guobiao
 
 import "sort"
 
-func isEqual(a, b, c interface{}) bool {
-	return a == b && b == c
+func isEqual(is ...interface{}) bool {
+	for i := 1; i < len(is); i++ {
+		if is[i] != is[i-1] {
+			return false
+		}
+	}
+	return true
 }
 
 func isTBW(a, b, c CardType) bool {
 	return a != ZI && b != ZI && c != ZI && a != b && a != c && b != c
 }
 
-func isStep(a, b, c int) bool {
-	s := []int{a, b, c}
-	sort.Ints(s)
-	return s[1]-s[0] == 1 && s[2]-s[1] == 1
+func isStep(is ...int) bool {
+	sort.Ints(is)
+	for i := 1; i < len(is); i++ {
+		if is[i]-is[i-1] != 1 {
+			return false
+		}
+	}
+	return true
 }
 
-func isStep3(a, b, c int) bool {
-	s := []int{a, b, c}
-	sort.Ints(s)
-	return s[1]-s[0] == 3 && s[2]-s[1] == 3
+func isStep3(is ...int) bool {
+	sort.Ints(is)
+	for i := 1; i < len(is); i++ {
+		if is[i]-is[i-1] != 3 {
+			return false
+		}
+	}
+	return true
 }

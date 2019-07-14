@@ -25,7 +25,7 @@ var (
 		Fan:  6,
 		Match: func(hand GroupHand) bool {
 			for _, t := range TYPE_TBW {
-				if hand.Cards.Find(TypeIs(t).Or(TypeIs(ZI))).Size() == hand.Cards.Size() {
+				if hand.Cards.All(TypeIs(t).Or(TypeIs(ZI))) {
 					return true
 				}
 			}

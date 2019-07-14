@@ -39,7 +39,12 @@ var (
 		Fan:    24,
 		Ignore: []string{WU_ZI.Name},
 		Match: func(hand GroupHand) bool {
-			return hand.Cards.All(TypeIs(TIAO)) || hand.Cards.All(TypeIs(BING)) || hand.Cards.All(TypeIs(WAN))
+			for _, t := range TYPE_TBW {
+				if hand.Cards.All(TypeIs(t)) {
+					return true
+				}
+			}
+			return false
 		},
 	}
 

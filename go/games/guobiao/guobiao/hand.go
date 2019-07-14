@@ -59,6 +59,13 @@ func (gs Groups) HasTriple(match func(Group, Group, Group) bool) bool {
 	return false
 }
 
+func (gs Groups) HasQuad(match func(Group, Group, Group, Group) bool) bool {
+	if gs.Size() < 4 {
+		return false
+	}
+	return match(gs[0], gs[1], gs[2], gs[3])
+}
+
 func (gs Groups) Has(match func(Group) bool) bool {
 	for _, g := range gs {
 		if match(g) {
