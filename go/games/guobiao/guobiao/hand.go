@@ -68,6 +68,10 @@ func (gs Groups) Has(match func(Group) bool) bool {
 	return false
 }
 
+func (gs Groups) All(match func(Group) bool) bool {
+	return gs.Find(match).Size() == gs.Size()
+}
+
 func (gs Groups) Find(match func(Group) bool) Groups {
 	result := make(Groups, 0)
 	for _, g := range gs {
