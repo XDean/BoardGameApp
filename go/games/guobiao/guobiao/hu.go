@@ -23,6 +23,9 @@ func FindHu(hand Hand) []GroupHand {
 }
 
 func findGroup(cards Cards) [][]Group {
+	if cards.Size() == 0 {
+		return [][]Group{[]Group{}}
+	}
 	result := make([][]Group, 0)
 	for card, count := range cards {
 		if count == 0 {
@@ -55,5 +58,5 @@ func findGroup(cards Cards) [][]Group {
 			return result
 		}
 	}
-	return [][]Group{[]Group{}}
+	return nil
 }
