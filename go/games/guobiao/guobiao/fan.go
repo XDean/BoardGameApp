@@ -49,6 +49,7 @@ func (f Fans) Sum() int {
 
 var (
 	ALL_FAN = appendFan(
+		ALL_6_FAN,
 		ALL_4_FAN,
 		ALL_2_FAN,
 		ALL_1_FAN,

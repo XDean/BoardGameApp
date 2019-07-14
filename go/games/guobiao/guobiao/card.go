@@ -309,7 +309,7 @@ func (c Cards) FindCard(compare func(old, new Card) bool) Card {
 	return result
 }
 
-func (c Cards) FindMaxPoint() Card {
+func (c Cards) FindMaxPointCard() Card {
 	return c.FindCard(func(old, new Card) bool {
 		return new.Point > old.Point
 	})

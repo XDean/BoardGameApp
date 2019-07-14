@@ -34,7 +34,7 @@ var (
 		Ignore: []string{WU_ZI.Name},
 		Match: func(hand GroupHand) bool {
 			return !hand.Groups.HasGroup(func(g Group) bool {
-				return !(g.Type == GT_JIANG || g.Type == GT_SHUN)
+				return g.Type != GT_SHUN && (g.Type != GT_JIANG || (g.Type == GT_JIANG && g.Cards.FindMinPointCard().Type == ZI))
 			})
 		},
 	}
@@ -75,18 +75,18 @@ var (
 		Name: "双暗刻",
 		Fan:  2,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasGroupPair(func(a Group, b Group) bool {
-				return a.isAnKe() && b.isAnKe()
-			})
+			return hand.Groups.FindGroup(func(a Group) bool {
+				return a.isAnKe()
+			}).Size() == 2
 		},
 	}
 	AN_GANG = Fan{
 		Name: "暗杠",
 		Fan:  2,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasGroup(func(g Group) bool {
+			return hand.Groups.FindGroup(func(g Group) bool {
 				return g.Type == GT_AN_GANG
-			})
+			}).Size() == 1
 		},
 	}
 )

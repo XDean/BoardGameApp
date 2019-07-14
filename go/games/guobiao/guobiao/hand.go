@@ -44,6 +44,21 @@ func (gs Groups) HasGroupPair(match func(Group, Group) bool) bool {
 	return false
 }
 
+func (gs Groups) HasGroupTriple(match func(Group, Group, Group) bool) bool {
+	for i1, g1 := range gs {
+		for i2 := i1 + 1; i2 < len(gs); i2++ {
+			g2 := gs[i2]
+			for i3 := i2 + 1; i3 < len(gs); i3++ {
+				g3 := gs[i3]
+				if match(g1, g2, g3) {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
 func (gs Groups) HasGroup(match func(Group) bool) bool {
 	for _, g := range gs {
 		if match(g) {

@@ -57,8 +57,8 @@ var (
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.HasGroupPair(func(a Group, b Group) bool {
 				if a.isShunZi() && b.isShunZi() {
-					aMax := a.Cards.FindMaxPoint()
-					bMax := b.Cards.FindMaxPoint()
+					aMax := a.Cards.FindMaxPointCard()
+					bMax := b.Cards.FindMaxPointCard()
 					if aMax.Type == bMax.Type && Abs(aMax.Point-bMax.Point) == 3 {
 						return true
 					}
@@ -73,8 +73,8 @@ var (
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.HasGroupPair(func(a Group, b Group) bool {
 				if a.isShunZi() && b.isShunZi() {
-					aMax := a.Cards.FindMaxPoint()
-					bMax := b.Cards.FindMaxPoint()
+					aMax := a.Cards.FindMaxPointCard()
+					bMax := b.Cards.FindMaxPointCard()
 					if aMax.Type == bMax.Type && Abs(aMax.Point-bMax.Point) == 6 {
 						return true
 					}
@@ -89,8 +89,8 @@ var (
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.HasGroupPair(func(a Group, b Group) bool {
 				if a.isShunZi() && b.isShunZi() {
-					aMax := a.Cards.FindMaxPoint()
-					bMax := b.Cards.FindMaxPoint()
+					aMax := a.Cards.FindMaxPointCard()
+					bMax := b.Cards.FindMaxPointCard()
 					if aMax.Type != bMax.Type && Abs(aMax.Point-bMax.Point) == 0 {
 						return true
 					}
@@ -105,7 +105,7 @@ var (
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.HasGroup(func(a Group) bool {
 				if a.isKeZi() {
-					aMax := a.Cards.FindMaxPoint()
+					aMax := a.Cards.FindMaxPointCard()
 					if aMax.Point == 1 || aMax.Point == 9 {
 						return true
 					}
@@ -132,8 +132,8 @@ var (
 			}
 			return !hand.FindLastGroup().HasGroupPair(func(a Group, b Group) bool {
 				if a.Cards.Find(CardIs(hand.Last)).Size() > 0 && b.Cards.Find(CardIs(hand.Last)).Size() > 0 {
-					aMax := a.Cards.FindMaxPoint()
-					bMax := b.Cards.FindMaxPoint()
+					aMax := a.Cards.FindMaxPointCard()
+					bMax := b.Cards.FindMaxPointCard()
 					if Abs(aMax.Point-bMax.Point) == 2 {
 						return true
 					}
@@ -151,8 +151,8 @@ var (
 				return g.isShunZi() && g.Cards.FindMinPointCard().Point == hand.Last.Point-1
 			}) && !hand.Groups.HasGroupPair(func(a Group, b Group) bool {
 				if a.Cards.Find(CardIs(hand.Last)).Size() > 0 && b.Cards.Find(CardIs(hand.Last)).Size() > 0 {
-					aMax := a.Cards.FindMaxPoint()
-					bMax := b.Cards.FindMaxPoint()
+					aMax := a.Cards.FindMaxPointCard()
+					bMax := b.Cards.FindMaxPointCard()
 					if Abs(aMax.Point-bMax.Point) == 1 {
 						return true
 					}
@@ -166,7 +166,6 @@ var (
 		Name: "单调将",
 		Fan:  1,
 		Match: func(hand GroupHand) bool {
-
 			return hand.FindLastGroup().HasGroup(func(g Group) bool {
 				return g.isJiang()
 			})
