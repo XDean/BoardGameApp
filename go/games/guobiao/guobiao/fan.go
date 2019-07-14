@@ -36,6 +36,9 @@ func CalcGroupFan(hand GroupHand) Fans {
 			}
 		}
 	}
+	if len(result) == 0 {
+		result = append(result, WU_FAN_HU)
+	}
 	return result
 }
 
@@ -49,6 +52,7 @@ func (f Fans) Sum() int {
 
 var (
 	ALL_FAN = appendFan(
+		ALL_8_FAN,
 		ALL_6_FAN,
 		ALL_4_FAN,
 		ALL_2_FAN,

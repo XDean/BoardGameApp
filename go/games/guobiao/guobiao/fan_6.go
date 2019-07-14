@@ -109,9 +109,3 @@ var (
 		},
 	}
 )
-
-func isStep(a, b, c int) bool {
-	s := []int{a, b, c}
-	sort.Ints(s)
-	return s[1]-s[0] == 1 && s[2]-s[1] == 0
-}

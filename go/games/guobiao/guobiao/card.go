@@ -229,6 +229,17 @@ func (f CardFilter) And(o CardFilter) CardFilter {
 	}
 }
 
+func CardIn(cards []Card) CardFilter {
+	return func(card Card) bool {
+		for _, v := range cards {
+			if v == card {
+				return true
+			}
+		}
+		return false
+	}
+}
+
 func PointIs(point int) CardFilter {
 	return func(card Card) bool {
 		return card.Point == point
