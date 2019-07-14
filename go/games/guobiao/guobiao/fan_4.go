@@ -16,7 +16,7 @@ var (
 		Name: "不求人",
 		Fan:  4,
 		Match: func(hand GroupHand) bool {
-			return hand.ZiMo && !hand.Groups.HasGroup(func(g Group) bool {
+			return hand.ZiMo && !hand.Groups.Has(func(g Group) bool {
 				return g.isChiPengMing()
 			})
 		},
@@ -26,7 +26,7 @@ var (
 		Name: "全带幺",
 		Fan:  4,
 		Match: func(hand GroupHand) bool {
-			return !hand.Groups.HasGroup(func(g Group) bool {
+			return !hand.Groups.Has(func(g Group) bool {
 				return !g.Cards.Has(func(c Card) bool {
 					return c.Point == 1 || c.Point == 9 || c.Type == ZI
 				})
@@ -38,7 +38,7 @@ var (
 		Name: "双明杠",
 		Fan:  4,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.FindGroup(func(g Group) bool {
+			return hand.Groups.Find(func(g Group) bool {
 				return g.Type == GT_MING_GANG
 			}).Size() == 2
 		},

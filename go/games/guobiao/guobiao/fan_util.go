@@ -2,7 +2,7 @@ package guobiao
 
 import "sort"
 
-func isEqual(a, b, c int) bool {
+func isEqual(a, b, c interface{}) bool {
 	return a == b && b == c
 }
 

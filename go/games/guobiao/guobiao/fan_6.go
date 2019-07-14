@@ -1,7 +1,5 @@
 package guobiao
 
-import "sort"
-
 var (
 	ALL_6_FAN = []Fan{
 		PENG_PENG_HU,
@@ -16,7 +14,7 @@ var (
 		Name: "碰碰胡",
 		Fan:  6,
 		Match: func(hand GroupHand) bool {
-			return !hand.Groups.HasGroup(func(g Group) bool {
+			return !hand.Groups.Has(func(g Group) bool {
 				return !g.isKeZi() && !g.isJiang()
 			})
 		},
@@ -43,12 +41,12 @@ var (
 			if hand.ZiMo {
 				return false
 			}
-			if !hand.FindLastGroup().HasGroup(func(g Group) bool {
+			if !hand.FindLastGroup().Has(func(g Group) bool {
 				return g.isJiang()
 			}) {
 				return false
 			}
-			return !hand.Groups.HasGroup(func(g Group) bool {
+			return !hand.Groups.Has(func(g Group) bool {
 				return !g.isChiPengMing() && !g.isJiang()
 			})
 		},
@@ -58,7 +56,7 @@ var (
 		Name: "三色三步高",
 		Fan:  6,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasGroupTriple(func(a Group, b Group, c Group) bool {
+			return hand.Groups.HasTriple(func(a Group, b Group, c Group) bool {
 				if a.isShunZi() && b.isShunZi() && c.isShunZi() {
 					am := a.Cards.FindMinPointCard()
 					bm := b.Cards.FindMinPointCard()
@@ -92,7 +90,7 @@ var (
 		Fan:    6,
 		Ignore: []string{AN_GANG.Name},
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.FindGroup(func(g Group) bool {
+			return hand.Groups.Find(func(g Group) bool {
 				return g.Type == GT_AN_GANG
 			}).Size() == 2
 		},
@@ -103,7 +101,7 @@ var (
 		Fan:    6,
 		Ignore: []string{JIAN_KE.Name},
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.FindGroup(func(g Group) bool {
+			return hand.Groups.Find(func(g Group) bool {
 				return g.isKeZi() && g.Cards.FindMinPointCard().isZFB()
 			}).Size() == 2
 		},

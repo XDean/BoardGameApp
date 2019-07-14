@@ -13,7 +13,7 @@ var (
 		Fan:    12,
 		Ignore: []string{WU_MEN_QI.Name, MEN_QIAN_QING.Name},
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasGroup(func(g Group) bool {
+			return hand.Groups.Has(func(g Group) bool {
 				return g.Type == GT_QUAN_BU_KAO
 			})
 		},
@@ -23,7 +23,7 @@ var (
 		Name: "组合龙",
 		Fan:  12,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasGroup(func(g Group) bool {
+			return hand.Groups.Has(func(g Group) bool {
 				return g.Type == GT_ZU_HE_LONG
 			})
 		},
@@ -55,7 +55,7 @@ var (
 		Name: "三风刻",
 		Fan:  12,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.FindGroup(func(g Group) bool {
+			return hand.Groups.Find(func(g Group) bool {
 				return g.isKeZi() && g.Cards.FindMinPointCard().isFeng()
 			}).Size() == 3
 		},

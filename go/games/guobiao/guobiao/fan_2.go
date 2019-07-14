@@ -15,7 +15,7 @@ var (
 		Name: "门前清",
 		Fan:  2,
 		Match: func(hand GroupHand) bool {
-			return !hand.ZiMo && !hand.Groups.HasGroup(func(g Group) bool {
+			return !hand.ZiMo && !hand.Groups.Has(func(g Group) bool {
 				return g.isChiPengMing()
 			})
 		},
@@ -33,7 +33,7 @@ var (
 		Fan:    2,
 		Ignore: []string{WU_ZI.Name},
 		Match: func(hand GroupHand) bool {
-			return !hand.Groups.HasGroup(func(g Group) bool {
+			return !hand.Groups.Has(func(g Group) bool {
 				return g.Type != GT_SHUN && (g.Type != GT_JIANG || (g.Type == GT_JIANG && g.Cards.FindMinPointCard().Type == ZI))
 			})
 		},
@@ -42,7 +42,7 @@ var (
 		Name: "箭刻",
 		Fan:  2,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasGroup(func(g Group) bool {
+			return hand.Groups.Has(func(g Group) bool {
 				return g.isKeZi() && g.Cards.FindMinPointCard().isZFB()
 			})
 		},
@@ -53,7 +53,7 @@ var (
 		Match: func(hand GroupHand) bool {
 			return hand.Cards.Has(func(c Card) bool {
 				if hand.Cards[c] == 4 {
-					return !hand.Groups.HasGroup(func(g Group) bool {
+					return !hand.Groups.Has(func(g Group) bool {
 						return g.isGang() && g.Cards.HasCard(c)
 					})
 				} else {
@@ -66,7 +66,7 @@ var (
 		Name: "双同刻",
 		Fan:  2,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasGroupPair(func(a Group, b Group) bool {
+			return hand.Groups.HasPair(func(a Group, b Group) bool {
 				return a.isKeZi() && b.isKeZi() && a.Cards.FindMinPointCard().Point == b.Cards.FindMinPointCard().Point
 			})
 		},
@@ -75,7 +75,7 @@ var (
 		Name: "双暗刻",
 		Fan:  2,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.FindGroup(func(a Group) bool {
+			return hand.Groups.Find(func(a Group) bool {
 				return a.isAnKe()
 			}).Size() == 2
 		},
@@ -84,7 +84,7 @@ var (
 		Name: "暗杠",
 		Fan:  2,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.FindGroup(func(g Group) bool {
+			return hand.Groups.Find(func(g Group) bool {
 				return g.Type == GT_AN_GANG
 			}).Size() == 1
 		},

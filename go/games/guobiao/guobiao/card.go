@@ -164,6 +164,13 @@ func (c Card) String() string {
 	panic("never happen")
 }
 
+func (c Cards) Any() Card {
+	for k, _ := range c {
+		return k
+	}
+	return NIL_CARD
+}
+
 func (c Cards) Size() int {
 	i := 0
 	for _, v := range c {
@@ -314,7 +321,7 @@ func (c Cards) Equals(o Cards) bool {
 	return true
 }
 
-func (c Cards) FindCard(compare func(old, new Card) bool) Card {
+func (c Cards) Reduce(compare func(old, new Card) (newInsteadOld bool)) Card {
 	result := NIL_CARD
 	for card, _ := range c {
 		if result == NIL_CARD || compare(result, card) {
@@ -325,13 +332,13 @@ func (c Cards) FindCard(compare func(old, new Card) bool) Card {
 }
 
 func (c Cards) FindMaxPointCard() Card {
-	return c.FindCard(func(old, new Card) bool {
+	return c.Reduce(func(old, new Card) bool {
 		return new.Point > old.Point
 	})
 }
 
 func (c Cards) FindMinPointCard() Card {
-	return c.FindCard(func(old, new Card) bool {
+	return c.Reduce(func(old, new Card) bool {
 		return new.Point < old.Point
 	})
 }

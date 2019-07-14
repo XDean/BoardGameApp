@@ -32,7 +32,7 @@ func (h Hand) CardCount() int {
 	return sum
 }
 
-func (gs Groups) HasGroupPair(match func(Group, Group) bool) bool {
+func (gs Groups) HasPair(match func(Group, Group) bool) bool {
 	for i1, g1 := range gs {
 		for i2 := i1 + 1; i2 < len(gs); i2++ {
 			g2 := gs[i2]
@@ -44,7 +44,7 @@ func (gs Groups) HasGroupPair(match func(Group, Group) bool) bool {
 	return false
 }
 
-func (gs Groups) HasGroupTriple(match func(Group, Group, Group) bool) bool {
+func (gs Groups) HasTriple(match func(Group, Group, Group) bool) bool {
 	for i1, g1 := range gs {
 		for i2 := i1 + 1; i2 < len(gs); i2++ {
 			g2 := gs[i2]
@@ -59,7 +59,7 @@ func (gs Groups) HasGroupTriple(match func(Group, Group, Group) bool) bool {
 	return false
 }
 
-func (gs Groups) HasGroup(match func(Group) bool) bool {
+func (gs Groups) Has(match func(Group) bool) bool {
 	for _, g := range gs {
 		if match(g) {
 			return true
@@ -68,7 +68,7 @@ func (gs Groups) HasGroup(match func(Group) bool) bool {
 	return false
 }
 
-func (gs Groups) FindGroup(match func(Group) bool) Groups {
+func (gs Groups) Find(match func(Group) bool) Groups {
 	result := make(Groups, 0)
 	for _, g := range gs {
 		if match(g) {
@@ -76,6 +76,21 @@ func (gs Groups) FindGroup(match func(Group) bool) Groups {
 		}
 	}
 	return result
+}
+
+func (gs Groups) FindPair(match func(Group, Group) bool) (Groups, Groups) {
+	left := make(Groups, 0)
+	right := make(Groups, 0)
+	for i1, g1 := range gs {
+		for i2 := i1 + 1; i2 < len(gs); i2++ {
+			g2 := gs[i2]
+			if match(g1, g2) {
+				left = append(left, g1)
+				right = append(right, g2)
+			}
+		}
+	}
+	return left, right
 }
 
 func (gs Groups) Size() int {

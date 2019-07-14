@@ -11,12 +11,12 @@ var (
 		Name: "花龙",
 		Fan:  8,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasGroupTriple(func(a Group, b Group, c Group) bool {
+			return hand.Groups.HasTriple(func(a Group, b Group, c Group) bool {
 				if a.isShunZi() && b.isShunZi() && c.isShunZi() {
 					am := a.Cards.FindMinPointCard()
 					bm := b.Cards.FindMinPointCard()
 					cm := c.Cards.FindMinPointCard()
-					if am.Type != bm.Type && bm.Type != cm.Type && am.Type != cm.Type {
+					if isTBW(am.Type, bm.Type, cm.Type) {
 						return isStep3(am.Point, bm.Point, cm.Point)
 					}
 				}
@@ -28,7 +28,7 @@ var (
 		Name: "三色三同顺",
 		Fan:  8,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasGroupTriple(func(a Group, b Group, c Group) bool {
+			return hand.Groups.HasTriple(func(a Group, b Group, c Group) bool {
 				if a.isShunZi() && b.isShunZi() && c.isShunZi() {
 					am := a.Cards.FindMinPointCard()
 					bm := b.Cards.FindMinPointCard()
@@ -45,7 +45,7 @@ var (
 		Name: "三色三节高",
 		Fan:  8,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasGroupTriple(func(a Group, b Group, c Group) bool {
+			return hand.Groups.HasTriple(func(a Group, b Group, c Group) bool {
 				if a.isKeZi() && b.isKeZi() && c.isKeZi() {
 					am := a.Cards.FindMinPointCard()
 					bm := b.Cards.FindMinPointCard()
