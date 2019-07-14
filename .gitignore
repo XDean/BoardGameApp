@@ -32,3 +32,4 @@ nbdist/
 .svn/
 .*.md.html
 dependency-reduced-pom.xml
+*.exe
