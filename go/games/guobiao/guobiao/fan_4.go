@@ -13,8 +13,9 @@ var (
 	}
 
 	BU_QIU_REN = Fan{
-		Name: "不求人",
-		Fan:  4,
+		Name:   "不求人",
+		Fan:    4,
+		Ignore: []string{ZI_MO.Name},
 		Match: func(hand GroupHand) bool {
 			return hand.ZiMo && !hand.Groups.Has(func(g Group) bool {
 				return g.isChiPengMing()
@@ -39,7 +40,7 @@ var (
 		Fan:  4,
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.Find(func(g Group) bool {
-				return g.Type == GT_MING_GANG
+				return g.isGang()
 			}).Size() == 2
 		},
 	}

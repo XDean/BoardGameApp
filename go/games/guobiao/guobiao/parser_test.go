@@ -7,8 +7,8 @@ import (
 
 func TestParse(t *testing.T) {
 	parseAndFormat(t,
-		"吃筒123 明中中中中, 万33 筒234 北北北, 摸北",
-		"吃饼123 明中中中中 , 饼234 万33 北北北 , 摸北")
+		"吃筒123 明中, 万33 筒234 北北北, 摸北",
+		"吃饼123 明中 , 饼234 万33 北北北 , 摸北")
 }
 
 func parseAndFormat(t *testing.T, origin, format string) {

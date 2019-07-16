@@ -75,7 +75,7 @@ var (
 					ac := a.Cards.FindMinPointCard()
 					bc := b.Cards.FindMinPointCard()
 					cc := c.Cards.FindMinPointCard()
-					return isEqual(ac.Type, bc.Type, cc.Type) && isStep(ac.Point, bc.Point, cc.Point)
+					return ac.Type != ZI && isEqual(ac.Type, bc.Type, cc.Type) && isStep(ac.Point, bc.Point, cc.Point)
 				}
 				return false
 			})

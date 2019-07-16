@@ -101,7 +101,11 @@ func Parse(str string) (Hand, error) {
 			switch mode {
 			case mode_public:
 				if publicType.Public {
-					publicCards[newCard] += 1
+					if publicType == GT_CHI {
+						publicCards[newCard] += 1
+					} else {
+						publicCards[newCard] += publicType.CardCount
+					}
 					match := false
 					if publicCards.Size() == publicType.CardCount {
 						for card, _ := range publicCards {
@@ -159,14 +163,17 @@ func Format(hand Hand) string {
 		case GT_AN_GANG:
 			builder.WriteRune('暗')
 		}
-		for card, _ := range g.Cards {
-			if card.Type != ZI {
-				builder.WriteString(card.Type.String())
-			}
-			break
+
+		ac := g.Cards.Any()
+		if ac.Type != ZI {
+			builder.WriteString(ac.Type.String())
 		}
-		for _, card := range g.Cards.ToSortedArray() {
-			builder.WriteRune(card.FormatPoint())
+		if g.Type == GT_CHI {
+			for _, card := range g.Cards.ToSortedArray() {
+				builder.WriteRune(card.FormatPoint())
+			}
+		} else {
+			builder.WriteRune(ac.FormatPoint())
 		}
 		builder.WriteRune(' ')
 	}

@@ -26,7 +26,7 @@ var (
 		Ignore: []string{QUE_YI_MEN.Name},
 		Match: func(hand GroupHand) bool {
 			for _, t := range TYPE_TBW {
-				if hand.Cards.All(TypeIs(t).Or(TypeIs(ZI))) && !hand.Cards.All(TypeIs(t)) {
+				if hand.Cards.All(TypeIs(t).Or(TypeIs(ZI))) && !hand.Cards.All(TypeIs(t)) && !hand.Cards.All(TypeIs(ZI)) {
 					return true
 				}
 			}
@@ -89,7 +89,7 @@ var (
 	SHUANG_AN_GANG = Fan{
 		Name:   "双暗杠",
 		Fan:    6,
-		Ignore: []string{AN_GANG.Name},
+		Ignore: []string{AN_GANG.Name, SHUANG_MING_GANG.Name},
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.Find(func(g Group) bool {
 				return g.Type == GT_AN_GANG

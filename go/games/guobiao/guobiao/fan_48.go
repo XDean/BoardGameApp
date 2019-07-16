@@ -33,7 +33,7 @@ var (
 					bm := b.Cards.Any()
 					cm := c.Cards.Any()
 					dm := d.Cards.Any()
-					if isEqual(am.Type, bm.Type, cm.Type, dm.Type) {
+					if isEqual(am.Type, bm.Type, cm.Type, dm.Type) && am.Type != ZI {
 						return isStep(am.Point, bm.Point, cm.Point, dm.Point)
 					}
 				}

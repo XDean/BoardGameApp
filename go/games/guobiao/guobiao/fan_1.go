@@ -119,7 +119,7 @@ var (
 		Fan:  1,
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.Has(func(a Group) bool {
-				return a.isGang()
+				return a.Type == GT_MING_GANG
 			})
 		},
 	}

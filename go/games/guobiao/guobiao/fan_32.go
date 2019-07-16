@@ -31,11 +31,9 @@ var (
 		Fan:    32,
 		Ignore: []string{PENG_PENG_HU.Name, QUAN_DAI_YAO.Name, YAO_JIU_KE.Name},
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.All(func(g Group) bool {
-				return g.isJiang() || g.isKeZi()
-			}) && hand.Cards.All(func(card Card) bool {
-				return card.Type == ZI || card.Point == 1 || card.Point == 9
-			})
+			return !hand.Cards.All(PointIs(1).Or(PointIs(9))) &&
+				!hand.Cards.All(TypeIs(ZI)) &&
+				hand.Cards.All(PointIs(1).Or(PointIs(9)).Or(TypeIs(ZI)))
 		},
 	}
 
