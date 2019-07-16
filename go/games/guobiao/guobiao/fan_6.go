@@ -21,11 +21,12 @@ var (
 	}
 
 	HUN_YI_SE = Fan{
-		Name: "混一色",
-		Fan:  6,
+		Name:   "混一色",
+		Fan:    6,
+		Ignore: []string{QUE_YI_MEN.Name},
 		Match: func(hand GroupHand) bool {
 			for _, t := range TYPE_TBW {
-				if hand.Cards.All(TypeIs(t).Or(TypeIs(ZI))) {
+				if hand.Cards.All(TypeIs(t).Or(TypeIs(ZI))) && !hand.Cards.All(TypeIs(t)) {
 					return true
 				}
 			}

@@ -93,12 +93,13 @@ var (
 		},
 	}
 	SAN_AN_KE = Fan{
-		Name: "三暗刻",
-		Fan:  16,
+		Name:   "三暗刻",
+		Fan:    16,
+		Ignore: []string{SHUANG_AN_KE.Name},
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.HasTriple(func(a Group, b Group, c Group) bool {
-				return a.isAnKe() && b.isAnKe() && c.isAnKe()
-			})
+			return hand.Groups.Find(func(a Group) bool {
+				return a.isAnKe()
+			}).Size() == 3
 		},
 	}
 )
