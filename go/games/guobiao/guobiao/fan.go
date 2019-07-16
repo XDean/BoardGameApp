@@ -26,13 +26,12 @@ func CalcGroupFan(hand GroupHand) Fans {
 	result := make([]Fan, 0)
 	ignore := make(map[string]bool, 0)
 	for _, f := range ALL_FAN {
-		if ignore[f.Name] {
-			continue
-		}
 		if f.Match(hand) {
-			result = append(result, f)
 			for _, i := range f.Ignore {
 				ignore[i] = true
+			}
+			if !ignore[f.Name] {
+				result = append(result, f)
 			}
 		}
 	}
