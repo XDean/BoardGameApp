@@ -72,8 +72,8 @@ var (
 		Fan:    16,
 		Ignore: []string{DUAN_YAO.Name},
 		Match: func(hand GroupHand) bool {
-			return !hand.Groups.Has(func(g Group) bool {
-				return !g.Cards.Has(PointIs(5))
+			return hand.Groups.All(func(g Group) bool {
+				return g.isCommon() && g.Cards.Has(PointIs(5))
 			})
 		},
 	}

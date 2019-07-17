@@ -37,7 +37,7 @@ var (
 	QING_YI_SE = Fan{
 		Name:   "清一色",
 		Fan:    24,
-		Ignore: []string{WU_ZI.Name},
+		Ignore: []string{WU_ZI.Name, QUE_YI_MEN.Name},
 		Match: func(hand GroupHand) bool {
 			for _, t := range TYPE_TBW {
 				if hand.Cards.All(TypeIs(t)) {

@@ -33,7 +33,7 @@ func findGroup(cards Cards) [][]Group {
 		}
 		for _, t := range []GroupType{GT_SHI_SAN_YAO, GT_QI_XING_BU_KAO, GT_QUAN_BU_KAO, GT_QI_DUI} {
 			if ok, group, _ := t.Find(cards, card); ok {
-				return [][]Group{{group}}
+				result = append(result, []Group{group})
 			}
 		}
 		if cards.Size()%3 == 2 {
@@ -54,9 +54,6 @@ func findGroup(cards Cards) [][]Group {
 				result = append(result, leftGroups...)
 			}
 		}
-		if len(result) != 0 {
-			return result
-		}
 	}
-	return nil
+	return result
 }
