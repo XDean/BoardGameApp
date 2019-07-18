@@ -1,9 +1,9 @@
-Debug: false
-Web:
-  Port: 11071
-Wechat:
-  Token: ENC~reGkY4eOjfWUsTzvaTXL8z3jmtnGNddFe2RF+TLslUTsTeH+ncFD+aOBshB2PA==
-  AppId: ENC~oJK7HfInQkCQE8DLKxTLW5aNrxZjWNAiauaPZtvkxdgCkTmOQIkGyIld63x4ow==
-  AppSecret: ENC~VZYQhH7sbzYyMITp54sEbiRy6z0ZB7hV6uUE8lF7fMfWO09RIh9PIUSUkbBtjIYl0KqDuqIHyr49H7cg
-  Id:
-  Account: XDean_BoardGame
+debug: false
+web:
+  port: 11071
+wechat:
+  token: ENC~reGkY4eOjfWUsTzvaTXL8z3jmtnGNddFe2RF+TLslUTsTeH+ncFD+aOBshB2PA==
+  appId: ENC~oJK7HfInQkCQE8DLKxTLW5aNrxZjWNAiauaPZtvkxdgCkTmOQIkGyIld63x4ow==
+  appSecret: ENC~VZYQhH7sbzYyMITp54sEbiRy6z0ZB7hV6uUE8lF7fMfWO09RIh9PIUSUkbBtjIYl0KqDuqIHyr49H7cg
+  id:
+  account: XDean_BoardGame
