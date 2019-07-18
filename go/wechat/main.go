@@ -76,8 +76,7 @@ func run() {
 		return c.JSON(http.StatusOK, "pong")
 	})
 
-	e.GET("/wechat", handler.CheckSignature)
-	e.POST("/wechat", handler.Message)
+	e.Any("/wechat", handler.Wechat)
 
 	log.Fatal(e.Start(fmt.Sprintf(":%d", config.Instance.Web.Port)))
 }

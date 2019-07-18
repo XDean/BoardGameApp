@@ -11,22 +11,20 @@ import (
 	"strings"
 )
 
-//public String checkSignature(@RequestParam String signature, @RequestParam String nonce,
-//@RequestParam String timestamp, @RequestParam String echostr) {
-//if (WeChatUtil.checkSignature(wcv.getToken(), signature, timestamp, nonce)) {
-//info("sucess");
-//return echostr;
-//}
-//error("failed");
-//return "failed";
-//}
+func Wechat(c echo.Context) error {
+	if c.Param("Signature") != "" {
+		return CheckSignature(c)
+	} else {
+		return Message(c)
+	}
+}
 
 func CheckSignature(c echo.Context) error {
 	type Param struct {
-		Signature string `query:"signature"`
-		Nonce     string `query:"nonce"`
-		Timestamp string `query:"timestamp"`
-		Echo      string `query:"echostr"`
+		Signature string `query:"signature" validate:"required"`
+		Nonce     string `query:"nonce" validate:"required"`
+		Timestamp string `query:"timestamp" validate:"required"`
+		Echo      string `query:"echostr" validate:"required"`
 	}
 
 	param := new(Param)
