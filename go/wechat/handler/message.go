@@ -14,17 +14,19 @@ func Message(c echo.Context) error {
 	param := new(model.Message)
 	xecho.MustBindAndValidate(c, param)
 
+	msg := ""
 	hand, err := guobiao.Parse(param.Content)
 	if err != nil {
-		return err
+		msg = err.Error()
+	} else {
+		fan := guobiao.CalcFan(hand)
+		msg = fmt.Sprintf("番型: %s", fan)
 	}
-	fan := guobiao.CalcFan(hand)
-
 	return c.XML(http.StatusOK, model.Message{
 		FromUserName: param.ToUserName,
 		ToUserName:   param.FromUserName,
 		CreateTime:   time.Now().Unix(),
-		Content:      fmt.Sprintf("番型: %s", fan),
+		Content:      msg,
 		MsgType:      model.TEXT,
 	})
 }
