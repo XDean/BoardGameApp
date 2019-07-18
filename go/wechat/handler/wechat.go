@@ -21,10 +21,10 @@ import (
 
 func CheckSignature(c echo.Context) error {
 	type Param struct {
-		Signature string `query:"signature" validate:"signature"`
-		Nonce     string `query:"nonce" validate:"nonce"`
-		Timestamp string `query:"timestamp" validate:"timestamp"`
-		Echo      string `query:"echostr" validate:"echostr"`
+		Signature string `query:"signature"`
+		Nonce     string `query:"nonce"`
+		Timestamp string `query:"timestamp"`
+		Echo      string `query:"echostr"`
 	}
 
 	param := new(Param)
