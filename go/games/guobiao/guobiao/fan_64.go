@@ -76,7 +76,7 @@ var (
 	SI_AN_KE = Fan{
 		Name:   "四暗刻",
 		Fan:    64,
-		Ignore: []string{SAN_AN_KE.Name},
+		Ignore: []string{SAN_AN_KE.Name, PENG_PENG_HU.Name},
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.Find(func(g Group) bool {
 				return g.isAnKe()
