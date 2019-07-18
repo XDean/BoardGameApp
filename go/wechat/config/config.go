@@ -9,18 +9,18 @@ import (
 	"os"
 )
 
-var SettingFile = flag.String("setting", "", "setting file path")
-var SecretKey = flag.String("secret-key", "123456", "secret key")
+var SettingFile string
+var SecretKey string
 
 var Instance Config
 
 func Init() {
 	flag.Parse()
-	if *SettingFile == "" {
+	if SettingFile == "" {
 		fmt.Println("Please specify setting file")
 		os.Exit(1)
 	}
-	err := Instance.Load(*SettingFile)
+	err := Instance.Load(SettingFile)
 	if err != nil {
 		fmt.Println("Fail to load setting file: ", err.Error())
 		os.Exit(1)
@@ -28,18 +28,25 @@ func Init() {
 }
 
 // Conf is the root configuration struct
-type Config struct {
-	Debug  bool
-	Wechat Wechat
-}
+type (
+	Config struct {
+		Debug  bool
+		Web    Web
+		Wechat Wechat
+	}
 
-type Wechat struct {
-	Token     string
-	AppId     string
-	AppSecret string
-	Id        string
-	Account   string
-}
+	Web struct {
+		Port int
+	}
+
+	Wechat struct {
+		Token     string
+		AppId     string
+		AppSecret string
+		Id        string
+		Account   string
+	}
+)
 
 // Init configuration instance
 func (c *Config) Load(path string) (err error) {
