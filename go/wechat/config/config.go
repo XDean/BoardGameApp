@@ -56,7 +56,7 @@ func (c *Config) Load(path string) (err error) {
 	}
 	err = yaml.Unmarshal(content, c)
 	if err == nil {
-		err = xconfig.Decode(c, *SecretKey)
+		err = xconfig.Decode(c, SecretKey)
 	}
 	return
 }
