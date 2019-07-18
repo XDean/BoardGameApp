@@ -3,7 +3,7 @@ web:
   port: 11071
 wechat:
   token: ENC~reGkY4eOjfWUsTzvaTXL8z3jmtnGNddFe2RF+TLslUTsTeH+ncFD+aOBshB2PA==
-  appId: ENC~oJK7HfInQkCQE8DLKxTLW5aNrxZjWNAiauaPZtvkxdgCkTmOQIkGyIld63x4ow==
-  appSecret: ENC~VZYQhH7sbzYyMITp54sEbiRy6z0ZB7hV6uUE8lF7fMfWO09RIh9PIUSUkbBtjIYl0KqDuqIHyr49H7cg
+  app-id: ENC~oJK7HfInQkCQE8DLKxTLW5aNrxZjWNAiauaPZtvkxdgCkTmOQIkGyIld63x4ow==
+  app-secret: ENC~VZYQhH7sbzYyMITp54sEbiRy6z0ZB7hV6uUE8lF7fMfWO09RIh9PIUSUkbBtjIYl0KqDuqIHyr49H7cg
   id:
   account: XDean_BoardGame

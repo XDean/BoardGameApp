@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/xdean/goex/xecho"
+	"github.com/xdean/miniboardgame/go/wechat/config"
+	"net/http"
 	"sort"
 	"strings"
 )
@@ -30,7 +32,11 @@ func CheckSignature(c echo.Context) error {
 	param := new(Param)
 	xecho.MustBindAndValidate(c, param)
 
-	return nil
+	if checkSignature(config.Instance.Wechat.Token, param.Signature, param.Timestamp, param.Nonce) {
+		return c.String(http.StatusOK, param.Echo)
+	} else {
+		return c.String(http.StatusBadRequest, "Bad Signature")
+	}
 }
 
 func checkSignature(token, signature, timestamp, nonce string) bool {
