@@ -12,7 +12,7 @@ import (
 )
 
 func Wechat(c echo.Context) error {
-	if c.Param("Signature") != "" {
+	if c.QueryParam("echostr") != "" {
 		return CheckSignature(c)
 	} else {
 		return Message(c)
@@ -29,6 +29,8 @@ func CheckSignature(c echo.Context) error {
 
 	param := new(Param)
 	xecho.MustBindAndValidate(c, param)
+
+	fmt.Println(param)
 
 	if checkSignature(config.Instance.Wechat.Token, param.Signature, param.Timestamp, param.Nonce) {
 		return c.String(http.StatusOK, param.Echo)
