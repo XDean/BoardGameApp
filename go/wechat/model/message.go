@@ -5,6 +5,8 @@ const (
 )
 
 type Message struct {
+	XMLName struct{} `xml:"xml""`
+
 	ToUserName   string
 	FromUserName string
 	CreateTime   int64

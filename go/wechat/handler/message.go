@@ -15,14 +15,11 @@ func Message(c echo.Context) error {
 
 	fmt.Println(param)
 
-	return c.XML(http.StatusOK, struct {
-		model.Message
-		XMLName struct{} `xml:xml`
-	}{Message: model.Message{
+	return c.XML(http.StatusOK, model.Message{
 		FromUserName: param.ToUserName,
 		ToUserName:   param.FromUserName,
 		CreateTime:   time.Now().Unix(),
 		Content:      "echo: " + param.Content,
 		MsgType:      model.TEXT,
-	}})
+	})
 }
