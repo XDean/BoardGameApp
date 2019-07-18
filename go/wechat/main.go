@@ -6,10 +6,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"github.com/xdean/goex/xecho"
 	"github.com/xdean/miniboardgame/go/wechat/config"
 	"github.com/xdean/miniboardgame/go/wechat/handler"
+	"github.com/xdean/miniboardgame/go/wechat/service"
 	"net/http"
 	"os"
 )
@@ -32,6 +34,11 @@ func main() {
 			Usage:       "Secret key",
 			Destination: &config.SecretKey,
 		},
+		cli.BoolFlag{
+			Name:        "debug,d",
+			Usage:       "Debug mode",
+			Destination: &config.Debug,
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -42,6 +49,11 @@ func main() {
 		if err != nil {
 			return err
 		}
+		if config.Debug {
+			logrus.SetLevel(logrus.DebugLevel)
+		}
+		fmt.Println(config.Instance)
+		service.StartAccessTokenTask()
 		run()
 		return nil
 	}

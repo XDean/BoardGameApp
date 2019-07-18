@@ -2,8 +2,9 @@ debug: false
 web:
   port: 11071
 wechat:
+  url: sz.api.weixin.qq.com
   token: ENC~reGkY4eOjfWUsTzvaTXL8z3jmtnGNddFe2RF+TLslUTsTeH+ncFD+aOBshB2PA==
-  app-id: ENC~oJK7HfInQkCQE8DLKxTLW5aNrxZjWNAiauaPZtvkxdgCkTmOQIkGyIld63x4ow==
-  app-secret: ENC~VZYQhH7sbzYyMITp54sEbiRy6z0ZB7hV6uUE8lF7fMfWO09RIh9PIUSUkbBtjIYl0KqDuqIHyr49H7cg
+  appid: ENC~oJK7HfInQkCQE8DLKxTLW5aNrxZjWNAiauaPZtvkxdgCkTmOQIkGyIld63x4ow==
+  appsecret: ENC~VZYQhH7sbzYyMITp54sEbiRy6z0ZB7hV6uUE8lF7fMfWO09RIh9PIUSUkbBtjIYl0KqDuqIHyr49H7cg
   id:
   account: XDean_BoardGame

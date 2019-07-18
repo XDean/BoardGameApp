@@ -9,6 +9,7 @@ import (
 	"os"
 )
 
+var Debug bool
 var SettingFile string
 var SecretKey string
 
@@ -30,7 +31,6 @@ func Init() {
 // Conf is the root configuration struct
 type (
 	Config struct {
-		Debug  bool
 		Web    Web
 		Wechat Wechat
 	}
@@ -40,6 +40,7 @@ type (
 	}
 
 	Wechat struct {
+		Url       string
 		Token     string
 		AppId     string
 		AppSecret string
