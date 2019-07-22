@@ -130,7 +130,10 @@ var (
 			if hand.Last.Point != 3 && hand.Last.Point != 7 {
 				return false
 			}
-			return !hand.FindLastGroup().HasPair(func(a Group, b Group) bool {
+			last := hand.FindLastGroup()
+			return last.Has(func(g Group) bool {
+				return g.isShunZi()
+			}) && !last.HasPair(func(a Group, b Group) bool {
 				if a.Cards.Find(CardIs(hand.Last)).Size() > 0 && b.Cards.Find(CardIs(hand.Last)).Size() > 0 {
 					aMax := a.Cards.FindMaxPointCard()
 					bMax := b.Cards.FindMaxPointCard()
@@ -146,7 +149,6 @@ var (
 		Name: "坎张",
 		Fan:  1,
 		Match: func(hand GroupHand) bool {
-
 			return hand.FindLastGroup().Has(func(g Group) bool {
 				return g.isShunZi() && g.Cards.FindMinPointCard().Point == hand.Last.Point-1
 			}) && !hand.Groups.HasPair(func(a Group, b Group) bool {
