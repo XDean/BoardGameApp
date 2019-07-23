@@ -57,14 +57,14 @@ func (s OCR) Handle(msgType string) MessageHandler {
 					var body map[string]interface{}
 					if bytes, err := ioutil.ReadAll(resp.Body); err == nil {
 						err = json.Unmarshal(bytes, &body)
-						if regions, ok := body["regions"].([]map[string]interface{}); ok {
+						if regions, ok := body["regions"].([]interface{}); ok {
 							builder := strings.Builder{}
 							for _, v := range regions {
-								if lines, ok := v["lines"].([]map[string]interface{}); ok {
+								if lines, ok := v.(map[string]interface{})["lines"].([]interface{}); ok {
 									for _, line := range lines {
-										if words, ok := line["words"].([]map[string]interface{}); ok {
+										if words, ok := line.(map[string]interface{})["words"].([]interface{}); ok {
 											for _, word := range words {
-												builder.WriteString(word["text"].(string))
+												builder.WriteString(word.(map[string]interface{})["text"].(string))
 											}
 										}
 										builder.WriteString("\n")
