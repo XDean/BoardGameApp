@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
+	"github.com/xdean/goex/xconfig"
+	"github.com/xdean/miniboardgame/go/wechat/config"
 	"github.com/xdean/miniboardgame/go/wechat/model"
 	"io/ioutil"
 	"net/http"
@@ -31,8 +34,15 @@ func (s OCR) Handle(msgType string) MessageHandler {
 	switch msgType {
 	case model.IMAGE:
 		return func(msg model.Message) (State, model.Message) {
-			resp, err := http.Post("https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/ocr?language=zh-Hans", echo.MIMEApplicationJSON,
+			request, err := http.NewRequest("POST", "https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/ocr?language=zh-Hans",
 				strings.NewReader(fmt.Sprintf(`{"url":"%s"}`, msg.PicUrl)))
+			if err != nil {
+				return s, model.NewText("服务器错误")
+			}
+			request.Header.Set("Content-Type", echo.MIMEApplicationJSON)
+			key, _ := xconfig.Decrypt("ENC~dftlZFppmejDaFKQN5bWKbKhTwf4mC0aMLvZ7T02dDL216+tSZIgNRsgkYivpELWixGQ5URrxF0Ax2Gs", config.SecretKey)
+			request.Header.Set("Ocp-Apim-Subscription-Key", string(key))
+			resp, err := http.DefaultClient.Do(request)
 			if err != nil {
 				return s, model.NewText("解析失败")
 			} else {
@@ -65,6 +75,9 @@ func (s OCR) Handle(msgType string) MessageHandler {
 							return s, model.NewText(builder.String())
 						}
 					}
+				default:
+					bytes, _ := ioutil.ReadAll(resp.Body)
+					logrus.Debug(resp.StatusCode, string(bytes))
 				}
 				return s, model.NewText("远程服务器错误")
 			}
