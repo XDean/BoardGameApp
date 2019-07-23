@@ -40,7 +40,7 @@ func (s OCR) Handle(msgType string) MessageHandler {
 				return s, model.NewText("服务器错误")
 			}
 			request.Header.Set("Content-Type", echo.MIMEApplicationJSON)
-			key, _ := xconfig.Decrypt("ENC~dftlZFppmejDaFKQN5bWKbKhTwf4mC0aMLvZ7T02dDL216+tSZIgNRsgkYivpELWixGQ5URrxF0Ax2Gs", config.SecretKey)
+			key, _ := xconfig.Decrypt("dftlZFppmejDaFKQN5bWKbKhTwf4mC0aMLvZ7T02dDL216+tSZIgNRsgkYivpELWixGQ5URrxF0Ax2Gs", config.SecretKey)
 			request.Header.Set("Ocp-Apim-Subscription-Key", string(key))
 			resp, err := http.DefaultClient.Do(request)
 			if err != nil {
