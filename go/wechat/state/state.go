@@ -11,6 +11,7 @@ type (
 		Name() string
 		String() string // name
 		Help() string
+		Last() State
 		Handle(msgType string) MessageHandler
 	}
 
@@ -43,28 +44,48 @@ func (s BaseState) String() string {
 	return s.name
 }
 
+func (s BaseState) Last() State {
+	return s.last
+}
+
 func (s RootState) Help() string {
 	return rootList.String()
 }
 
 func (s RootState) Handle(msgType string) MessageHandler {
-	return handleOrHelp(s, model.TEXT, msgType, func(input model.Message) (state State, message model.Message) {
-		c := rootList.Find(input.Content)
-		if c == nil {
-			return s, model.NewText(s.Help())
-		} else {
-			next := c.(State)
-			return next, model.NewText(next.Help())
-		}
-	})
+	switch msgType {
+	case model.TEXT:
+		return defaultText(s, func(input model.Message) (state State, message model.Message) {
+			c := rootList.Find(input.Content)
+			if c == nil {
+				return s, model.NewText(s.Help())
+			} else {
+				next := c.(State)
+				return next, model.NewText(next.Help())
+			}
+		})
+	default:
+		return helpHandler(s)
+	}
 }
 
-func handleOrHelp(s State, targetType, msgType string, handler MessageHandler) MessageHandler {
-	if targetType == msgType {
-		return handler
-	} else {
-		return func(input model.Message) (state State, message model.Message) {
+func defaultText(s State, h MessageHandler) MessageHandler {
+	return func(input model.Message) (state State, message model.Message) {
+		switch input.Content {
+		case Help.String():
 			return s, model.NewText(s.Help())
+		case Back.String():
+			last := s.Last()
+			if last != nil {
+				return last, model.NewText(last.Help())
+			}
 		}
+		return h(input)
+	}
+}
+
+func helpHandler(s State) MessageHandler {
+	return func(input model.Message) (state State, message model.Message) {
+		return s, model.NewText(s.Help())
 	}
 }

@@ -19,7 +19,7 @@ func (o OptionList) String() string {
 	b.WriteString(o.What)
 	b.WriteString("\n")
 	for i, v := range o.Options {
-		b.WriteString(strconv.Itoa(i) + ". ")
+		b.WriteString(strconv.Itoa(i+1) + ". ")
 		b.WriteString(v.String())
 		b.WriteString("\n")
 	}
@@ -29,7 +29,7 @@ func (o OptionList) String() string {
 
 func (o OptionList) Find(input string) fmt.Stringer {
 	for i, v := range o.Options {
-		if input == strconv.Itoa(i) || input == v.String() {
+		if input == strconv.Itoa(i+1) || input == v.String() {
 			return v
 		}
 	}
