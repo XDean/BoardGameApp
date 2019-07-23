@@ -7,6 +7,7 @@ import (
 	"github.com/xdean/miniboardgame/go/wechat/state"
 	"net/http"
 	"sync"
+	"time"
 )
 
 var userLock = sync.Map{}
@@ -26,5 +27,8 @@ func Message(c echo.Context) error {
 	}
 	next, msg := s.Handle(param.MsgType)(*param)
 	userState[param.FromUserName] = next
+	msg.FromUserName = param.ToUserName
+	msg.ToUserName = param.FromUserName
+	msg.CreateTime = time.Now().Unix()
 	return c.XML(http.StatusOK, msg)
 }
