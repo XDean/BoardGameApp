@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	MessageHandler func(input model.Message) (State, model.Message)
+	MessageHandler func(msg model.Message) (State, model.Message)
 	State          interface {
 		Name() string
 		String() string // name
