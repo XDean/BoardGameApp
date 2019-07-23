@@ -52,8 +52,9 @@ var (
 	}
 
 	SAN_FENG_KE = Fan{
-		Name: "三风刻",
-		Fan:  12,
+		Name:   "三风刻",
+		Fan:    12,
+		Ignore: []string{YAO_JIU_KE.Name},
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.Find(func(g Group) bool {
 				return g.isKeZi() && g.Cards.FindMinPointCard().isFeng()

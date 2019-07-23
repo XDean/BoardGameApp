@@ -106,7 +106,7 @@ var (
 			return hand.Groups.Has(func(a Group) bool {
 				if a.isKeZi() {
 					aMax := a.Cards.FindMaxPointCard()
-					if aMax.Point == 1 || aMax.Point == 9 {
+					if aMax.Point == 1 || aMax.Point == 9 || aMax.isFeng() {
 						return true
 					}
 				}
