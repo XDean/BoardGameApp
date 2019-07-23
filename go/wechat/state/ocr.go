@@ -32,6 +32,10 @@ func (OCR) Help() string {
 
 func (s OCR) Handle(msgType string) MessageHandler {
 	switch msgType {
+	case model.TEXT:
+		return defaultText(s, func(msg model.Message) (state State, message model.Message) {
+			return s, model.NewText(s.Help())
+		})
 	case model.IMAGE:
 		return func(msg model.Message) (State, model.Message) {
 			request, err := http.NewRequest("POST", "https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/ocr?language=zh-Hans",
