@@ -29,21 +29,23 @@ func Parse(str string) (Hand, error) {
 		Last:    NIL_CARD,
 	}
 
-	for i, c := range str {
+	count := 0
+	for _, c := range str {
+		count++
 		switch c {
 		case ' ', '\t':
 			continue
 		case ',', '，':
 			switch mode {
 			case mode_public:
-				if publicType.Public || publicCards.Size() != 0 {
-					return hand, parseError(i, "未完成的吃碰杠")
+				if publicCards.Size() != 0 {
+					return hand, parseError(count, "未完成的吃碰杠")
 				}
 				mode = mode_private
 			case mode_private:
 				mode = mode_last
 			case mode_last:
-				return hand, parseError(i, "多余的块")
+				return hand, parseError(count, "多余的块")
 			}
 		case '条':
 			cardType = TIAO
@@ -61,10 +63,10 @@ func Parse(str string) (Hand, error) {
 			newPublicType = GT_MING_GANG
 		case '摸':
 			if mode != mode_last {
-				return hand, parseError(i, "非法的自摸")
+				return hand, parseError(count, "非法的自摸")
 			}
 			if hand.ZiMo {
-				return hand, parseError(i, "冗余的自摸")
+				return hand, parseError(count, "冗余的自摸")
 			}
 			hand.ZiMo = true
 		case '东':
@@ -83,16 +85,16 @@ func Parse(str string) (Hand, error) {
 			newCard = BAI_CARD
 		case '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			if cardType == ZI {
-				return hand, parseError(i, "未指定牌类型")
+				return hand, parseError(count, "未指定牌类型")
 			}
 			newCard = Card{Type: cardType, Point: int(c) - '0'}
 		}
 		if newPublicType.Public {
 			if mode != mode_public {
-				return hand, parseError(i, "只能在第一部分吃碰杠")
+				return hand, parseError(count, "只能在第一部分吃碰杠")
 			}
-			if publicType.Public {
-				return hand, parseError(i, "重复吃碰杠")
+			if publicCards.Size() != 0 {
+				return hand, parseError(count, "前一组吃碰杠未完成")
 			}
 			publicType = newPublicType
 			newPublicType = GT_QI_XING_BU_KAO
@@ -112,16 +114,15 @@ func Parse(str string) (Hand, error) {
 							if ok, group, _ := publicType.Find(publicCards, card); ok {
 								hand.Public = append(hand.Public, group)
 								match = true
-								publicType = GT_QI_XING_BU_KAO
 								publicCards = Cards{}
 							}
 						}
 						if !match {
-							return hand, parseError(i, "错误的牌组合")
+							return hand, parseError(count, "错误的牌组合")
 						}
 					}
 				} else {
-					return hand, parseError(i, "未指定吃碰杠类型")
+					return hand, parseError(count, "未指定吃碰杠类型")
 				}
 			case mode_private:
 				hand.Private[newCard] += 1
@@ -129,7 +130,7 @@ func Parse(str string) (Hand, error) {
 				if hand.Last == NIL_CARD {
 					hand.Last = newCard
 				} else {
-					return hand, parseError(i, "多余的胡牌")
+					return hand, parseError(count, "多余的胡牌")
 				}
 			}
 			newCard = NIL_CARD
@@ -203,5 +204,5 @@ func Format(hand Hand) string {
 }
 
 func parseError(index int, message string) error {
-	return errors.New(fmt.Sprintf("Parse failed at {%d} because: %s", index, message))
+	return errors.New(fmt.Sprintf("解析失败{%d}: %s", index, message))
 }

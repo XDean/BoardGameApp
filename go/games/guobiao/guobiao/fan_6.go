@@ -89,7 +89,7 @@ var (
 	SHUANG_AN_GANG = Fan{
 		Name:   "双暗杠",
 		Fan:    6,
-		Ignore: []string{AN_GANG.Name, SHUANG_MING_GANG.Name},
+		Ignore: []string{AN_GANG.Name, SHUANG_AN_KE.Name},
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.Find(func(g Group) bool {
 				return g.Type == GT_AN_GANG

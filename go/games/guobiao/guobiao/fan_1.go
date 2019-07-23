@@ -118,9 +118,9 @@ var (
 		Name: "明杠",
 		Fan:  1,
 		Match: func(hand GroupHand) bool {
-			return hand.Groups.Has(func(a Group) bool {
-				return a.Type == GT_MING_GANG
-			})
+			return hand.Groups.Find(func(a Group) bool {
+				return a.isGang()
+			}).Size() == 1
 		},
 	}
 	BIAN_ZHANG = Fan{

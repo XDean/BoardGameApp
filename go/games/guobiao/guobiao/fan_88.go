@@ -100,7 +100,7 @@ var (
 	SI_GANG = Fan{
 		Name:   "四杠",
 		Fan:    88,
-		Ignore: []string{SHUANG_AN_GANG.Name, DAN_DIAO_JIANG.Name, PENG_PENG_HU.Name},
+		Ignore: []string{DAN_DIAO_JIANG.Name, PENG_PENG_HU.Name, SAN_GANG.Name},
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.Find(func(g Group) bool {
 				return g.isGang()

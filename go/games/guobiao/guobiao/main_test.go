@@ -8,7 +8,7 @@ import (
 
 func TestCalcFan(t *testing.T) {
 	testFan(t, "碰万2, 万234 筒222 条45677 , 摸7",
-		DUAN_YAO, SI_GUI_YI, SHUANG_TONG_KE, WU_ZI, BIAN_ZHANG, DAN_DIAO_JIANG, ZI_MO)
+		DUAN_YAO, SI_GUI_YI, SHUANG_TONG_KE, WU_ZI, DAN_DIAO_JIANG, ZI_MO)
 	testFan(t, "暗东 暗西 暗南 暗北，中中，摸中",
 		DA_SI_XI, SI_GANG, ZI_YI_SE, SI_AN_KE, BU_QIU_REN)
 	testFan(t, "，条11122345678999，摸2",
@@ -25,6 +25,7 @@ func TestCalcFan(t *testing.T) {
 		DA_SAN_YUAN, SI_AN_KE, HUN_YI_SE, BU_QIU_REN)
 	testFan(t, "碰万1，22233344455，5",
 		YI_SE_SI_JIE_GAO, QING_YI_SE, SAN_AN_KE, YAO_JIU_KE, DAN_DIAO_JIANG)
+	testFan(t, "明东南暗西北，中中，中", DA_SI_XI, SI_GANG, ZI_YI_SE, SHUANG_AN_GANG)
 }
 
 func testFan(t *testing.T, handStr string, expected ...Fan) {

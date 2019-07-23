@@ -81,8 +81,9 @@ var (
 		},
 	}
 	AN_GANG = Fan{
-		Name: "暗杠",
-		Fan:  2,
+		Name:   "暗杠",
+		Fan:    2,
+		Ignore: []string{MING_GANG.Name},
 		Match: func(hand GroupHand) bool {
 			return hand.Groups.Find(func(g Group) bool {
 				return g.Type == GT_AN_GANG
