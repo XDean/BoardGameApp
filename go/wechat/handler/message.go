@@ -1,32 +1,30 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/xdean/goex/xecho"
-	"github.com/xdean/miniboardgame/go/games/guobiao/guobiao"
 	"github.com/xdean/miniboardgame/go/wechat/model"
+	"github.com/xdean/miniboardgame/go/wechat/state"
 	"net/http"
-	"time"
+	"sync"
 )
+
+var userLock = sync.Map{}
+var userState = map[string]state.State{}
 
 func Message(c echo.Context) error {
 	param := new(model.Message)
 	xecho.MustBindAndValidate(c, param)
 
-	msg := ""
-	hand, err := guobiao.Parse(param.Content)
-	if err != nil {
-		msg = err.Error()
-	} else {
-		fan := guobiao.CalcFan(hand)
-		msg = fmt.Sprintf("番型: %s", fan)
+	actual, _ := userLock.LoadOrStore(param.FromUserName, sync.Mutex{})
+	lock := actual.(sync.Mutex)
+	lock.Lock()
+	s, ok := userState[param.FromUserName]
+	if !ok {
+		userState[param.FromUserName] = state.Root
+		s = state.Root
 	}
-	return c.XML(http.StatusOK, model.Message{
-		FromUserName: param.ToUserName,
-		ToUserName:   param.FromUserName,
-		CreateTime:   time.Now().Unix(),
-		Content:      msg,
-		MsgType:      model.TEXT,
-	})
+	next, msg := s.Handle(param.MsgType)(*param)
+	userState[param.FromUserName] = next
+	return c.XML(http.StatusOK, msg)
 }

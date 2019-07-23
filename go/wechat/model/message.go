@@ -13,3 +13,10 @@ type Message struct {
 	MsgType      string
 	Content      string
 }
+
+func NewText(s string) Message {
+	return Message{
+		MsgType: TEXT,
+		Content: s,
+	}
+}
