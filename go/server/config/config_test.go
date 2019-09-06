@@ -10,7 +10,6 @@ import (
 
 var actual *Config = new(Config)
 var expected = Config{
-	Debug: true,
 	DB: DB{
 		Dialect: "sqlite3",
 		URL:     "some-url",
@@ -29,6 +28,6 @@ func TestInit(t *testing.T) {
 		t.Fatal("fail to init config, reason:", err)
 	}
 	if diff, equal := messagediff.PrettyDiff(expected, *actual); !equal {
-		t.Errorf("expected Global = %#v\n%s", expected, diff)
+		t.Errorf("expected Instance = %#v\n%s", expected, diff)
 	}
 }

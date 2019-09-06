@@ -13,7 +13,7 @@ func TestWechat(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	config.Global.Wechat = config.Wechat{
+	config.Instance.Wechat = config.Wechat{
 		AuthUrl: url,
 	}
 

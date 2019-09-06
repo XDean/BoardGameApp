@@ -1,35 +1,31 @@
 package config
 
 import (
+	"github.com/xdean/goex/xconfig"
+	wechatConfig "github.com/xdean/miniboardgame/go/wechat/config"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
 
-// Global instance
-var Global Config
+var Debug bool
+var SettingFile string
+var SecretKey string
 
-// Conf is the root configuration struct
+var Instance Config
+
 type Config struct {
-	Debug    bool
-	Security Security
-	DB       DB
-	Wechat   Wechat
+	DB     DB
+	Wechat Wechat
 }
 
-type Security struct {
-	Key string
-}
-
-// DB is Database configuration struct
 type DB struct {
 	Dialect string
 	URL     string
 }
 
 type Wechat struct {
-	AppId     string
-	AppSecret string
-	AuthUrl   string
+	wechatConfig.Wechat
+	AuthUrl string
 }
 
 // Init configuration instance
@@ -40,7 +36,7 @@ func (c *Config) Load(path string) (err error) {
 	}
 	err = yaml.Unmarshal(content, c)
 	if err == nil {
-		err = Decode(c, c.Security.Key)
+		err = xconfig.Decode(c, SecretKey)
 	}
 	return
 }

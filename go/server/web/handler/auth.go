@@ -30,7 +30,7 @@ func SignUp(c echo.Context) error {
 		Roles:    []model.Role{{Name: _const.ROLE_USER}},
 	}
 	if err := user.CreateAccount(GetDB(c)); err == nil {
-		if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
+		if t, err := user.GenerateToken(config.SecretKey); err == nil {
 			c.SetCookie(generateTokenCookie(t))
 			return c.JSON(http.StatusCreated, xecho.J{
 				"message": "Sign up success",
@@ -79,7 +79,7 @@ func LoginPassword(c echo.Context, param LoginParam) error {
 	user := new(model.User)
 	if err := user.FindByUsername(GetDB(c), param.Username); err == nil {
 		if user.MatchPassword(param.Password) {
-			if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
+			if t, err := user.GenerateToken(config.SecretKey); err == nil {
 				c.SetCookie(generateTokenCookie(t))
 				return c.JSON(http.StatusOK, xecho.J{
 					"message": "Login success",
@@ -118,7 +118,7 @@ func LoginOpenid(c echo.Context, param LoginParam) error {
 				return err
 			}
 		}
-		if t, err := user.GenerateToken(config.Global.Security.Key); err == nil {
+		if t, err := user.GenerateToken(config.SecretKey); err == nil {
 			c.SetCookie(generateTokenCookie(t))
 			return c.JSON(http.StatusOK, xecho.J{
 				"message": "Login success",

@@ -21,7 +21,7 @@ const (
 
 func Jwt() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		key := []byte(config.Global.Security.Key)
+		key := []byte(config.SecretKey)
 		return func(c echo.Context) error {
 			var auth string
 			var ok bool

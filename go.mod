@@ -15,6 +15,7 @@ require (
 	github.com/urfave/cli v1.20.0
 	github.com/xdean/goex v0.0.0-20190717134511-6c960029f3bc
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
+	gopkg.in/d4l3k/messagediff.v1 v1.2.1
 	gopkg.in/resty.v1 v1.12.0
 	gopkg.in/yaml.v2 v2.2.2
 )

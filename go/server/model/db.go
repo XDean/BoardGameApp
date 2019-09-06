@@ -12,7 +12,7 @@ import (
 )
 
 func LoadFromConfig() (*gorm.DB, error) {
-	db, err := gorm.Open(config.Global.DB.Dialect, config.Global.DB.URL)
+	db, err := gorm.Open(config.Instance.DB.Dialect, config.Instance.DB.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func Configure(database *gorm.DB) (*gorm.DB, error) {
 	}
 
 	// Db.ShowSQL(true)
-	database = database.LogMode(config.Global.Debug)
+	database = database.LogMode(config.Debug)
 	database = database.Set("gorm:auto_preload", true)
 
 	err = database.AutoMigrate(new(User), new(Role), new(Profile), new(Room), new(Player)).Error

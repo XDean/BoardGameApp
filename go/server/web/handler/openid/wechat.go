@@ -24,11 +24,11 @@ var wechatOpenIdProvider = OpenIdProvider{
 	TRY:
 		try++
 		response, err := resty.R().SetQueryParams(map[string]string{
-			"appid":      config.Global.Wechat.AppId,
-			"secret":     config.Global.Wechat.AppSecret,
+			"appid":      config.Instance.Wechat.AppId,
+			"secret":     config.Instance.Wechat.AppSecret,
 			"js_code":    token,
 			"grant_type": "authorization_code",
-		}).Get(config.Global.Wechat.AuthUrl)
+		}).Get(config.Instance.Wechat.AuthUrl)
 		if err == nil {
 			body := response.Body()
 			info := new(wechatAuthInfo)

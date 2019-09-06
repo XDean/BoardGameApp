@@ -13,7 +13,7 @@ import (
 var testDB *gorm.DB
 
 func TestMain(m *testing.M) {
-	config.Global.Debug = true
+	config.Debug = true
 	tmp, err := ioutil.TempFile("", "mini-bg-*.db")
 	if err != nil {
 		panic(err)

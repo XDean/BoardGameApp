@@ -13,7 +13,7 @@ import (
 
 func Run() {
 	// Load Config
-	err := config.Global.Load("./config-dev.yml")
+	err := config.Instance.Load("./config-dev.yml")
 	if err != nil {
 		log.Fatal("Config load fail", err)
 	}
