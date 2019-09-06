@@ -1,11 +1,12 @@
-package state
+package main
 
 import (
 	"github.com/xdean/miniboardgame/go/games/guobiao"
 	"github.com/xdean/miniboardgame/go/games/ocr"
+	"github.com/xdean/miniboardgame/go/wechat/state"
 )
 
 func init() {
-	Register(guobiao.State)
-	Register(ocr.State)
+	state.Register(guobiao.State)
+	state.Register(ocr.State)
 }
