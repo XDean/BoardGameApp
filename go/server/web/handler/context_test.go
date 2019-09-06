@@ -2,11 +2,11 @@ package handler
 
 import (
 	"fmt"
-	"github.com/XDean/MiniBoardgame/config"
-	"github.com/XDean/MiniBoardgame/log"
-	"github.com/XDean/MiniBoardgame/model"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"github.com/xdean/miniboardgame/go/server/config"
+	"github.com/xdean/miniboardgame/go/server/log"
+	"github.com/xdean/miniboardgame/go/server/model"
 	"io/ioutil"
 	"os"
 	"testing"

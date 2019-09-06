@@ -1,8 +1,8 @@
 package model
 
 import (
-	_const "github.com/XDean/MiniBoardgame/const"
 	"github.com/stretchr/testify/assert"
+	_const "github.com/xdean/miniboardgame/go/server/const"
 	"testing"
 )
 

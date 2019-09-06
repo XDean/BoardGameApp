@@ -2,9 +2,9 @@ package model
 
 import (
 	"fmt"
-	"github.com/XDean/MiniBoardgame/config"
-	"github.com/XDean/MiniBoardgame/log"
 	"github.com/jinzhu/gorm"
+	"github.com/xdean/miniboardgame/go/server/config"
+	"github.com/xdean/miniboardgame/go/server/log"
 	"io/ioutil"
 	"os"
 	"testing"

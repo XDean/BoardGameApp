@@ -1,14 +1,14 @@
 package web
 
 import (
-	"github.com/XDean/MiniBoardgame/config"
-	"github.com/XDean/MiniBoardgame/model"
-	"github.com/XDean/MiniBoardgame/web/handler"
-	myMiddleware "github.com/XDean/MiniBoardgame/web/middleware"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/xdean/goex/xecho"
+	"github.com/xdean/miniboardgame/go/server/config"
+	"github.com/xdean/miniboardgame/go/server/model"
+	"github.com/xdean/miniboardgame/go/server/web/handler"
+	myMiddleware "github.com/xdean/miniboardgame/go/server/web/middleware"
 )
 
 func Run() {

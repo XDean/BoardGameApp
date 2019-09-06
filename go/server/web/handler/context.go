@@ -1,10 +1,10 @@
 package handler
 
 import (
-	_const "github.com/XDean/MiniBoardgame/const"
-	"github.com/XDean/MiniBoardgame/model"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	_const "github.com/xdean/miniboardgame/go/server/const"
+	"github.com/xdean/miniboardgame/go/server/model"
 	"net/http"
 )
 

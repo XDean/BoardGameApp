@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"github.com/XDean/MiniBoardgame/model"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"github.com/xdean/miniboardgame/go/server/model"
 	"net/http"
 	"strconv"
 )

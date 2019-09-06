@@ -1,10 +1,10 @@
 package web
 
 import (
-	_const "github.com/XDean/MiniBoardgame/const"
-	"github.com/XDean/MiniBoardgame/web/handler"
-	"github.com/XDean/MiniBoardgame/web/middleware"
 	"github.com/labstack/echo/v4"
+	_const "github.com/xdean/miniboardgame/go/server/const"
+	"github.com/xdean/miniboardgame/go/server/web/handler"
+	"github.com/xdean/miniboardgame/go/server/web/middleware"
 	"net/http"
 )
 

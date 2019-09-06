@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	_const "github.com/XDean/MiniBoardgame/const"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	_const "github.com/xdean/miniboardgame/go/server/const"
 )
 
 func DbContext(db *gorm.DB) echo.MiddlewareFunc {

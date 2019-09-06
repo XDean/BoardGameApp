@@ -2,11 +2,11 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/XDean/MiniBoardgame/config"
-	_const "github.com/XDean/MiniBoardgame/const"
-	"github.com/XDean/MiniBoardgame/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
+	"github.com/xdean/miniboardgame/go/server/config"
+	_const "github.com/xdean/miniboardgame/go/server/const"
+	"github.com/xdean/miniboardgame/go/server/model"
 	"net/http"
 )
 

@@ -1,6 +1,6 @@
-package server
+package main
 
-import "github.com/XDean/MiniBoardgame/web"
+import "github.com/xdean/miniboardgame/go/server/web"
 
 func main() {
 	web.Run()

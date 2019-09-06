@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"github.com/XDean/MiniBoardgame/config"
-	_const "github.com/XDean/MiniBoardgame/const"
-	"github.com/XDean/MiniBoardgame/model"
-	"github.com/XDean/MiniBoardgame/web/handler/openid"
-	"github.com/XDean/MiniBoardgame/web/middleware"
 	"github.com/labstack/echo/v4"
 	"github.com/xdean/goex/xecho"
+	"github.com/xdean/miniboardgame/go/server/config"
+	_const "github.com/xdean/miniboardgame/go/server/const"
+	"github.com/xdean/miniboardgame/go/server/model"
+	"github.com/xdean/miniboardgame/go/server/web/handler/openid"
+	"github.com/xdean/miniboardgame/go/server/web/middleware"
 	"net/http"
 	"time"
 )

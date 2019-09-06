@@ -1,9 +1,9 @@
 package openid
 
 import (
-	"github.com/XDean/MiniBoardgame/config"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+	"github.com/xdean/miniboardgame/go/server/config"
 	"testing"
 )
 

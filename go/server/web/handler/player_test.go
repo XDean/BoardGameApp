@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/XDean/MiniBoardgame/model"
 	"github.com/xdean/goex/xecho"
+	"github.com/xdean/miniboardgame/go/server/model"
 	"net/http"
 	"strconv"
 	"testing"

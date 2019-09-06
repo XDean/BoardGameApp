@@ -3,8 +3,8 @@ package openid
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/XDean/MiniBoardgame/config"
 	"github.com/labstack/echo/v4"
+	"github.com/xdean/miniboardgame/go/server/config"
 	"gopkg.in/resty.v1"
 	"net/http"
 )
