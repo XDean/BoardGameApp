@@ -1,4 +1,4 @@
-package state
+package ocr
 
 import (
 	"encoding/json"
@@ -8,36 +8,35 @@ import (
 	"github.com/xdean/goex/xconfig"
 	"github.com/xdean/miniboardgame/go/wechat/config"
 	"github.com/xdean/miniboardgame/go/wechat/model"
+	"github.com/xdean/miniboardgame/go/wechat/state"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
-func init() {
-	Register(OCR{
-		BaseState{
-			TheName: "图像识别文字",
-			TheLast: Root,
-		},
-	})
+var State = OCR{
+	state.BaseState{
+		TheName: "图像识别文字",
+		TheLast: state.Root,
+	},
 }
 
 type OCR struct {
-	BaseState
+	state.BaseState
 }
 
 func (OCR) Help() string {
 	return `输入图片识别图中文字`
 }
 
-func (s OCR) Handle(msgType string) MessageHandler {
+func (s OCR) Handle(msgType string) state.MessageHandler {
 	switch msgType {
 	case model.TEXT:
-		return DefaultText(s, func(msg model.Message) (state State, message model.Message) {
+		return state.DefaultText(s, func(msg model.Message) (state state.State, message model.Message) {
 			return s, model.NewText(s.Help())
 		})
 	case model.IMAGE:
-		return func(msg model.Message) (State, model.Message) {
+		return func(msg model.Message) (state.State, model.Message) {
 			request, err := http.NewRequest("POST", "https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/ocr?language=zh-Hans",
 				strings.NewReader(fmt.Sprintf(`{"url":"%s"}`, msg.PicUrl)))
 			if err != nil {
@@ -87,6 +86,6 @@ func (s OCR) Handle(msgType string) MessageHandler {
 			}
 		}
 	default:
-		return HelpHandler(s)
+		return state.HelpHandler(s)
 	}
 }

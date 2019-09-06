@@ -3,19 +3,19 @@ package guobiao
 import (
 	"fmt"
 	"github.com/xdean/miniboardgame/go/wechat/model"
-	. "github.com/xdean/miniboardgame/go/wechat/state"
+	"github.com/xdean/miniboardgame/go/wechat/state"
 	"strings"
 )
 
-var StateInstance = GuoBiao{
-	BaseState{
+var State = GuoBiao{
+	state.BaseState{
 		TheName: "国标麻将算番",
-		TheLast: Root,
+		TheLast: state.Root,
 	},
 }
 
 type GuoBiao struct {
-	BaseState
+	state.BaseState
 }
 
 func (s GuoBiao) Help() string {
@@ -29,10 +29,10 @@ func (s GuoBiao) Help() string {
 特殊番型需另计：如和绝张(4)、抢杠和(8)、海底捞月(8)等`
 }
 
-func (s GuoBiao) Handle(msgType string) MessageHandler {
+func (s GuoBiao) Handle(msgType string) state.MessageHandler {
 	switch msgType {
 	case model.TEXT:
-		return DefaultText(s, func(input model.Message) (state State, message model.Message) {
+		return state.DefaultText(s, func(input model.Message) (state state.State, message model.Message) {
 			hand, err := Parse(input.Content)
 			if err != nil {
 				return s, model.NewText(err.Error())
@@ -47,6 +47,6 @@ func (s GuoBiao) Handle(msgType string) MessageHandler {
 			return s, model.NewText(b.String())
 		})
 	default:
-		return HelpHandler(s)
+		return state.HelpHandler(s)
 	}
 }
