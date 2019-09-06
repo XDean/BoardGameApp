@@ -16,8 +16,8 @@ type (
 	}
 
 	BaseState struct {
-		name string
-		last State
+		TheName string
+		TheLast State
 	}
 
 	RootState struct {
@@ -25,27 +25,30 @@ type (
 	}
 )
 
-var Root = RootState{BaseState{name: "root", last: nil}}
+var Root = RootState{BaseState{TheName: "root", TheLast: nil}}
 var rootStates = make([]State, 0)
 var rootList = OptionList{
 	Options: []fmt.Stringer{},
 }
 
 func Register(state State) {
+	if state.Last() != Root {
+		panic("RootState's Last must be Root")
+	}
 	rootStates = append(rootStates, state)
 	rootList.Options = append(rootList.Options, state)
 }
 
 func (s BaseState) Name() string {
-	return s.name
+	return s.TheName
 }
 
 func (s BaseState) String() string {
-	return s.name
+	return s.TheName
 }
 
 func (s BaseState) Last() State {
-	return s.last
+	return s.TheLast
 }
 
 func (s RootState) Help() string {
@@ -55,7 +58,7 @@ func (s RootState) Help() string {
 func (s RootState) Handle(msgType string) MessageHandler {
 	switch msgType {
 	case model.TEXT:
-		return defaultText(s, func(input model.Message) (state State, message model.Message) {
+		return DefaultText(s, func(input model.Message) (state State, message model.Message) {
 			c := rootList.Find(input.Content)
 			if c == nil {
 				return s, model.NewText(s.Help())
@@ -65,11 +68,11 @@ func (s RootState) Handle(msgType string) MessageHandler {
 			}
 		})
 	default:
-		return helpHandler(s)
+		return HelpHandler(s)
 	}
 }
 
-func defaultText(s State, h MessageHandler) MessageHandler {
+func DefaultText(s State, h MessageHandler) MessageHandler {
 	return func(input model.Message) (state State, message model.Message) {
 		switch input.Content {
 		case Help.String():
@@ -84,7 +87,7 @@ func defaultText(s State, h MessageHandler) MessageHandler {
 	}
 }
 
-func helpHandler(s State) MessageHandler {
+func HelpHandler(s State) MessageHandler {
 	return func(input model.Message) (state State, message model.Message) {
 		return s, model.NewText(s.Help())
 	}

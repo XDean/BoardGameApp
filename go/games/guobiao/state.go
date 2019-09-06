@@ -1,19 +1,17 @@
-package state
+package guobiao
 
 import (
 	"fmt"
-	"github.com/xdean/miniboardgame/go/games/guobiao/guobiao"
 	"github.com/xdean/miniboardgame/go/wechat/model"
+	. "github.com/xdean/miniboardgame/go/wechat/state"
 	"strings"
 )
 
-func init() {
-	Register(GuoBiao{
-		BaseState{
-			name: "国标麻将算番",
-			last: Root,
-		},
-	})
+var StateInstance = GuoBiao{
+	BaseState{
+		TheName: "国标麻将算番",
+		TheLast: Root,
+	},
 }
 
 type GuoBiao struct {
@@ -34,12 +32,12 @@ func (s GuoBiao) Help() string {
 func (s GuoBiao) Handle(msgType string) MessageHandler {
 	switch msgType {
 	case model.TEXT:
-		return defaultText(s, func(input model.Message) (state State, message model.Message) {
-			hand, err := guobiao.Parse(input.Content)
+		return DefaultText(s, func(input model.Message) (state State, message model.Message) {
+			hand, err := Parse(input.Content)
 			if err != nil {
 				return s, model.NewText(err.Error())
 			}
-			fan := guobiao.CalcFan(hand)
+			fan := CalcFan(hand)
 			b := strings.Builder{}
 			for _, v := range fan {
 				b.WriteString(v.String())
@@ -49,6 +47,6 @@ func (s GuoBiao) Handle(msgType string) MessageHandler {
 			return s, model.NewText(b.String())
 		})
 	default:
-		return helpHandler(s)
+		return HelpHandler(s)
 	}
 }

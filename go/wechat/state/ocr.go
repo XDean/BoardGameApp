@@ -16,8 +16,8 @@ import (
 func init() {
 	Register(OCR{
 		BaseState{
-			name: "图像识别文字",
-			last: Root,
+			TheName: "图像识别文字",
+			TheLast: Root,
 		},
 	})
 }
@@ -33,7 +33,7 @@ func (OCR) Help() string {
 func (s OCR) Handle(msgType string) MessageHandler {
 	switch msgType {
 	case model.TEXT:
-		return defaultText(s, func(msg model.Message) (state State, message model.Message) {
+		return DefaultText(s, func(msg model.Message) (state State, message model.Message) {
 			return s, model.NewText(s.Help())
 		})
 	case model.IMAGE:
@@ -87,6 +87,6 @@ func (s OCR) Handle(msgType string) MessageHandler {
 			}
 		}
 	default:
-		return helpHandler(s)
+		return HelpHandler(s)
 	}
 }
