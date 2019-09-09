@@ -1,4 +1,4 @@
-package lostctiy
+package lostcities
 
 import (
 	"github.com/thoas/go-funk"

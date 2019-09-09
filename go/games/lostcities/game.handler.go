@@ -1,4 +1,4 @@
-package lostctiy
+package lostcities
 
 func (g *Game) Start() {
 	go g.GameLoop()

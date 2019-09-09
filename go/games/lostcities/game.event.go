@@ -1,4 +1,4 @@
-package lostctiy
+package lostcities
 
 import "errors"
 
