@@ -10,27 +10,8 @@ type (
 		Options []Option
 
 		// play
-		NewEvent func() interface{}
-		OnEvent  func(interface{}) (interface{}, error)
-	}
-
-	Option struct {
-		Id     string
-		Name   string
-		Type   OptionType
-		Domain interface{}
-	}
-
-	OptionType int
-
-	Range struct {
-		Min int
-		Max int
-	}
-
-	Event struct {
-		PlayerId int
-		RoomId   int
+		NewEvent func() Event
+		OnEvent  func(Event) Response
 	}
 )
 

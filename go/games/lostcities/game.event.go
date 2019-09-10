@@ -1,10 +1,14 @@
 package lostcities
 
-import "errors"
+import (
+	"errors"
+	"github.com/xdean/miniboardgame/go/server/game"
+)
 
 type (
 	// Events
 	Event struct {
+		game.BaseEvent
 		// Play card
 		Card Card
 		Drop bool
@@ -14,33 +18,36 @@ type (
 	}
 )
 
-func (g *Game) Play(player int, event Event) (Card, error) {
+func (g *Game) Play(event Event) game.Response {
+	player := event.GetPlayerId()
 	if g.Current != player {
-		return EMPTY_CARD, errors.New("You are not current player")
+		return errors.New("You are not current player")
 	}
 	if event.Drop && !event.FromDeck && (event.Card.Color() == event.Color) {
-		return EMPTY_CARD, errors.New("You can't draw the drop card immediatly")
+		return errors.New("You can't draw the drop card immediatly")
 	}
 	if !g.hasCard(player, event.Card) {
-		return EMPTY_CARD, errors.New("You don't have the card to play")
+		return errors.New("You don't have the card to play")
 	}
 	cards := g.Board[player][event.Card.Color()]
 	if !event.Drop && len(cards) > 0 && cards[0].Point() > event.Card.Point() {
-		return EMPTY_CARD, errors.New("You can't play the card because you already have a lagrer one")
+		return errors.New("You can't play the card because you already have a lagrer one")
 	}
 	if !event.FromDeck && len(g.Drop[event.Color]) == 0 {
-		return EMPTY_CARD, errors.New("No card to draw in this color's drop area")
+		return errors.New("No card to draw in this color's drop area")
 	}
 	// TODO Check deck has card
 	if event.Drop {
 		g.DropCard(player, event.Card)
+		return "Drop Success"
 	} else {
 		g.PlayCard(player, event.Card)
+		return "Play Success"
 	}
 	if event.FromDeck {
-		return g.DrawCard(player, 1)[0], nil
+		return g.DrawCard(player, 1)[0]
 	} else {
-		return g.DrawDropCard(player, event.Color), nil
+		return g.DrawDropCard(player, event.Color)
 	}
 }
 
