@@ -19,7 +19,8 @@ type (
 
 	NewGameEvent struct {
 		BaseEvent
-		Options map[string]string
+		Options     map[string]string
+		EventStream chan<- interface{}
 	}
 )
 

@@ -30,6 +30,7 @@ func StartGame(c echo.Context) error {
 	res := g.OnEvent(game.NewGameEvent{
 		BaseEvent: game.BaseEvent{},
 		Options:   room.Options.Src,
+		//EventStream: //TODO
 	})
 	return eventResponse(c, res)
 }

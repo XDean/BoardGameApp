@@ -23,11 +23,12 @@ type (
 	}
 
 	Game struct {
-		Current int
-		Deck    []Card     // [index] from 0 (top)
-		Board   [][][]Card // [player][color][index] from 0 (oldest)
-		Drop    [][]Card   // [color][index] from 0 (oldest)
-		Hand    [][]Card   // [player][index] no order, by default 0 (oldest)
+		EventStream chan<- interface{}
+		Current     int
+		Deck        []Card     // [index] from 0 (top)
+		Board       [][][]Card // [player][color][index] from 0 (oldest)
+		Drop        [][]Card   // [color][index] from 0 (oldest)
+		Hand        [][]Card   // [player][index] no order, by default 0 (oldest)
 	}
 )
 

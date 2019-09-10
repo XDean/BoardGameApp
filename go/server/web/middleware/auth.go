@@ -55,7 +55,7 @@ func AuthRoom() echo.MiddlewareFunc {
 					err := room.FindByUserID(db, user.ID)
 					if gorm.IsRecordNotFoundError(err) {
 						return echo.NewHTTPError(http.StatusNotFound, "You are not in a room")
-					} else {
+					} else if err != nil {
 						return err
 					}
 					context.Set(_const.ROOM, room)

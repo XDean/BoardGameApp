@@ -35,17 +35,29 @@ func run() {
 		select {
 		case event := <-eventStream:
 			logrus.Debug(event)
-			switch t := event.(type) {
-			case Event:
-				g := games[t.GetRoomId()]
-				t.PutResponse(g.Play(t))
-			case game.NewGameEvent:
-				g := NewStandardGame()
-				games[t.GetRoomId()] = g
-				t.PutResponse("Create Success")
-			default:
-				t.PutResponse(errors.New("Unknown event"))
-			}
+			event.PutResponse(handleEvent(event))
 		}
+	}
+}
+
+func handleEvent(event game.Event) game.Response {
+	room := games[event.GetRoomId()]
+	switch t := event.(type) {
+	case Event:
+		if room == nil {
+			return errors.New("No such game room")
+		}
+		g := games[event.GetRoomId()]
+		return g.Play(t)
+	case game.NewGameEvent:
+		if room != nil {
+			return errors.New("The game has started")
+		}
+		g := NewStandardGame()
+		g.EventStream = t.EventStream
+		games[event.GetRoomId()] = g
+		return "Create Success"
+	default:
+		return errors.New("Unknown event")
 	}
 }
