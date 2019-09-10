@@ -4,11 +4,12 @@ import "time"
 
 type Room struct {
 	ID          uint `gorm:"primary_key"`
-	GameName    string
+	GameId      string
 	PlayerCount uint
 	RoomName    string
 	CreatedTime time.Time
 	Players     []*Player
+	Options     *StringMap `gorm:"type:json"`
 }
 
 func (r *Room) normalize() {
@@ -25,4 +26,22 @@ func (r *Room) FindPlayerBySeat(seat uint) (*Player, bool) {
 		}
 	}
 	return nil, false
+}
+
+func (r *Room) FindHost() *Player {
+	for _, p := range r.Players {
+		if p.State == HOST {
+			return p
+		}
+	}
+	return nil
+}
+
+func (r *Room) IsAllReady() bool {
+	for _, p := range r.Players {
+		if p.State == NOT_READY {
+			return false
+		}
+	}
+	return true
 }

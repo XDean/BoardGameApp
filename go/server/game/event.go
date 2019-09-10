@@ -17,7 +17,7 @@ type (
 	Response interface {
 	}
 
-	CreateRoomEvent struct {
+	NewGameEvent struct {
 		BaseEvent
 		Options map[string]string
 	}

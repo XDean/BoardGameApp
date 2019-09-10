@@ -24,7 +24,7 @@ func TestRoom_CreateByHost(t *testing.T) {
 
 	room := &Room{
 		ID:          ROOMID,
-		GameName:    "game",
+		GameId:      "game",
 		RoomName:    "room",
 		PlayerCount: 3,
 	}
@@ -36,7 +36,7 @@ func TestRoom_CreateByHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, player.Room.Players[0], player)
 	assert.Equal(t, ROOMID, player.RoomID)
-	assert.Equal(t, "game", player.Room.GameName)
+	assert.Equal(t, "game", player.Room.GameId)
 	assert.Equal(t, "room", player.Room.RoomName)
 
 	room = new(Room)
@@ -44,7 +44,7 @@ func TestRoom_CreateByHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, room.Players[0].Room, room)
 	assert.Equal(t, ROOMID, room.ID)
-	assert.Equal(t, "game", room.GameName)
+	assert.Equal(t, "game", room.GameId)
 	assert.Equal(t, "room", room.RoomName)
 
 	rooms, err := FindRoomsByGame(db, "game", Unbound)
@@ -56,7 +56,7 @@ func TestRoom_CreateByHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, room.Players[0].Room, room)
 	assert.Equal(t, ROOMID, room.ID)
-	assert.Equal(t, "game", room.GameName)
+	assert.Equal(t, "game", room.GameId)
 	assert.Equal(t, "room", room.RoomName)
 
 }

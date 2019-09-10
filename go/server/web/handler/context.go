@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	_const "github.com/xdean/miniboardgame/go/server/const"
+	"github.com/xdean/miniboardgame/go/server/game"
 	"github.com/xdean/miniboardgame/go/server/model"
 	"net/http"
 )
@@ -28,4 +29,16 @@ func GetDB(e echo.Context) *gorm.DB {
 	} else {
 		panic("No db instance in context")
 	}
+}
+
+func GetCurrentGame(c echo.Context) (*game.Game, error) {
+	room, err := GetCurrentRoom(c)
+	if err != nil {
+		return nil, err
+	}
+	g, err := game.FindGame(room.GameId)
+	if err != nil {
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "No such game")
+	}
+	return g, nil
 }

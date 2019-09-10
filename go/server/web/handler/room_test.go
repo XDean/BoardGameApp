@@ -26,7 +26,7 @@ func TestCreateRoom(t *testing.T) {
 				room := new(model.Room)
 				err := room.FindByUserID(db, USERID)
 				assert.NoError(t, err)
-				assert.Equal(t, "game name", room.GameName)
+				assert.Equal(t, "game name", room.GameId)
 				assert.Equal(t, "room name", room.RoomName)
 				assert.Equal(t, uint(3), room.PlayerCount)
 				assert.Equal(t, uint(USERID), room.Players[0].UserID)
@@ -69,7 +69,7 @@ func TestGetRoom(t *testing.T) {
 		response: Response{
 			Body: xecho.J{
 				"ID":          ROOMID,
-				"GameName":    ROOM.GameName,
+				"GameId":      ROOM.GameId,
 				"RoomName":    ROOM.RoomName,
 				"PlayerCount": ROOM.PlayerCount,
 				"Players": []xecho.J{

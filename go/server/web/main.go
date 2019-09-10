@@ -25,6 +25,7 @@ func Run() {
 
 	// Init echo
 	e := echo.New()
+
 	e.Validator = handler.NewValidator()
 
 	e.Use(middleware.Logger())

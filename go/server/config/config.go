@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/xdean/goex/xconfig"
+	"github.com/xdean/goex/xgo"
 	wechatConfig "github.com/xdean/miniboardgame/go/wechat/config"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -39,4 +40,10 @@ func (c *Config) Load(path string) (err error) {
 		err = xconfig.Decode(c, SecretKey)
 	}
 	return
+}
+
+func (c *Config) ToYaml() string {
+	out, err := yaml.Marshal(c)
+	xgo.MustNoError(err)
+	return string(out)
 }

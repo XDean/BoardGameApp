@@ -62,7 +62,7 @@ var (
 	}
 	ROOM = &model.Room{
 		ID:          ROOMID,
-		GameName:    "game name",
+		GameId:      "game name",
 		RoomName:    "room name",
 		PlayerCount: 3,
 	}
@@ -185,7 +185,7 @@ func initVars() {
 	}
 	ROOM = &model.Room{
 		ID:          ROOMID,
-		GameName:    "game name",
+		GameId:      "game name",
 		RoomName:    "room name",
 		PlayerCount: 3,
 	}

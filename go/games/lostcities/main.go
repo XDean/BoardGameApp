@@ -6,7 +6,7 @@ import (
 	"github.com/xdean/miniboardgame/go/server/game"
 )
 
-var Instance = game.Game{
+var Instance = &game.Game{
 	Id:   "lost-cities",
 	Name: "失落的城市",
 	Player: game.Range{
@@ -39,7 +39,7 @@ func run() {
 			case Event:
 				g := games[t.GetRoomId()]
 				t.PutResponse(g.Play(t))
-			case game.CreateRoomEvent:
+			case game.NewGameEvent:
 				g := NewStandardGame()
 				games[t.GetRoomId()] = g
 				t.PutResponse("Create Success")

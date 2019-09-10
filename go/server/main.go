@@ -46,11 +46,10 @@ func main() {
 		if config.Debug {
 			logrus.SetLevel(logrus.DebugLevel)
 		}
-		fmt.Println(config.Instance)
+		fmt.Println("Config", config.Instance.ToYaml())
 		web.Run()
 		return nil
 	}
-
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)

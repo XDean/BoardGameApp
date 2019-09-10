@@ -9,7 +9,7 @@ import (
 
 func CreateRoom(c echo.Context) error {
 	type Param struct {
-		GameName    string `json:"game_name" query:"game_name" form:"game_name" validate:"required"`
+		GameId      string `json:"game_id" query:"game_id" form:"game_id" validate:"required"`
 		RoomName    string `json:"room_name" query:"room_name" form:"room_name" validate:"required"`
 		PlayerCount uint   `json:"player_count" query:"player_count" form:"player_count" validate:"required"`
 	}
@@ -30,7 +30,7 @@ func CreateRoom(c echo.Context) error {
 	}
 
 	room := new(model.Room)
-	room.GameName = param.GameName
+	room.GameId = param.GameId
 	room.RoomName = param.RoomName
 	room.PlayerCount = param.PlayerCount
 	err = room.CreateByHost(db, player)
@@ -52,7 +52,7 @@ func roomJson(room *model.Room) interface{} {
 	}
 	return xecho.J{
 		"ID":          room.ID,
-		"GameName":    room.GameName,
+		"GameId":      room.GameId,
 		"RoomName":    room.RoomName,
 		"PlayerCount": room.PlayerCount,
 		"CreatedTime": room.CreatedTime,
