@@ -1,12 +1,12 @@
 {
-  "front-version": "2.19.2",
+  "front-version": "2.20.0",
   "version": 3,
   "nodes": [
     {
       "type": "Project",
       "description": "",
       "id": "4e8b906a-502e-45b2-b6ce-eb16f3d4c473",
-      "lastModified": "2019-05-31T10:34:41.547+08:00",
+      "lastModified": "2019-09-12T14:33:12.829+08:00",
       "name": "mini-boardgame"
     },
     {
@@ -66,9 +66,7 @@
       "lastModified": "2019-05-31T10:27:35.853+08:00",
       "name": "Login",
       "headers": [],
-      "metaInfo": {
-        "ownerId": "google-oauth2|101148860420940940652"
-      },
+      "metaInfo": {},
       "parentId": "d6f91f6c-ee57-4b59-9132-a27ce7243282"
     },
     {
@@ -103,9 +101,7 @@
       "lastModified": "2019-05-31T10:26:47.204+08:00",
       "name": "Logout",
       "headers": [],
-      "metaInfo": {
-        "ownerId": "google-oauth2|101148860420940940652"
-      },
+      "metaInfo": {},
       "parentId": "d6f91f6c-ee57-4b59-9132-a27ce7243282"
     },
     {
@@ -152,9 +148,7 @@
       "lastModified": "2019-05-31T10:21:23.771+08:00",
       "name": "Signup",
       "headers": [],
-      "metaInfo": {
-        "ownerId": "google-oauth2|101148860420940940652"
-      },
+      "metaInfo": {},
       "parentId": "d6f91f6c-ee57-4b59-9132-a27ce7243282"
     },
     {
@@ -196,9 +190,7 @@
       "lastModified": "2019-05-31T10:21:56.351+08:00",
       "name": "Get",
       "headers": [],
-      "metaInfo": {
-        "ownerId": "google-oauth2|101148860420940940652"
-      },
+      "metaInfo": {},
       "parentId": "11fa8e56-c62a-4b32-a895-3f1dc19918df"
     },
     {
@@ -233,9 +225,7 @@
       "lastModified": "2019-05-31T10:22:24.968+08:00",
       "name": "GetByID",
       "headers": [],
-      "metaInfo": {
-        "ownerId": "google-oauth2|101148860420940940652"
-      },
+      "metaInfo": {},
       "parentId": "11fa8e56-c62a-4b32-a895-3f1dc19918df"
     },
     {
@@ -277,9 +267,7 @@
       "lastModified": "2019-05-31T10:23:23.655+08:00",
       "name": "Get",
       "headers": [],
-      "metaInfo": {
-        "ownerId": "google-oauth2|101148860420940940652"
-      },
+      "metaInfo": {},
       "parentId": "8669c198-ebf1-4821-92fe-49bab682779d"
     },
     {
@@ -314,9 +302,7 @@
       "lastModified": "2019-05-31T10:23:37.503+08:00",
       "name": "GetByID",
       "headers": [],
-      "metaInfo": {
-        "ownerId": "google-oauth2|101148860420940940652"
-      },
+      "metaInfo": {},
       "parentId": "8669c198-ebf1-4821-92fe-49bab682779d"
     },
     {
@@ -375,9 +361,7 @@
           "value": "application/json"
         }
       ],
-      "metaInfo": {
-        "ownerId": "google-oauth2|101148860420940940652"
-      },
+      "metaInfo": {},
       "parentId": "8669c198-ebf1-4821-92fe-49bab682779d"
     },
     {
@@ -427,9 +411,7 @@
           "value": "application/json"
         }
       ],
-      "metaInfo": {
-        "ownerId": "google-oauth2|101148860420940940652"
-      },
+      "metaInfo": {},
       "parentId": "61b37fea-d8f6-423a-ab25-f6785b3bfcec"
     },
     {
@@ -464,21 +446,116 @@
       "lastModified": "2019-05-31T10:29:22.287+08:00",
       "name": "Get",
       "headers": [],
-      "metaInfo": {
-        "ownerId": "google-oauth2|101148860420940940652"
-      },
+      "metaInfo": {},
       "parentId": "61b37fea-d8f6-423a-ab25-f6785b3bfcec"
+    },
+    {
+      "type": "Service",
+      "id": "5f03f013-2f3e-459b-a705-a7786798a6bc",
+      "lastModified": "2019-09-12T14:33:12.830+08:00",
+      "name": "5. Player",
+      "parentId": "4e8b906a-502e-45b2-b6ce-eb16f3d4c473"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/api/player"
+      },
+      "id": "e6a9c42b-db09-4d89-8cb8-14b277ebe62d",
+      "lastModified": "2019-09-10T14:39:12.652+08:00",
+      "name": "Get",
+      "headers": [],
+      "metaInfo": {},
+      "parentId": "5f03f013-2f3e-459b-a705-a7786798a6bc"
+    },
+    {
+      "type": "Service",
+      "id": "297a0fe4-6099-4f94-abb0-6b1c807e7fda",
+      "lastModified": "2019-09-12T14:33:07.397+08:00",
+      "name": "6. Game",
+      "parentId": "4e8b906a-502e-45b2-b6ce-eb16f3d4c473"
+    },
+    {
+      "type": "Request",
+      "method": {
+        "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+        "name": "GET"
+      },
+      "body": {
+        "formBody": {
+          "overrideContentType": true,
+          "encoding": "application/x-www-form-urlencoded",
+          "items": []
+        },
+        "bodyType": "Text",
+        "autoSetLength": true
+      },
+      "headersType": "Form",
+      "uri": {
+        "query": {
+          "delimiter": "&",
+          "items": []
+        },
+        "scheme": {
+          "name": "http",
+          "version": "V11"
+        },
+        "host": "${\"base-url\"}",
+        "path": "/api/games"
+      },
+      "id": "d0ce4b8d-630a-4f6f-84cb-f11e61e1b4bc",
+      "lastModified": "2019-09-12T14:32:32.477+08:00",
+      "name": "GetAll",
+      "headers": [],
+      "metaInfo": {},
+      "parentId": "297a0fe4-6099-4f94-abb0-6b1c807e7fda"
     },
     {
       "type": "Context",
       "id": "d857ad5a-7085-4734-a80d-b03c64a86805",
-      "lastModified": "2019-05-31T10:18:35.309+08:00",
-      "name": "dev",
+      "lastModified": "2019-06-14T16:48:32.614+08:00",
+      "name": "dev-msgew",
       "variables": [
         {
           "enabled": true,
           "name": "base-url",
-          "value": "127.0.0.1"
+          "value": "localhost"
+        }
+      ]
+    },
+    {
+      "type": "Context",
+      "id": "8c8227e0-d0f6-4b68-8952-a14af4ec18a2",
+      "lastModified": "2019-06-17T14:03:44.813+08:00",
+      "name": "product-msgew",
+      "variables": [
+        {
+          "enabled": true,
+          "name": "base-url",
+          "value": "47.111.12.217:11070"
         }
       ]
     }
