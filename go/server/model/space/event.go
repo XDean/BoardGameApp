@@ -1,6 +1,12 @@
-package model
+package space
+
+import "sync"
 
 type (
+	Host interface {
+		EventHostId() string
+	}
+
 	Event struct {
 		From       int `json:"-"` // user id
 		To         int `json:"-"` // user id, -1 means all
@@ -9,49 +15,51 @@ type (
 		Payload    interface{}
 	}
 
-	RoomObserver struct {
+	Observer struct {
 		EventListener chan<- Event
 		Done          <-chan bool
 	}
 
-	RoomSubscription struct {
+	Subscription struct {
 		EventListener <-chan Event
 		Done          chan<- bool
 	}
 
-	RoomThread struct {
+	Thread struct {
 		EventStream    chan Event
-		ObserverStream chan RoomObserver
+		ObserverStream chan Observer
 		Done           chan bool
+		Attribute      sync.Map
 	}
 
-	roomThreadGetter struct {
-		Room   *Room
-		Getter chan<- RoomThread
+	threadGetter struct {
+		Host   Host
+		Getter chan<- *Thread
 	}
 )
 
 var (
-	roomThreadAccessStream = make(chan roomThreadGetter)
-	roomThreads            = make(map[uint]RoomThread)
+	threadAccessStream = make(chan threadGetter)
+	threads            = make(map[string]*Thread)
 )
 
 func init() {
-	go roomThreadAccess(roomThreadAccessStream)
+	go threadAccess(threadAccessStream)
 }
 
-func roomThreadAccess(stream chan roomThreadGetter) {
+func threadAccess(stream chan threadGetter) {
 	for {
 		select {
 		case g := <-stream:
-			rt, ok := roomThreads[g.Room.ID]
+			rt, ok := threads[g.Host.EventHostId()]
 			if !ok {
-				rt = RoomThread{
+				rt = &Thread{
 					EventStream:    make(chan Event, 5),
-					ObserverStream: make(chan RoomObserver, 5),
+					ObserverStream: make(chan Observer, 5),
 					Done:           make(chan bool),
+					Attribute:      sync.Map{},
 				}
-				roomThreads[g.Room.ID] = rt
+				threads[g.Host.EventHostId()] = rt
 				go rt.run()
 			}
 			g.Getter <- rt
@@ -59,47 +67,52 @@ func roomThreadAccess(stream chan roomThreadGetter) {
 	}
 }
 
-func (r *Room) SendEvent(event Event) {
-	rt := r.getThread()
+func SendEvent(r Host, event Event) {
+	rt := getThread(r)
 	rt.EventStream <- event
 }
 
-func (r *Room) Listen() RoomSubscription {
-	rt := r.getThread()
+func Listen(r Host) Subscription {
+	rt := getThread(r)
 	eventListener := make(chan Event, 5)
 	done := make(chan bool, 1)
-	rt.ObserverStream <- RoomObserver{
+	rt.ObserverStream <- Observer{
 		EventListener: eventListener,
 		Done:          done,
 	}
-	return RoomSubscription{
+	return Subscription{
 		EventListener: eventListener,
 		Done:          done,
 	}
 }
 
-func (r *Room) ThreadDone(event Event) {
-	rt := r.getThread()
+func Attribute(r Host, event Event) *sync.Map {
+	rt := getThread(r)
+	return &rt.Attribute
+}
+
+func Done(r Host, event Event) {
+	rt := getThread(r)
 	rt.Done <- true
 }
 
-func (r *Room) getThread() RoomThread {
-	ch := make(chan RoomThread)
-	g := roomThreadGetter{
-		Room:   r,
+func getThread(r Host) *Thread {
+	ch := make(chan *Thread)
+	g := threadGetter{
+		Host:   r,
 		Getter: ch,
 	}
-	roomThreadAccessStream <- g
+	threadAccessStream <- g
 	rt := <-ch
 	return rt
 }
 
-func (r *RoomThread) run() {
-	observers := make([]RoomObserver, 0)
+func (r *Thread) run() {
+	observers := make([]Observer, 0)
 	for {
 		select {
 		case event := <-r.EventStream:
-			new := make([]RoomObserver, 0)
+			new := make([]Observer, 0)
 			for _, v := range observers {
 				select {
 				case v.EventListener <- event:

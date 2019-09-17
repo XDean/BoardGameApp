@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/xdean/goex/xecho"
 	topic "github.com/xdean/miniboardgame/go/server/const/socket"
-	"github.com/xdean/miniboardgame/go/server/model"
+	"github.com/xdean/miniboardgame/go/server/model/space"
 )
 
 var (
@@ -27,7 +27,7 @@ func RoomSocket(c echo.Context) error {
 	err = ws.WriteMessage(websocket.PingMessage, []byte("ping"))
 	xecho.MustNoError(err)
 
-	room.SendEvent(model.Event{
+	room.SendEvent(space.Event{
 		From:    int(user.ID),
 		To:      -1,
 		Topic:   topic.PLAYER_CONNECTED,
@@ -37,7 +37,7 @@ func RoomSocket(c echo.Context) error {
 	subscription := room.Listen()
 
 	ws.SetCloseHandler(func(code int, text string) error {
-		room.SendEvent(model.Event{
+		room.SendEvent(space.Event{
 			From:    int(user.ID),
 			To:      -1,
 			Topic:   topic.PLAYER_DISCONNECTED,
@@ -48,11 +48,11 @@ func RoomSocket(c echo.Context) error {
 	})
 
 	for {
-		event, ok := <-subscription.EventListener
+		e, ok := <-subscription.EventListener
 		if !ok {
 			return nil
 		}
-		bytes, err := json.Marshal(event)
+		bytes, err := json.Marshal(e)
 		xecho.MustNoError(err)
 
 		err = ws.WriteMessage(websocket.TextMessage, bytes)

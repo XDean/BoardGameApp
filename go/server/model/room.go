@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"fmt"
+	"github.com/xdean/miniboardgame/go/server/model/space"
+	"time"
+)
 
 type Room struct {
 	ID          uint `gorm:"primary_key"`
@@ -10,6 +14,10 @@ type Room struct {
 	CreatedTime time.Time
 	Players     []*Player
 	Options     *StringMap `gorm:"type:json"`
+}
+
+func (r *Room) EventHostId() string {
+	return fmt.Sprintf("ROOM-%d", r.ID)
 }
 
 func (r *Room) normalize() {
@@ -44,4 +52,12 @@ func (r *Room) IsAllReady() bool {
 		}
 	}
 	return true
+}
+
+func (r *Room) SendEvent(e space.Event) {
+	space.SendEvent(r, e)
+}
+
+func (r *Room) Listen() space.Subscription {
+	return space.Listen(r)
 }
