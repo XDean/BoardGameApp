@@ -49,9 +49,8 @@ func RoomSocket(c echo.Context) error {
 
 	for {
 		event, ok := <-subscription.EventListener
-
 		if !ok {
-			break
+			return nil
 		}
 		bytes, err := json.Marshal(event)
 		xecho.MustNoError(err)

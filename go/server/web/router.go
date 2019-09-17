@@ -39,6 +39,8 @@ func InitRouter(e *echo.Echo) {
 	authored.POST("/game/start", handler.StartGame, middleware.AuthRoom())
 	authored.POST("/game/event", handler.GameEvent, middleware.AuthRoom())
 
+	authored.GET("/socket/room", handler.RoomSocket, middleware.AuthRoom())
+
 	admin := authored.Group("/admin")
 	admin.Use(middleware.AuthRole(_const.ROLE_ADMIN))
 }
