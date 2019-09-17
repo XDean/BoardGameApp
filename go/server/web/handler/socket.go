@@ -37,6 +37,12 @@ func RoomSocket(c echo.Context) error {
 	subscription := room.Listen()
 
 	ws.SetCloseHandler(func(code int, text string) error {
+		room.SendEvent(model.Event{
+			From:    int(user.ID),
+			To:      -1,
+			Topic:   topic.PLAYER_DISCONNECTED,
+			Payload: user.ID,
+		})
 		subscription.Done <- true
 		return nil
 	})
