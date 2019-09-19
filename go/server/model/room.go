@@ -1,8 +1,6 @@
 package model
 
 import (
-	"fmt"
-	"github.com/xdean/miniboardgame/go/server/model/space"
 	"time"
 )
 
@@ -16,10 +14,6 @@ type Room struct {
 	Options     *StringMap `gorm:"type:json"`
 }
 
-func (r *Room) EventHostId() string {
-	return fmt.Sprintf("ROOM-%d", r.ID)
-}
-
 func (r *Room) normalize() {
 	for _, player := range r.Players {
 		player.Room = r
@@ -28,8 +22,14 @@ func (r *Room) normalize() {
 }
 
 func (r *Room) FindPlayerBySeat(seat uint) (*Player, bool) {
+	return r.FindPlayer(func(p *Player) bool {
+		return p.Seat == seat
+	})
+}
+
+func (r *Room) FindPlayer(f func(p *Player) bool) (*Player, bool) {
 	for _, p := range r.Players {
-		if seat == p.Seat {
+		if f(p) {
 			return p, true
 		}
 	}
@@ -46,6 +46,9 @@ func (r *Room) FindHost() *Player {
 }
 
 func (r *Room) IsAllReady() bool {
+	if len(r.Players) != int(r.PlayerCount) {
+		return false
+	}
 	for _, p := range r.Players {
 		if p.State == NOT_READY {
 			return false
@@ -54,10 +57,30 @@ func (r *Room) IsAllReady() bool {
 	return true
 }
 
-func (r *Room) SendEvent(e space.Event) {
-	space.SendEvent(r, e)
+func (r *Room) FindSeatByPlayer(userId uint) int {
+	for _, v := range r.Players {
+		if v.UserID == userId {
+			return int(v.Seat)
+		}
+	}
+	return -1
 }
 
-func (r *Room) Listen() space.Subscription {
-	return space.Listen(r)
+func (r *Room) GetNextSeat() (uint, bool) {
+	for i := uint(0); i < r.PlayerCount; i++ {
+		if _, ok := r.FindPlayerBySeat(i); !ok {
+			return i, true
+		}
+	}
+	return 0, false
+}
+
+func (r *Room) RemovePlayer(userId uint) {
+	new := make([]*Player, 0)
+	for _, v := range r.Players {
+		if v.UserID != userId {
+			new = append(new, v)
+		}
+	}
+	r.Players = new
 }

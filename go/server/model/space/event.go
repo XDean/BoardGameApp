@@ -7,7 +7,7 @@ type (
 		EventHostId() string
 	}
 
-	Event struct {
+	Message struct {
 		From       int `json:"-"` // user id
 		To         int `json:"-"` // user id, -1 means all
 		Topic      string
@@ -15,22 +15,28 @@ type (
 		Payload    interface{}
 	}
 
+	Action struct {
+		Func func()
+		Done chan<- bool
+	}
+
 	Publisher struct {
 		thread *Thread
 	}
 
 	Subscriber struct {
-		EventListener chan<- Event
-		Done          <-chan bool
+		MessageListener chan<- Message
+		Done            <-chan bool
 	}
 
 	Subscription struct {
-		EventListener <-chan Event
-		Done          chan<- bool
+		MessageListener <-chan Message
+		Done            chan<- bool
 	}
 
 	Thread struct {
-		EventStream      chan Event
+		MessageStream    chan Message
+		ActionStream     chan Action
 		SubscriberStream chan Subscriber
 		Done             chan bool
 		Attribute        sync.Map
@@ -58,7 +64,8 @@ func threadAccess(stream chan threadGetter) {
 			rt, ok := threads[g.Host.EventHostId()]
 			if !ok {
 				rt = &Thread{
-					EventStream:      make(chan Event, 5),
+					ActionStream:     make(chan Action, 5),
+					MessageStream:    make(chan Message, 5),
 					SubscriberStream: make(chan Subscriber, 5),
 					Done:             make(chan bool),
 					Attribute:        sync.Map{},
@@ -69,39 +76,6 @@ func threadAccess(stream chan threadGetter) {
 			g.Getter <- rt
 		}
 	}
-}
-
-func SendEvent(r Host, event Event) {
-	rt := getThread(r)
-	rt.EventStream <- event
-}
-
-func Publish(r Host) Publisher {
-	return Publisher{thread: getThread(r)}
-}
-
-func Listen(r Host) Subscription {
-	rt := getThread(r)
-	eventListener := make(chan Event, 5)
-	done := make(chan bool, 1)
-	rt.SubscriberStream <- Subscriber{
-		EventListener: eventListener,
-		Done:          done,
-	}
-	return Subscription{
-		EventListener: eventListener,
-		Done:          done,
-	}
-}
-
-func Attribute(r Host, event Event) *sync.Map {
-	rt := getThread(r)
-	return &rt.Attribute
-}
-
-func Done(r Host, event Event) {
-	rt := getThread(r)
-	rt.Done <- true
 }
 
 func getThread(r Host) *Thread {
@@ -115,32 +89,36 @@ func getThread(r Host) *Thread {
 	return rt
 }
 
-func (p Publisher) SendEvent(event Event) {
-	p.thread.EventStream <- event
+func (p Publisher) SendEvent(message Message) {
+	p.thread.MessageStream <- message
 }
 
 func (r *Thread) run() {
 	subscribers := make([]Subscriber, 0)
 	for {
 		select {
-		case event := <-r.EventStream:
+		case message := <-r.MessageStream:
 			new := make([]Subscriber, 0)
 			for _, v := range subscribers {
 				select {
-				case v.EventListener <- event:
+				case v.MessageListener <- message:
 					new = append(new, v)
 				case <-v.Done:
-					close(v.EventListener)
+					close(v.MessageListener)
 				default:
-					close(v.EventListener)
+					close(v.MessageListener)
 				}
 			}
 			subscribers = new
+		case action := <-r.ActionStream:
+			action.Func()
+			action.Done <- true
+			close(action.Done)
 		case obs := <-r.SubscriberStream:
 			subscribers = append(subscribers, obs)
 		case <-r.Done:
 			for _, v := range subscribers {
-				close(v.EventListener)
+				close(v.MessageListener)
 			}
 			break
 		}

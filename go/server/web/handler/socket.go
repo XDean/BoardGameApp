@@ -28,7 +28,7 @@ func RoomSocket(c echo.Context) error {
 	err = ws.WriteMessage(websocket.PingMessage, []byte("ping"))
 	xecho.MustNoError(err)
 
-	room.SendEvent(space.Event{
+	room.SendEvent(space.Message{
 		From:    int(user.ID),
 		To:      -1,
 		Topic:   topic.PLAYER_CONNECTED,
@@ -38,7 +38,7 @@ func RoomSocket(c echo.Context) error {
 	subscription := room.Listen()
 
 	ws.SetCloseHandler(func(code int, text string) error {
-		room.SendEvent(space.Event{
+		room.SendEvent(space.Message{
 			From:    int(user.ID),
 			To:      -1,
 			Topic:   topic.PLAYER_DISCONNECTED,
@@ -49,7 +49,7 @@ func RoomSocket(c echo.Context) error {
 	})
 
 	for {
-		e, ok := <-subscription.EventListener
+		e, ok := <-subscription.MessageListener
 		if !ok {
 			return nil
 		}
@@ -71,14 +71,14 @@ func RoomSSE(c echo.Context) error {
 	streamer := sse.New()
 	streamer.BufSize(5)
 
-	room.SendEvent(space.Event{
+	room.SendEvent(space.Message{
 		From:    int(user.ID),
 		To:      -1,
 		Topic:   topic.PLAYER_CONNECTED,
 		Payload: user.ID,
 	})
 
-	defer room.SendEvent(space.Event{
+	defer room.SendEvent(space.Message{
 		From:    int(user.ID),
 		To:      -1,
 		Topic:   topic.PLAYER_DISCONNECTED,
@@ -92,7 +92,7 @@ func RoomSSE(c echo.Context) error {
 		id := 0
 		for {
 			id++
-			e, ok := <-subscription.EventListener
+			e, ok := <-subscription.MessageListener
 			if !ok {
 				return
 			}

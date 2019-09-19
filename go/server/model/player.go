@@ -35,3 +35,7 @@ func (s PlayerState) String() string {
 func (p *Player) normalize() {
 	// do nothing
 }
+
+func (p *Player) IsInGame() bool {
+	return p.State != OUT_OF_GAME
+}

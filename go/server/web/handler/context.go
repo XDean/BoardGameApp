@@ -20,7 +20,22 @@ func GetCurrentRoom(c echo.Context) (*model.Room, error) {
 	if user, ok := c.Get(_const.ROOM).(*model.Room); ok {
 		return user, nil
 	}
-	return nil, echo.NewHTTPError(http.StatusUnauthorized, "You are not in a room")
+	return nil, echo.NewHTTPError(http.StatusBadRequest, "You are not in a room")
+}
+
+func GetCurrentPlayer(c echo.Context) (*model.Player, error) {
+	if player, ok := c.Get(_const.PLAYER).(*model.Player); ok {
+		return player, nil
+	} else if user, err := GetCurrentUser(c); err != nil {
+		return nil, err
+	} else {
+		player := new(model.Player)
+		err := player.GetByUserID(GetDB(c), user.ID)
+		if err != nil {
+			c.Set(_const.PLAYER, player)
+		}
+		return player, err
+	}
 }
 
 func GetDB(e echo.Context) *gorm.DB {

@@ -40,3 +40,7 @@ func (e BaseEvent) GetUser() *model.User {
 func (e BaseEvent) GetRoom() *model.Room {
 	return e.Room
 }
+
+func (e BaseEvent) GetSeat() int {
+	return e.Room.FindSeatByPlayer(e.User.ID)
+}

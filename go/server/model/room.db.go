@@ -2,6 +2,8 @@ package model
 
 import (
 	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo/v4"
+	"net/http"
 	"time"
 )
 
@@ -43,4 +45,44 @@ func (r *Room) CreateByHost(db *gorm.DB, host *Player) error {
 		host,
 	}
 	return db.Save(r).Error
+}
+
+func (r *Room) Join(db *gorm.DB, p *Player) error {
+	defer r.normalize()
+	p.State = NOT_READY
+	if seat, ok := r.GetNextSeat(); ok {
+		p.Seat = seat
+	} else {
+		return echo.NewHTTPError(http.StatusBadRequest, "The room is full")
+	}
+	p.normalize()
+
+	r.Players = append(r.Players, p)
+	return db.Save(r).Error
+}
+
+func (r *Room) Exit(db *gorm.DB, p *Player) error {
+	defer r.normalize()
+	p.State = OUT_OF_GAME
+	p.RoomID = 0
+	p.normalize()
+
+	r.RemovePlayer(p.UserID)
+
+	tr := db.Begin()
+
+	err := tr.Save(r).Error
+	if err != nil {
+		tr.Rollback()
+		return err
+	}
+
+	err = tr.Save(p).Error
+	if err != nil {
+		tr.Rollback()
+		return err
+	}
+
+	tr.Commit()
+	return nil
 }

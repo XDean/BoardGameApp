@@ -4,6 +4,7 @@ package _const
 const (
 	USER     = "USER"     // *model.User
 	ROOM     = "ROOM"     // *model.Room
+	PLAYER   = "PLAYER"   // *model.Player
 	DATABASE = "DATABASE" // *gorm.DB
 )
 

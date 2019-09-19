@@ -33,10 +33,13 @@ func InitRouter(e *echo.Echo) {
 	authored.GET("/player/:id", handler.GetPlayerByID)
 
 	authored.POST("/room", handler.CreateRoom)
+	authored.GET("/room/:id", handler.GetRoomByID)
 	authored.GET("/room", handler.GetRoom, middleware.AuthRoom())
+	authored.GET("/room/join/:id", handler.JoinRoom)
+	authored.GET("/room/exit", handler.ExitRoom)
 
 	authored.GET("/games", handler.GetGameList)
-	authored.POST("/game/start", handler.StartGame, middleware.AuthRoom())
+	authored.GET("/game/start", handler.StartGame, middleware.AuthRoom())
 	authored.POST("/game/event", handler.GameEvent, middleware.AuthRoom())
 
 	authored.GET("/socket/room", handler.RoomSocket, middleware.AuthRoom())
