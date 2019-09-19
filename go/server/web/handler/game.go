@@ -28,9 +28,10 @@ func StartGame(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, xecho.M("Players not ready"))
 	}
 	res := g.OnEvent(game.NewGameEvent{
-		BaseEvent: game.BaseEvent{},
-		Options:   room.Options.Src,
-		//EventStream: //TODO
+		BaseEvent: game.BaseEvent{
+			ResponseStream: make(chan game.Response),
+			User:           user,
+		},
 	})
 	return eventResponse(c, res)
 }

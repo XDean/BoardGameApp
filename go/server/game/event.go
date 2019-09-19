@@ -1,17 +1,19 @@
 package game
 
+import "github.com/xdean/miniboardgame/go/server/model"
+
 type (
 	Event interface {
 		PutResponse(Response)
 		GetResponse() Response
-		GetPlayerId() int
-		GetRoomId() int
+		GetUser() *model.User
+		GetRoom() *model.Room
 	}
 
 	BaseEvent struct {
 		ResponseStream chan Response
-		PlayerId       int
-		RoomId         int
+		User           *model.User
+		Room           *model.Room
 	}
 
 	Response interface {
@@ -19,23 +21,22 @@ type (
 
 	NewGameEvent struct {
 		BaseEvent
-		Options     map[string]string
-		EventStream chan<- interface{}
 	}
 )
 
 func (e BaseEvent) PutResponse(res Response) {
 	e.ResponseStream <- res
+	close(e.ResponseStream)
 }
 
 func (e BaseEvent) GetResponse() Response {
 	return <-e.ResponseStream
 }
 
-func (e BaseEvent) GetPlayerId() int {
-	return e.PlayerId
+func (e BaseEvent) GetUser() *model.User {
+	return e.User
 }
 
-func (e BaseEvent) GetRoomId() int {
-	return e.RoomId
+func (e BaseEvent) GetRoom() *model.Room {
+	return e.Room
 }

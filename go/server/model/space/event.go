@@ -15,7 +15,11 @@ type (
 		Payload    interface{}
 	}
 
-	Observer struct {
+	Publisher struct {
+		thread *Thread
+	}
+
+	Subscriber struct {
 		EventListener chan<- Event
 		Done          <-chan bool
 	}
@@ -26,10 +30,10 @@ type (
 	}
 
 	Thread struct {
-		EventStream    chan Event
-		ObserverStream chan Observer
-		Done           chan bool
-		Attribute      sync.Map
+		EventStream      chan Event
+		SubscriberStream chan Subscriber
+		Done             chan bool
+		Attribute        sync.Map
 	}
 
 	threadGetter struct {
@@ -54,10 +58,10 @@ func threadAccess(stream chan threadGetter) {
 			rt, ok := threads[g.Host.EventHostId()]
 			if !ok {
 				rt = &Thread{
-					EventStream:    make(chan Event, 5),
-					ObserverStream: make(chan Observer, 5),
-					Done:           make(chan bool),
-					Attribute:      sync.Map{},
+					EventStream:      make(chan Event, 5),
+					SubscriberStream: make(chan Subscriber, 5),
+					Done:             make(chan bool),
+					Attribute:        sync.Map{},
 				}
 				threads[g.Host.EventHostId()] = rt
 				go rt.run()
@@ -72,11 +76,15 @@ func SendEvent(r Host, event Event) {
 	rt.EventStream <- event
 }
 
+func Publish(r Host) Publisher {
+	return Publisher{thread: getThread(r)}
+}
+
 func Listen(r Host) Subscription {
 	rt := getThread(r)
 	eventListener := make(chan Event, 5)
 	done := make(chan bool, 1)
-	rt.ObserverStream <- Observer{
+	rt.SubscriberStream <- Subscriber{
 		EventListener: eventListener,
 		Done:          done,
 	}
@@ -107,13 +115,17 @@ func getThread(r Host) *Thread {
 	return rt
 }
 
+func (p Publisher) SendEvent(event Event) {
+	p.thread.EventStream <- event
+}
+
 func (r *Thread) run() {
-	observers := make([]Observer, 0)
+	subscribers := make([]Subscriber, 0)
 	for {
 		select {
 		case event := <-r.EventStream:
-			new := make([]Observer, 0)
-			for _, v := range observers {
+			new := make([]Subscriber, 0)
+			for _, v := range subscribers {
 				select {
 				case v.EventListener <- event:
 					new = append(new, v)
@@ -123,11 +135,11 @@ func (r *Thread) run() {
 					close(v.EventListener)
 				}
 			}
-			observers = new
-		case obs := <-r.ObserverStream:
-			observers = append(observers, obs)
+			subscribers = new
+		case obs := <-r.SubscriberStream:
+			subscribers = append(subscribers, obs)
 		case <-r.Done:
-			for _, v := range observers {
+			for _, v := range subscribers {
 				close(v.EventListener)
 			}
 			break

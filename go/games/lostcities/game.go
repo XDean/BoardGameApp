@@ -2,6 +2,7 @@ package lostcities
 
 import (
 	"github.com/thoas/go-funk"
+	"github.com/xdean/miniboardgame/go/server/model/space"
 	"math/rand"
 )
 
@@ -23,12 +24,12 @@ type (
 	}
 
 	Game struct {
-		EventStream chan<- interface{}
-		Current     int
-		Deck        []Card     // [index] from 0 (top)
-		Board       [][][]Card // [player][color][index] from 0 (oldest)
-		Drop        [][]Card   // [color][index] from 0 (oldest)
-		Hand        [][]Card   // [player][index] no order, by default 0 (oldest)
+		Thread  space.Publisher
+		Current int
+		Deck    []Card     // [index] from 0 (top)
+		Board   [][][]Card // [player][color][index] from 0 (oldest)
+		Drop    [][]Card   // [color][index] from 0 (oldest)
+		Hand    [][]Card   // [player][index] no order, by default 0 (oldest)
 	}
 )
 
