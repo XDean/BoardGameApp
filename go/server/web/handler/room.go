@@ -148,11 +148,12 @@ func findRoomByID(c echo.Context) *model.Room {
 	idParam := c.Param("id")
 	if id, err := strconv.Atoi(idParam); err == nil {
 		room := new(model.Room)
-		err = room.FindByID(GetDB(c), uint(id))
-		xecho.MustNoError(err)
+		if err = room.FindByID(GetDB(c), uint(id)); err != nil {
+			xecho.MustNoError(DBNotFound(err, "No such room"))
+		}
 		return room
 	} else {
 		xecho.MustNoError(echo.NewHTTPError(http.StatusBadRequest, "Unrecognized id: "+idParam))
-		return nil
 	}
+	return nil
 }

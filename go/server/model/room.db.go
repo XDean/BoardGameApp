@@ -62,27 +62,37 @@ func (r *Room) Join(db *gorm.DB, p *Player) error {
 }
 
 func (r *Room) Exit(db *gorm.DB, p *Player) error {
-	defer r.normalize()
-	p.State = OUT_OF_GAME
-	p.RoomID = 0
-	p.normalize()
-
+	host := p.State == HOST
 	r.RemovePlayer(p.UserID)
 
 	tr := db.Begin()
-
-	err := tr.Save(r).Error
+	// update this player
+	err := tr.Model(p).Updates(map[string]interface{}{
+		"room_id": 0,
+		"state":   OUT_OF_GAME,
+		"seat":    0,
+	}).Error
 	if err != nil {
 		tr.Rollback()
 		return err
 	}
-
-	err = tr.Save(p).Error
-	if err != nil {
-		tr.Rollback()
-		return err
+	// delete room if no player
+	if len(r.Players) == 0 {
+		err := tr.Delete(r).Error
+		if err != nil {
+			tr.Rollback()
+			return err
+		}
+	} else
+	// new host if exit player is host
+	if host {
+		newHostPlayer := r.Players[0]
+		err := tr.Model(newHostPlayer).Update("state", HOST).Error
+		if err != nil {
+			tr.Rollback()
+			return err
+		}
 	}
-
 	tr.Commit()
 	return nil
 }

@@ -80,6 +80,10 @@ func (r *Room) RemovePlayer(userId uint) {
 	for _, v := range r.Players {
 		if v.UserID != userId {
 			new = append(new, v)
+		} else {
+			v.Room = nil
+			v.RoomID = 0
+			v.State = OUT_OF_GAME
 		}
 	}
 	r.Players = new

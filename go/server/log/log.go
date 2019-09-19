@@ -8,5 +8,4 @@ var Global *logrus.Logger = logrus.StandardLogger()
 
 func init() {
 	Global.SetFormatter(&logrus.TextFormatter{})
-	Global.SetReportCaller(true)
 }

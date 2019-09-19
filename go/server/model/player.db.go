@@ -4,7 +4,7 @@ import "github.com/jinzhu/gorm"
 
 func (p *Player) GetByUserID(db *gorm.DB, id uint) error {
 	p.UserID = id
-	err := db.FirstOrCreate(p, "user_id = ?", id).Error
+	err := db.FirstOrCreate(p).Error
 	if err == nil {
 		err = p.normalizeDB(db)
 	}
