@@ -7,6 +7,7 @@ import (
 	"github.com/xdean/goex/xecho"
 	topic "github.com/xdean/miniboardgame/go/server/const/socket"
 	"github.com/xdean/miniboardgame/go/server/model/space"
+	"github.com/xdean/miniboardgame/go/server/web/handler/sse"
 )
 
 var (
@@ -58,4 +59,48 @@ func RoomSocket(c echo.Context) error {
 		err = ws.WriteMessage(websocket.TextMessage, bytes)
 		xecho.MustNoError(err)
 	}
+}
+
+func RoomSSE(c echo.Context) error {
+	user, err := GetCurrentUser(c)
+	xecho.MustNoError(err)
+
+	room, err := GetCurrentRoom(c)
+	xecho.MustNoError(err)
+
+	streamer := sse.New()
+	streamer.BufSize(5)
+
+	room.SendEvent(space.Event{
+		From:    int(user.ID),
+		To:      -1,
+		Topic:   topic.PLAYER_CONNECTED,
+		Payload: user.ID,
+	})
+
+	defer room.SendEvent(space.Event{
+		From:    int(user.ID),
+		To:      -1,
+		Topic:   topic.PLAYER_DISCONNECTED,
+		Payload: user.ID,
+	})
+
+	subscription := room.Listen()
+	defer func() { subscription.Done <- true }()
+
+	go func() {
+		id := 0
+		for {
+			id++
+			e, ok := <-subscription.EventListener
+			if !ok {
+				return
+			}
+			err := streamer.SendJSON(string(id), e.Topic, e)
+			xecho.MustNoError(err)
+		}
+	}()
+
+	streamer.ServeHTTP(c.Response(), c.Request())
+	return nil
 }

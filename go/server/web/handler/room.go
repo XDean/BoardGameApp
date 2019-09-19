@@ -84,6 +84,7 @@ func SwapSeat(c echo.Context) error {
 		//TODO
 		// go swap()
 	} else {
+		//room.SendEvent()
 		// TODO  there is no player, go to the seat directly
 	}
 	return nil

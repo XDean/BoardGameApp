@@ -9,6 +9,7 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/jarcoal/httpmock v1.0.4
 	github.com/jinzhu/gorm v1.9.10
+	github.com/julienschmidt/sse v0.0.0-20150904221518-dedc8dfa3d5d
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.1.6
 	github.com/labstack/gommon v0.2.9
