@@ -13,7 +13,7 @@ func (l *GormLogrusLogger) Print(values ...interface{}) {
 	if len(values) > 1 {
 		level := values[0]
 		source := values[1]
-		entry = l.Logger.WithField("source", source)
+		entry = entry.WithField("source", source)
 		if level == "sql" {
 			duration := values[2]
 			// sql
