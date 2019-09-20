@@ -33,10 +33,14 @@ const (
 )
 
 var (
-	USER, USER2, ADMIN          *model.User
-	USER_PROFILE, ADMIN_PROFILE *model.Profile
-	ROOM                        *model.Room
+	USER, USER2, ADMIN          = new(model.User), new(model.User), new(model.User)
+	USER_PROFILE, ADMIN_PROFILE = new(model.Profile), new(model.Profile)
+	ROOM                        = new(model.Room)
 )
+
+func init() {
+	initVars()
+}
 
 type (
 	DBSetup      func(db *gorm.DB)
@@ -129,7 +133,7 @@ func WithOpenid() ContextSetup {
 }
 
 func initVars() {
-	USER = &model.User{
+	*USER = model.User{
 		ID:       USERID,
 		Username: USERNAME,
 		Password: USERPWD,
@@ -139,7 +143,7 @@ func initVars() {
 			},
 		},
 	}
-	USER2 = &model.User{
+	*USER2 = model.User{
 		ID:       USERID2,
 		Username: USERNAME2,
 		Password: USERPWD2,
@@ -149,7 +153,7 @@ func initVars() {
 			},
 		},
 	}
-	ADMIN = &model.User{
+	*ADMIN = model.User{
 		ID:       ADMINID,
 		Username: ADMINNAME,
 		Password: ADMINPWD,
@@ -159,19 +163,19 @@ func initVars() {
 			},
 		},
 	}
-	USER_PROFILE = &model.Profile{
+	*USER_PROFILE = model.Profile{
 		UserID:    USERID,
 		Sex:       model.Male,
 		Nickname:  "usernick",
 		AvatarURL: "userurl",
 	}
-	ADMIN_PROFILE = &model.Profile{
+	*ADMIN_PROFILE = model.Profile{
 		UserID:    USERID,
 		Sex:       model.Male,
 		Nickname:  "adminname",
 		AvatarURL: "adminurl",
 	}
-	ROOM = &model.Room{
+	*ROOM = model.Room{
 		ID:          ROOMID,
 		GameId:      "game name",
 		RoomName:    "room name",
@@ -183,26 +187,25 @@ func (t TestHttp) Run() {
 	initVars()
 
 	// prepare db
-	tx := dbContext.Begin()
-	defer tx.Rollback()
+	defer resetDB()()
 
-	setupDB(tx, t.setups)
+	setupDB(dbContext, t.setups)
 
-	t.doRun(tx)
+	t.doRun(dbContext)
 }
 
 func (s TestHttpSeries) Run() {
 	initVars()
 
 	// prepare db
-	tx := dbContext.Begin()
-	defer tx.Rollback()
-	setupDB(tx, s.setups)
+	defer resetDB()()
+
+	setupDB(dbContext, s.setups)
 
 	for _, t := range s.children {
 		t.test = s.test
 		t.setups = append(s.setups, t.setups...)
-		t.doRun(tx)
+		t.doRun(dbContext)
 	}
 }
 

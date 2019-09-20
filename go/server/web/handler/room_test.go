@@ -135,3 +135,87 @@ func TestGetRoom(t *testing.T) {
 		},
 	}.Run()
 }
+
+func TestJoinRoom(t *testing.T) {
+	TestHttpSeries{
+		test: t,
+		setups: []Setup{
+			WithUser(t, USER),
+			WithUser(t, USER2),
+		},
+		children: []TestHttp{
+			{
+				handler: CreateRoom,
+				request: Request{
+					Body: xecho.J{
+						"game_id":      "game name",
+						"room_name":    "room name",
+						"player_count": 3,
+					},
+				},
+				response: Response{
+					Extra: func(db *gorm.DB, recorder *httptest.ResponseRecorder) {
+						room := new(model.Room)
+						err := room.FindByUserID(db, USERID)
+						assert.NoError(t, err)
+						assert.Equal(t, "game name", room.GameId)
+						assert.Equal(t, "room name", room.RoomName)
+						assert.Equal(t, uint(3), room.PlayerCount)
+						assert.Equal(t, uint(USERID), room.Players[0].UserID)
+					},
+				},
+				setups: []Setup{
+					WithLogin(t, USER),
+				},
+			},
+			{
+				handler: JoinRoom,
+				request: Request{
+					Params: Params{
+						"id": "1",
+					},
+				},
+				response: Response{
+					Extra: func(db *gorm.DB, recorder *httptest.ResponseRecorder) {
+						player := new(model.Player)
+						err := player.GetByUserID(db, USERID2)
+						assert.NoError(t, err)
+						assert.Equal(t, 2, len(player.Room.Players))
+						assert.Equal(t, model.NOT_READY, player.State)
+						assert.Equal(t, uint(1), player.RoomID)
+						assert.Equal(t, uint(1), player.Seat)
+					},
+				},
+				setups: []Setup{
+					WithLogin(t, USER2),
+				},
+			},
+			{
+				handler: ExitRoom,
+				response: Response{
+					Extra: func(db *gorm.DB, recorder *httptest.ResponseRecorder) {
+						player := new(model.Player)
+						err := player.GetByUserID(db, USERID)
+						assert.Nil(t, player.Room)
+						assert.NoError(t, err)
+						assert.Equal(t, model.OUT_OF_GAME, player.State)
+						assert.Equal(t, uint(0), player.RoomID)
+						assert.Equal(t, uint(0), player.Seat)
+
+						player2 := new(model.Player)
+						err = player2.GetByUserID(db, USERID2)
+						assert.NoError(t, err)
+						assert.NotNil(t, player2.Room)
+						assert.Equal(t, 1, len(player2.Room.Players))
+						assert.Equal(t, model.HOST, player2.State)
+						assert.Equal(t, uint(1), player2.RoomID)
+						assert.Equal(t, uint(1), player2.Seat)
+					},
+				},
+				setups: []Setup{
+					WithLogin(t, USER),
+				},
+			},
+		},
+	}.Run()
+}
