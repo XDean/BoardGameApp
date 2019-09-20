@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"github.com/xdean/goex/xgo"
 	"net/http"
 	"time"
 )
@@ -95,4 +96,19 @@ func (r *Room) Exit(db *gorm.DB, p *Player) error {
 	}
 	tr.Commit()
 	return nil
+}
+
+func (r *Room) SwapSeat(db *gorm.DB, a, b uint) error {
+	xgo.MustTrue(a < r.PlayerCount, "Seat")
+	xgo.MustTrue(b < r.PlayerCount, "Seat")
+
+	p, ok := r.FindPlayerBySeat(a)
+	if ok {
+		p.Seat = b
+	}
+	p, ok = r.FindPlayerBySeat(b)
+	if ok {
+		p.Seat = a
+	}
+	return r.save(db)
 }

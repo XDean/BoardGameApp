@@ -5,7 +5,6 @@ import (
 	"github.com/xdean/goex/xecho"
 	"github.com/xdean/miniboardgame/go/server/model"
 	"net/http"
-	"strconv"
 )
 
 func CreateRoom(c echo.Context) error {
@@ -71,7 +70,7 @@ func JoinRoom(c echo.Context) error {
 				resultStream <- c.JSON(http.StatusOK, xecho.M("Join success"))
 			}
 		} else {
-			resultStream <- c.JSON(http.StatusBadRequest, xecho.M("The room is full"))
+			resultStream <- echo.NewHTTPError(http.StatusBadRequest, "The room is full")
 		}
 	})
 
@@ -100,24 +99,45 @@ func ExitRoom(c echo.Context) error {
 }
 
 func SwapSeat(c echo.Context) error {
-	user, err := GetCurrentUser(c)
+	player, err := GetCurrentPlayer(c)
 	xecho.MustNoError(err)
 
-	room, err := GetCurrentRoom(c)
-	xecho.MustNoError(err)
+	room := player.Room
 
-	targetSeat := IntParam(c, "seat")
-	if player, ok := room.FindPlayerBySeat(uint(targetSeat)); ok {
-		if player.UserID == user.ID {
-			return echo.NewHTTPError(http.StatusBadRequest, "Can't swap seat with yourself")
-		}
-		//TODO
-		// go swap()
-	} else {
-		//room.SendEvent()
-		// TODO  there is no player, go to the seat directly
+	targetSeat := uint(IntParam(c, "seat"))
+	if targetSeat >= room.PlayerCount {
+		return echo.NewHTTPError(http.StatusBadRequest, "Seat out of range")
 	}
-	return nil
+
+	resultStream := make(chan error)
+	s, _ := room.Attribute().LoadOrStore("swap-seat", make(map[uint]uint))
+	swapSeatRecords := s.(map[uint]uint)
+	room.DoAndWait(func() {
+		doSwap := func() {
+			err := room.SwapSeat(GetDB(c), player.Seat, targetSeat)
+			if err != nil {
+				resultStream <- err
+			} else {
+				resultStream <- c.JSON(http.StatusOK, "Swap success")
+			}
+		}
+		if player, ok := room.FindPlayerBySeat(targetSeat); ok {
+			if player.UserID == player.UserID {
+				resultStream <- echo.NewHTTPError(http.StatusBadRequest, "Can't swap seat with yourself")
+			}
+			rev, ok := swapSeatRecords[targetSeat]
+			if ok && rev == player.Seat {
+				delete(swapSeatRecords, targetSeat)
+				doSwap()
+			} else {
+				swapSeatRecords[player.Seat] = targetSeat
+				resultStream <- c.JSON(http.StatusOK, "Swap request accepted")
+			}
+		} else {
+			doSwap()
+		}
+	})
+	return <-resultStream
 }
 
 func roomJson(room *model.Room) interface{} {
@@ -145,15 +165,10 @@ func roomPlayerJson(player *model.Player) interface{} {
 }
 
 func findRoomByID(c echo.Context) *model.Room {
-	idParam := c.Param("id")
-	if id, err := strconv.Atoi(idParam); err == nil {
-		room := new(model.Room)
-		if err = room.FindByID(GetDB(c), uint(id)); err != nil {
-			xecho.MustNoError(DBNotFound(err, "No such room"))
-		}
-		return room
-	} else {
-		xecho.MustNoError(echo.NewHTTPError(http.StatusBadRequest, "Unrecognized id: "+idParam))
+	id := IntParam(c, "id")
+	room := new(model.Room)
+	if err := room.FindByID(GetDB(c), uint(id)); err != nil {
+		xecho.MustNoError(DBNotFound(err, "No such room"))
 	}
-	return nil
+	return room
 }
