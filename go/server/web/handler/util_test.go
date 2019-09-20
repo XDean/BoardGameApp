@@ -128,6 +128,8 @@ func WithRoom(t *testing.T, room *model.Room) Setup {
 		assert.NoError(t, err)
 		err = room.CreateByHost(GetDB(c), player)
 		assert.NoError(t, err)
+
+		c.Set(_const.ROOM, room)
 	}
 }
 
@@ -242,7 +244,7 @@ func (t TestHttp) Run() {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
-				e, ok := r.(model.BreakError)
+				e, ok := r.(xecho.BreakError)
 				if !ok {
 					panic(r)
 				}

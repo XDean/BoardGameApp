@@ -16,7 +16,7 @@ func TestCreateRoom(t *testing.T) {
 		handler: CreateRoom,
 		request: Request{
 			Body: xecho.J{
-				"game_name":    "game name",
+				"game_id":      "game name",
 				"room_name":    "room name",
 				"player_count": 3,
 			},
@@ -45,7 +45,7 @@ func TestCreateRoomExist(t *testing.T) {
 		handler: CreateRoom,
 		request: Request{
 			Body: xecho.J{
-				"game_name":    "game name",
+				"game_id":      "game name",
 				"room_name":    "room name",
 				"player_count": 3,
 			},
@@ -93,7 +93,7 @@ func TestGetRoom(t *testing.T) {
 		test:    t,
 		handler: GetRoom,
 		response: Response{
-			Code:  http.StatusNotFound,
+			Code:  http.StatusBadRequest,
 			Error: true,
 		},
 		setups: []Setup{

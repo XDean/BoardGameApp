@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
-	"github.com/xdean/miniboardgame/go/server/model"
+	"github.com/xdean/goex/xecho"
 	"net/http"
 	"strconv"
 )
@@ -21,6 +21,7 @@ func IntParam(c echo.Context, name string) int {
 	if i, err := strconv.Atoi(param); err == nil {
 		return i
 	} else {
-		panic(model.BreakError{echo.NewHTTPError(http.StatusBadRequest, "Unrecognized param '"+name+"': "+param)})
+		xecho.MustNoError(echo.NewHTTPError(http.StatusBadRequest, "Unrecognized param '"+name+"': "+param))
+		return 0
 	}
 }
