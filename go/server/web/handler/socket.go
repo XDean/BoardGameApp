@@ -7,7 +7,7 @@ import (
 	"github.com/xdean/goex/xecho"
 	topic "github.com/xdean/miniboardgame/go/server/const/socket"
 	"github.com/xdean/miniboardgame/go/server/model/space"
-	"github.com/xdean/miniboardgame/go/server/web/handler/sse"
+	"github.com/xdean/sse"
 )
 
 var (

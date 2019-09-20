@@ -66,8 +66,6 @@ github.com/jinzhu/now v1.0.1 h1:HjfetcXq097iXP0uoPCdnM4Efp5/9MsM0/M+XOTeR3M=
 github.com/jinzhu/now v1.0.1/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=
 github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024/go.mod h1:6v2b51hI/fHJwM22ozAgKL4VKDeJcHhJFhtBdhmNjmU=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
-github.com/julienschmidt/sse v0.0.0-20150904221518-dedc8dfa3d5d h1:wTX+iH+d5T2pPI2WvlCfiIZy+0ygDJOowiSAG/AVcjg=
-github.com/julienschmidt/sse v0.0.0-20150904221518-dedc8dfa3d5d/go.mod h1:PjhTb1j5U/VAfbh40cFhOh/996l/DS25FuemXDEkzGU=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1 h1:mweAR1A6xJ3oS2pRaGiHgQ4OO8tzTaLawm8vnODuwDk=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
@@ -130,6 +128,8 @@ github.com/valyala/fasttemplate v1.0.1 h1:tY9CJiPnMXf1ERmG2EyK7gNUd+c6RKGD0IfU8W
 github.com/valyala/fasttemplate v1.0.1/go.mod h1:UQGH1tvbgY+Nz5t2n7tXsz52dQxojPUpymEIMZ47gx8=
 github.com/xdean/goex v0.0.0-20190717134511-6c960029f3bc h1:I2Go7Xbo+bl6l34LRE65fbM9krmhe0YhIpftJnGe+aw=
 github.com/xdean/goex v0.0.0-20190717134511-6c960029f3bc/go.mod h1:s1vJcA2mwbqikZH5u8cbAY9khXoGyMIT+bzRsQsa89M=
+github.com/xdean/sse v0.0.0-20190920011231-c68e50d7fc08 h1:evWAWUadV0hd9TbRSqyDaWDOT3EXOn8dk9fDMd5gJRs=
+github.com/xdean/sse v0.0.0-20190920011231-c68e50d7fc08/go.mod h1:215vb8H5wWzlObbmAawvwxc1fi5W4Ek3WBUt6KF/Zdg=
 go.opencensus.io v0.20.1/go.mod h1:6WKK9ahsWS3RSO+PY9ZHZUfv2irvY6gN279GOPZjmmk=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=

@@ -9,7 +9,6 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/jarcoal/httpmock v1.0.4
 	github.com/jinzhu/gorm v1.9.10
-	github.com/julienschmidt/sse v0.0.0-20150904221518-dedc8dfa3d5d
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.1.6
 	github.com/labstack/gommon v0.2.9
@@ -19,6 +18,7 @@ require (
 	github.com/thoas/go-funk v0.4.0
 	github.com/urfave/cli v1.20.0
 	github.com/xdean/goex v0.0.0-20190717134511-6c960029f3bc
+	github.com/xdean/sse v0.0.0-20190920011231-c68e50d7fc08
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
 	gopkg.in/d4l3k/messagediff.v1 v1.2.1
 	gopkg.in/go-playground/assert.v1 v1.2.1
