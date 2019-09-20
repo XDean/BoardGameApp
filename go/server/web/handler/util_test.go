@@ -267,11 +267,19 @@ func (t TestHttp) Run() {
 	assert.Equal(t.test, t.response.Code, rec.Code)
 
 	// assert body
-	if t.response.Body != nil {
+	expectBody := t.response.Body
+	if expectBody != nil {
 		actualResponse := make(xecho.J)
 		err := json.Unmarshal(rec.Body.Bytes(), &actualResponse)
 		assert.NoError(t.test, err)
-		if ok, err := xgo.StructContain(actualResponse, t.response.Body); !ok {
+
+		expectResponse := make(xecho.J)
+		expectJson, err := json.Marshal(expectBody)
+		assert.NoError(t.test, err)
+		err = json.Unmarshal(expectJson, &expectResponse)
+		assert.NoError(t.test, err)
+
+		if ok, err := xgo.StructContain(actualResponse, expectResponse); !ok {
 			if err == nil {
 				assert.Fail(t.test, "Body not as expected: ", t.response.Body)
 			} else {
