@@ -26,14 +26,18 @@ const (
 	USERNAME2 = "username2"
 	USERPWD2  = "user1234562"
 
-	ADMINID   = 3
+	USERID3   = 3
+	USERNAME3 = "username3"
+	USERPWD3  = "user1234563"
+
+	ADMINID   = 4
 	ADMINNAME = "adminname"
 	ADMINPWD  = "admin123456"
 	ROOMID    = 1
 )
 
 var (
-	USER, USER2, ADMIN          = new(model.User), new(model.User), new(model.User)
+	USER, USER2, USER3, ADMIN   = new(model.User), new(model.User), new(model.User), new(model.User)
 	USER_PROFILE, ADMIN_PROFILE = new(model.Profile), new(model.Profile)
 	ROOM                        = new(model.Room)
 )
@@ -147,6 +151,16 @@ func initVars() {
 		ID:       USERID2,
 		Username: USERNAME2,
 		Password: USERPWD2,
+		Roles: []model.Role{
+			{
+				Name: _const.ROLE_USER,
+			},
+		},
+	}
+	*USER3 = model.User{
+		ID:       USERID3,
+		Username: USERNAME3,
+		Password: USERPWD3,
 		Roles: []model.Role{
 			{
 				Name: _const.ROLE_USER,

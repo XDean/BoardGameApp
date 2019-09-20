@@ -71,7 +71,7 @@ func JoinRoom(c echo.Context) error {
 				resultStream <- c.JSON(http.StatusOK, xecho.M("Join success"))
 			}
 		} else {
-			resultStream <- echo.NewHTTPError(http.StatusBadRequest, "The room is full")
+			resultStream <- c.JSON(http.StatusBadRequest, xecho.M("The room is full"))
 		}
 	})
 
