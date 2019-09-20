@@ -7,6 +7,7 @@ import (
 	"github.com/xdean/miniboardgame/go/server/model"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
@@ -57,7 +58,7 @@ func TestCreateRoomExist(t *testing.T) {
 		setups: []Setup{
 			WithUser(t, USER),
 			WithLogin(t, USER),
-			WithRoom(t, ROOM),
+			WithRoom(t, ROOM, USER),
 		},
 	}.Run()
 }
@@ -85,7 +86,38 @@ func TestGetRoom(t *testing.T) {
 		setups: []Setup{
 			WithUser(t, USER),
 			WithLogin(t, USER),
-			WithRoom(t, ROOM),
+			WithRoom(t, ROOM, USER),
+		},
+	}.Run()
+
+	TestHttp{
+		test:    t,
+		handler: GetRoomByID,
+		request: Request{
+			Params: Params{
+				"id": strconv.Itoa(ROOMID),
+			},
+		},
+		response: Response{
+			Body: xecho.J{
+				"ID":          ROOMID,
+				"GameId":      ROOM.GameId,
+				"RoomName":    ROOM.RoomName,
+				"PlayerCount": ROOM.PlayerCount,
+				"Players": []xecho.J{
+					{
+						"UserID":      USERID2,
+						"State":       model.HOST,
+						"StateString": model.HOST.String(),
+						"Seat":        0,
+					},
+				},
+			},
+		},
+		setups: []Setup{
+			WithUser(t, USER),
+			WithLogin(t, USER),
+			WithRoom(t, ROOM, USER2),
 		},
 	}.Run()
 

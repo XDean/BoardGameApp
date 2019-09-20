@@ -18,10 +18,15 @@ import (
 )
 
 const (
-	USERID    = 1
-	USERNAME  = "username"
-	USERPWD   = "user123456"
-	ADMINID   = 2
+	USERID   = 1
+	USERNAME = "username"
+	USERPWD  = "user123456"
+
+	USERID2   = 2
+	USERNAME2 = "username2"
+	USERPWD2  = "user1234562"
+
+	ADMINID   = 3
 	ADMINNAME = "adminname"
 	ADMINPWD  = "admin123456"
 	ROOMID    = 1
@@ -32,6 +37,16 @@ var (
 		ID:       USERID,
 		Username: USERNAME,
 		Password: USERPWD,
+		Roles: []model.Role{
+			{
+				Name: _const.ROLE_USER,
+			},
+		},
+	}
+	USER2 = &model.User{
+		ID:       USERID2,
+		Username: USERNAME2,
+		Password: USERPWD2,
 		Roles: []model.Role{
 			{
 				Name: _const.ROLE_USER,
@@ -116,20 +131,22 @@ func WithLogin(t *testing.T, user *model.User) Setup {
 	}
 }
 
-func WithRoom(t *testing.T, room *model.Room) Setup {
+func WithRoom(t *testing.T, room *model.Room, host *model.User) Setup {
 	return func(c echo.Context) {
-		user, err := GetCurrentUser(c)
-		assert.NoError(t, err)
-
 		player := new(model.Player)
-		err = player.GetByUserID(GetDB(c), user.ID)
+		err := player.GetByUserID(GetDB(c), host.ID)
 		assert.NoError(t, err)
 
 		assert.NoError(t, err)
 		err = room.CreateByHost(GetDB(c), player)
 		assert.NoError(t, err)
 
-		c.Set(_const.ROOM, room)
+		user, err := GetCurrentUser(c)
+		assert.NoError(t, err)
+
+		if user.ID == host.ID {
+			c.Set(_const.ROOM, room)
+		}
 	}
 }
 

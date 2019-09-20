@@ -24,7 +24,7 @@ func TestGetPlayer(t *testing.T) {
 		setups: []Setup{
 			WithUser(t, USER),
 			WithLogin(t, USER),
-			WithRoom(t, ROOM),
+			WithRoom(t, ROOM, USER),
 		},
 	}.Run()
 
