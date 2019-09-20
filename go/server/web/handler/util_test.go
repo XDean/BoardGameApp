@@ -33,6 +33,102 @@ const (
 )
 
 var (
+	USER, USER2, ADMIN          *model.User
+	USER_PROFILE, ADMIN_PROFILE *model.Profile
+	ROOM                        *model.Room
+)
+
+type (
+	DBSetup      func(db *gorm.DB)
+	ContextSetup func(echo.Context)
+	Params       map[string]string
+
+	Setup interface {
+		mark()
+	}
+
+	TestHttp struct {
+		test     *testing.T
+		handler  echo.HandlerFunc
+		request  Request
+		response Response
+		setups   []Setup
+	}
+
+	TestHttpSeries struct {
+		test     *testing.T
+		setups   []Setup
+		children []TestHttp
+	}
+
+	Request struct {
+		Method string
+		Path   string
+		Params Params
+		Body   interface{}
+	}
+
+	Response struct {
+		Code        int
+		Body        interface{}
+		Error       bool
+		ErrorDetail string
+		Extra       func(*gorm.DB, *httptest.ResponseRecorder)
+	}
+)
+
+func (DBSetup) mark() {
+}
+
+func (ContextSetup) mark() {
+}
+
+func WithUser(t *testing.T, user *model.User) DBSetup {
+	return func(db *gorm.DB) { assert.NoError(t, user.CreateAccount(db)) }
+}
+
+func WithProfile(t *testing.T, profile *model.Profile) DBSetup {
+	return func(db *gorm.DB) { assert.NoError(t, profile.Save(db)) }
+}
+
+func WithCreateRoom(t *testing.T, room *model.Room, host *model.User) DBSetup {
+	return func(db *gorm.DB) {
+		player := new(model.Player)
+		err := player.GetByUserID(db, host.ID)
+		assert.NoError(t, err)
+		err = room.CreateByHost(db, player)
+		assert.NoError(t, err)
+	}
+}
+
+func WithLogin(t *testing.T, user *model.User) ContextSetup {
+	return func(c echo.Context) { c.Set(_const.USER, user) }
+}
+
+func WithInRoom(t *testing.T, room *model.Room) ContextSetup {
+	return func(c echo.Context) { c.Set(_const.ROOM, room) }
+}
+
+func WithOpenid() ContextSetup {
+	return func(c echo.Context) {
+		openid.Providers = map[string]openid.OpenIdProvider{
+			"test": {
+				Name: "test",
+				Auth: func(token string) (string, error) {
+					return token, nil
+				},
+			},
+			"test-fail": {
+				Name: "test",
+				Auth: func(token string) (string, error) {
+					return "", errors.New("openid fail")
+				},
+			},
+		}
+	}
+}
+
+func initVars() {
 	USER = &model.User{
 		ID:       USERID,
 		Username: USERNAME,
@@ -81,197 +177,55 @@ var (
 		RoomName:    "room name",
 		PlayerCount: 3,
 	}
-)
-
-type (
-	Setup  func(echo.Context)
-	Params map[string]string
-
-	TestHttp struct {
-		test     *testing.T
-		handler  echo.HandlerFunc
-		request  Request
-		response Response
-		setups   []Setup
-	}
-
-	Request struct {
-		Method string
-		Path   string
-		Params Params
-		Body   interface{}
-	}
-
-	Response struct {
-		Code        int
-		Body        interface{}
-		Error       bool
-		ErrorDetail string
-		Extra       func(*gorm.DB, *httptest.ResponseRecorder)
-	}
-)
-
-func WithUser(t *testing.T, user *model.User) Setup {
-	return func(c echo.Context) {
-		err := user.CreateAccount(GetDB(c))
-		assert.NoError(t, err)
-	}
-}
-
-func WithProfile(t *testing.T, profile *model.Profile) Setup {
-	return func(c echo.Context) {
-		err := profile.Save(GetDB(c))
-		assert.NoError(t, err)
-	}
-}
-
-func WithLogin(t *testing.T, user *model.User) Setup {
-	return func(c echo.Context) {
-		c.Set(_const.USER, user)
-	}
-}
-
-func WithRoom(t *testing.T, room *model.Room, host *model.User) Setup {
-	return func(c echo.Context) {
-		player := new(model.Player)
-		err := player.GetByUserID(GetDB(c), host.ID)
-		assert.NoError(t, err)
-
-		assert.NoError(t, err)
-		err = room.CreateByHost(GetDB(c), player)
-		assert.NoError(t, err)
-
-		user, err := GetCurrentUser(c)
-		assert.NoError(t, err)
-
-		if user.ID == host.ID {
-			c.Set(_const.ROOM, room)
-		}
-	}
-}
-
-func WithOpenid() Setup {
-	return func(c echo.Context) {
-		openid.Providers = map[string]openid.OpenIdProvider{
-			"test": {
-				Name: "test",
-				Auth: func(token string) (string, error) {
-					return token, nil
-				},
-			},
-			"test-fail": {
-				Name: "test",
-				Auth: func(token string) (string, error) {
-					return "", errors.New("openid fail")
-				},
-			},
-		}
-	}
-}
-
-func initVars() {
-	USER = &model.User{
-		ID:       USERID,
-		Username: USERNAME,
-		Password: USERPWD,
-		Roles: []model.Role{
-			{
-				Name: _const.ROLE_USER,
-			},
-		},
-	}
-	ADMIN = &model.User{
-		ID:       ADMINID,
-		Username: ADMINNAME,
-		Password: ADMINPWD,
-		Roles: []model.Role{
-			{
-				Name: _const.ROLE_ADMIN,
-			},
-		},
-	}
-	USER_PROFILE = &model.Profile{
-		UserID:    USERID,
-		Sex:       model.Male,
-		Nickname:  "usernick",
-		AvatarURL: "userurl",
-	}
-	ADMIN_PROFILE = &model.Profile{
-		UserID:    USERID,
-		Sex:       model.Male,
-		Nickname:  "adminname",
-		AvatarURL: "adminurl",
-	}
-	ROOM = &model.Room{
-		ID:          ROOMID,
-		GameId:      "game name",
-		RoomName:    "room name",
-		PlayerCount: 3,
-	}
 }
 
 func (t TestHttp) Run() {
 	initVars()
-	// prepare request and response
-	t.request = defaultRequest(t.request)
-	t.response = defaultResponse(t.response)
 
 	// prepare db
 	tx := dbContext.Begin()
 	defer tx.Rollback()
 
-	// format body and create request object
-	var body *strings.Reader
-	var err error
-	var req *http.Request
-	if t.request.Body != nil {
-		var js []byte
-		js, err = json.Marshal(t.request.Body)
-		body = strings.NewReader(string(js))
-		assert.NoError(t.test, err)
-		req = httptest.NewRequest(t.request.Method, t.request.Path, body)
-	} else {
-		req = httptest.NewRequest(t.request.Method, t.request.Path, nil)
-	}
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	setupDB(tx, t.setups)
 
-	// create response object and echo context
+	t.doRun(tx)
+}
+
+func (s TestHttpSeries) Run() {
+	initVars()
+
+	// prepare db
+	tx := dbContext.Begin()
+	defer tx.Rollback()
+	setupDB(tx, s.setups)
+
+	for _, t := range s.children {
+		t.test = s.test
+		t.setups = append(s.setups, t.setups...)
+		t.doRun(tx)
+	}
+}
+
+func (t TestHttp) doRun(tx *gorm.DB) {
+	// prepare request and response
+	t.request = defaultRequest(t.request)
+	t.response = defaultResponse(t.response)
+	// create request and response object and echo context
+	req := t.genRequest()
 	rec := httptest.NewRecorder()
 	c := echoContext.NewContext(req, rec)
-
 	// setup echo context
 	c.Set(_const.DATABASE, tx)
-	if t.request.Params != nil {
-		keys := make([]string, 0)
-		values := make([]string, 0)
-		for k, v := range t.request.Params {
-			keys = append(keys, k)
-			values = append(values, v)
-		}
-		c.SetParamNames(keys...)
-		c.SetParamValues(values...)
-	}
-	if t.setups != nil {
-		for _, setup := range t.setups {
-			setup(c)
-		}
-	}
-
+	t.setupRequestParam(c)
+	t.setupContext(c)
 	// handle
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				e, ok := r.(xecho.BreakError)
-				if !ok {
-					panic(r)
-				}
-				err = e.Actual
-			}
-		}()
-		err = t.handler(c)
-	}()
+	err := t.doHttp(c)
 	echoContext.HTTPErrorHandler(err, c)
+	// assert
+	t.doAssert(err, rec, tx)
+}
 
+func (t TestHttp) doAssert(err error, rec *httptest.ResponseRecorder, tx *gorm.DB) {
 	// assert error
 	if t.response.Error {
 		assert.Error(t.test, err)
@@ -281,10 +235,8 @@ func (t TestHttp) Run() {
 	} else {
 		assert.NoError(t.test, err)
 	}
-
 	// assert code
 	assert.Equal(t.test, t.response.Code, rec.Code)
-
 	// assert body
 	expectBody := t.response.Body
 	if expectBody != nil {
@@ -306,11 +258,66 @@ func (t TestHttp) Run() {
 			}
 		}
 	}
-
 	// extra
 	if t.response.Extra != nil {
 		t.response.Extra(tx, rec)
 	}
+}
+
+func (t TestHttp) doHttp(c echo.Context) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			e, ok := r.(xecho.BreakError)
+			if !ok {
+				panic(r)
+			}
+			err = e.Actual
+		}
+	}()
+	return t.handler(c)
+}
+
+func (t TestHttp) setupContext(c echo.Context) {
+	for _, setup := range t.setups {
+		if t, ok := setup.(ContextSetup); ok {
+			t(c)
+		}
+	}
+}
+
+func setupDB(db *gorm.DB, setups []Setup) {
+	for _, setup := range setups {
+		if t, ok := setup.(DBSetup); ok {
+			t(db)
+		}
+	}
+}
+
+func (t TestHttp) setupRequestParam(c echo.Context) {
+	if t.request.Params != nil {
+		keys := make([]string, 0)
+		values := make([]string, 0)
+		for k, v := range t.request.Params {
+			keys = append(keys, k)
+			values = append(values, v)
+		}
+		c.SetParamNames(keys...)
+		c.SetParamValues(values...)
+	}
+}
+
+func (t TestHttp) genRequest() (req *http.Request) {
+	if t.request.Body != nil {
+		var js []byte
+		js, err := json.Marshal(t.request.Body)
+		body := strings.NewReader(string(js))
+		assert.NoError(t.test, err)
+		req = httptest.NewRequest(t.request.Method, t.request.Path, body)
+	} else {
+		req = httptest.NewRequest(t.request.Method, t.request.Path, nil)
+	}
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	return req
 }
 
 func defaultRequest(request Request) Request {

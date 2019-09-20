@@ -58,7 +58,7 @@ func TestCreateRoomExist(t *testing.T) {
 		setups: []Setup{
 			WithUser(t, USER),
 			WithLogin(t, USER),
-			WithRoom(t, ROOM, USER),
+			WithCreateRoom(t, ROOM, USER),
 		},
 	}.Run()
 }
@@ -86,7 +86,8 @@ func TestGetRoom(t *testing.T) {
 		setups: []Setup{
 			WithUser(t, USER),
 			WithLogin(t, USER),
-			WithRoom(t, ROOM, USER),
+			WithCreateRoom(t, ROOM, USER),
+			WithInRoom(t, ROOM),
 		},
 	}.Run()
 
@@ -117,7 +118,7 @@ func TestGetRoom(t *testing.T) {
 		setups: []Setup{
 			WithUser(t, USER),
 			WithLogin(t, USER),
-			WithRoom(t, ROOM, USER2),
+			WithCreateRoom(t, ROOM, USER2),
 		},
 	}.Run()
 

@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"errors"
 	"github.com/labstack/echo/v4"
 	"github.com/xdean/goex/xecho"
 	"github.com/xdean/miniboardgame/go/server/model"
+	"github.com/xdean/miniboardgame/go/server/web/handler/openid"
 	"net/http"
 	"testing"
 )
@@ -143,6 +145,21 @@ func TestLoginPassword(t *testing.T) {
 }
 
 func TestLoginOpenid(t *testing.T) {
+	openid.Providers = map[string]openid.OpenIdProvider{
+		"test": {
+			Name: "test",
+			Auth: func(token string) (string, error) {
+				return token, nil
+			},
+		},
+		"test-fail": {
+			Name: "test",
+			Auth: func(token string) (string, error) {
+				return "", errors.New("openid fail")
+			},
+		},
+	}
+
 	TestHttp{
 		test:    t,
 		handler: Login,
@@ -152,9 +169,6 @@ func TestLoginOpenid(t *testing.T) {
 				"provider": "test",
 				"token":    "token",
 			},
-		},
-		setups: []Setup{
-			WithOpenid(),
 		},
 	}.Run()
 	TestHttp{
@@ -168,7 +182,6 @@ func TestLoginOpenid(t *testing.T) {
 			},
 		},
 		setups: []Setup{
-			WithOpenid(),
 			WithUser(t, &model.User{
 				Username: "token@test",
 			}),
