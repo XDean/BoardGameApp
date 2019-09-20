@@ -10,7 +10,7 @@ func (r *Room) EventHostId() string {
 }
 
 func (r *Room) SendEvent(e space.Message) {
-	space.SendEvent(r, e)
+	space.SendMessage(r, e)
 }
 
 func (r *Room) Listen() space.Subscription {

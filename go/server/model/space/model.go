@@ -1,6 +1,9 @@
 package space
 
-import "sync"
+import (
+	"github.com/xdean/miniboardgame/go/server/log"
+	"sync"
+)
 
 type (
 	Host interface {
@@ -35,11 +38,9 @@ type (
 	}
 
 	Thread struct {
-		MessageStream    chan Message
-		ActionStream     chan Action
-		SubscriberStream chan Subscriber
-		Done             chan bool
-		Attribute        sync.Map
+		EventStream chan interface{} // Message or Action or Subscriber
+		Done        chan bool
+		Attribute   sync.Map
 	}
 
 	threadGetter struct {
@@ -64,11 +65,9 @@ func threadAccess(stream chan threadGetter) {
 			rt, ok := threads[g.Host.EventHostId()]
 			if !ok {
 				rt = &Thread{
-					ActionStream:     make(chan Action, 5),
-					MessageStream:    make(chan Message, 5),
-					SubscriberStream: make(chan Subscriber, 5),
-					Done:             make(chan bool),
-					Attribute:        sync.Map{},
+					EventStream: make(chan interface{}, 10),
+					Done:        make(chan bool),
+					Attribute:   sync.Map{},
 				}
 				threads[g.Host.EventHostId()] = rt
 				go rt.run()
@@ -89,38 +88,43 @@ func getThread(r Host) *Thread {
 	return rt
 }
 
-func (p Publisher) SendEvent(message Message) {
-	p.thread.MessageStream <- message
-}
-
 func (r *Thread) run() {
 	subscribers := make([]Subscriber, 0)
 	for {
 		select {
-		case message := <-r.MessageStream:
-			new := make([]Subscriber, 0)
-			for _, v := range subscribers {
-				select {
-				case v.MessageListener <- message:
-					new = append(new, v)
-				case <-v.Done:
-					close(v.MessageListener)
-				default:
-					close(v.MessageListener)
+		case event := <-r.EventStream:
+			switch t := event.(type) {
+			case Message:
+				new := make([]Subscriber, 0)
+				for _, v := range subscribers {
+					select {
+					case <-v.Done:
+						close(v.MessageListener)
+					default:
+						select {
+						case v.MessageListener <- t:
+							new = append(new, v)
+						default:
+							// downstream is block
+							close(v.MessageListener)
+						}
+					}
 				}
+				subscribers = new
+			case Action:
+				t.Func()
+				t.Done <- true
+				close(t.Done)
+			case Subscriber:
+				subscribers = append(subscribers, t)
+			default:
+				log.Global.Warn("Unknown event:", t)
 			}
-			subscribers = new
-		case action := <-r.ActionStream:
-			action.Func()
-			action.Done <- true
-			close(action.Done)
-		case obs := <-r.SubscriberStream:
-			subscribers = append(subscribers, obs)
 		case <-r.Done:
 			for _, v := range subscribers {
 				close(v.MessageListener)
 			}
-			break
+			return
 		}
 	}
 }

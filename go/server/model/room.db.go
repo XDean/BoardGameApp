@@ -27,7 +27,7 @@ func (r *Room) FindByUserID(db *gorm.DB, id uint) error {
 
 func FindRoomsByGame(db *gorm.DB, game string, bound RowBound) ([]*Room, error) {
 	rooms := make([]*Room, 0)
-	err := db.Where("game_name = ?", game).Limit(bound.Limit).Offset(bound.Offset).Find(&rooms).Error
+	err := db.Where("game_id = ?", game).Limit(bound.Limit).Offset(bound.Offset).Find(&rooms).Error
 	for _, room := range rooms {
 		room.normalize()
 	}
