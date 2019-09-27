@@ -112,7 +112,7 @@ func SwapSeat(c echo.Context) error {
 	resultStream := make(chan error)
 	s, _ := room.Attribute().LoadOrStore("swap-seat", make(map[uint]uint))
 	swapSeatRecords := s.(map[uint]uint)
-	room.DoAndWait(func() {
+	room.Do(func() {
 		doSwap := func() {
 			err := room.SwapSeat(GetDB(c), player.Seat, targetSeat)
 			if err != nil {
@@ -121,9 +121,10 @@ func SwapSeat(c echo.Context) error {
 				resultStream <- c.JSON(http.StatusOK, "Swap success")
 			}
 		}
-		if player, ok := room.FindPlayerBySeat(targetSeat); ok {
-			if player.UserID == player.UserID {
+		if targetPlayer, ok := room.FindPlayerBySeat(targetSeat); ok {
+			if player.UserID == targetPlayer.UserID {
 				resultStream <- echo.NewHTTPError(http.StatusBadRequest, "Can't swap seat with yourself")
+				return
 			}
 			rev, ok := swapSeatRecords[targetSeat]
 			if ok && rev == player.Seat {

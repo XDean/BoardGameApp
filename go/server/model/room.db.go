@@ -102,13 +102,13 @@ func (r *Room) SwapSeat(db *gorm.DB, a, b uint) error {
 	xgo.MustTrue(a < r.PlayerCount, "Seat")
 	xgo.MustTrue(b < r.PlayerCount, "Seat")
 
-	p, ok := r.FindPlayerBySeat(a)
-	if ok {
-		p.Seat = b
+	p1, ok1 := r.FindPlayerBySeat(a)
+	p2, ok2 := r.FindPlayerBySeat(b)
+	if ok1 {
+		p1.Seat = b
 	}
-	p, ok = r.FindPlayerBySeat(b)
-	if ok {
-		p.Seat = a
+	if ok2 {
+		p2.Seat = a
 	}
 	return r.save(db)
 }

@@ -300,7 +300,8 @@ func TestJoinRoom(t *testing.T) {
 					},
 				},
 				response: Response{
-					Code: http.StatusBadRequest,
+					Code:  http.StatusBadRequest,
+					Error: true,
 				},
 				setups: []Setup{
 					WithLogin(t, USER3),
@@ -324,6 +325,148 @@ func TestJoinRoom(t *testing.T) {
 				},
 				setups: []Setup{
 					WithLogin(t, USER2),
+				},
+			},
+		},
+	}.Run()
+}
+
+func TestSwapSeat(t *testing.T) {
+	user1Create := TestHttp{
+		handler: CreateRoom,
+		request: Request{
+			Body: xecho.J{
+				"game_id":      "game name",
+				"room_name":    "room name",
+				"player_count": 3,
+			},
+		},
+		setups: []Setup{
+			WithLogin(t, USER),
+		},
+	}
+	user2Join := TestHttp{
+		handler: JoinRoom,
+		request: Request{
+			Params: Params{
+				"id": "1",
+			},
+		},
+		setups: []Setup{
+			WithLogin(t, USER2),
+		},
+	}
+	// swap 1 -> 2
+	TestHttpSeries{
+		test: t,
+		setups: []Setup{
+			WithUser(t, USER),
+			WithUser(t, USER2),
+		},
+		children: []TestHttp{
+			user1Create,
+			user2Join,
+			{
+				handler: SwapSeat,
+				request: Request{
+					Params: Params{
+						"seat": "2",
+					},
+				},
+				response: Response{
+					Extra: func(db *gorm.DB, recorder *httptest.ResponseRecorder) {
+						player := new(model.Player)
+						err := player.GetByUserID(db, USERID2)
+						assert.NoError(t, err)
+						assert.Equal(t, model.NOT_READY, player.State)
+						assert.Equal(t, uint(1), player.RoomID)
+						assert.Equal(t, uint(2), player.Seat)
+					},
+				},
+				setups: []Setup{
+					WithLogin(t, USER2),
+				},
+			},
+		},
+	}.Run()
+	// swap 1 -> 1
+	TestHttpSeries{
+		test: t,
+		setups: []Setup{
+			WithUser(t, USER),
+			WithUser(t, USER2),
+		},
+		children: []TestHttp{
+			user1Create,
+			user2Join,
+			{
+				handler: SwapSeat,
+				request: Request{
+					Params: Params{
+						"seat": "1",
+					},
+				},
+				response: Response{
+					Code:  http.StatusBadRequest,
+					Error: true,
+				},
+				setups: []Setup{
+					WithLogin(t, USER2),
+				},
+			},
+		},
+	}.Run()
+	// swap 1 <-> 0
+	TestHttpSeries{
+		test: t,
+		setups: []Setup{
+			WithUser(t, USER),
+			WithUser(t, USER2),
+		},
+		children: []TestHttp{
+			user1Create,
+			user2Join,
+			{
+				handler: SwapSeat,
+				request: Request{
+					Params: Params{
+						"seat": "0",
+					},
+				},
+				response: Response{
+					Code: http.StatusOK,
+				},
+				setups: []Setup{
+					WithLogin(t, USER2),
+				},
+			},
+			{
+				handler: SwapSeat,
+				request: Request{
+					Params: Params{
+						"seat": "1",
+					},
+				},
+				response: Response{
+					Code: http.StatusOK,
+					Extra: func(db *gorm.DB, recorder *httptest.ResponseRecorder) {
+						player := new(model.Player)
+						err := player.GetByUserID(db, USERID)
+						assert.NoError(t, err)
+						assert.Equal(t, model.HOST, player.State)
+						assert.Equal(t, uint(1), player.RoomID)
+						assert.Equal(t, uint(1), player.Seat)
+
+						player2 := new(model.Player)
+						err = player2.GetByUserID(db, USERID2)
+						assert.NoError(t, err)
+						assert.Equal(t, model.NOT_READY, player2.State)
+						assert.Equal(t, uint(1), player2.RoomID)
+						assert.Equal(t, uint(0), player2.Seat)
+					},
+				},
+				setups: []Setup{
+					WithLogin(t, USER),
 				},
 			},
 		},
