@@ -32,7 +32,7 @@ func RoomSocket(c echo.Context) error {
 		From:    int(user.ID),
 		To:      -1,
 		Topic:   topic.PLAYER_CONNECTED,
-		Payload: user.ID,
+		Payload: true,
 	})
 
 	subscription := room.Listen()
@@ -41,8 +41,8 @@ func RoomSocket(c echo.Context) error {
 		room.SendEvent(space.Message{
 			From:    int(user.ID),
 			To:      -1,
-			Topic:   topic.PLAYER_DISCONNECTED,
-			Payload: user.ID,
+			Topic:   topic.PLAYER_CONNECTED,
+			Payload: false,
 		})
 		subscription.Done <- true
 		return nil
@@ -75,14 +75,14 @@ func RoomSSE(c echo.Context) error {
 		From:    int(user.ID),
 		To:      -1,
 		Topic:   topic.PLAYER_CONNECTED,
-		Payload: user.ID,
+		Payload: true,
 	})
 
 	defer room.SendEvent(space.Message{
 		From:    int(user.ID),
 		To:      -1,
-		Topic:   topic.PLAYER_DISCONNECTED,
-		Payload: user.ID,
+		Topic:   topic.PLAYER_CONNECTED,
+		Payload: false,
 	})
 
 	subscription := room.Listen()

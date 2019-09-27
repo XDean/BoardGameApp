@@ -38,6 +38,7 @@ func InitRouter(e *echo.Echo) {
 	authored.GET("/room/join/:id", handler.JoinRoom)
 	authored.GET("/room/exit", handler.ExitRoom)
 	authored.GET("/room/swap/:seat", handler.SwapSeat)
+	authored.GET("/room/ready", handler.Ready)
 
 	authored.GET("/games", handler.GetGameList)
 	authored.GET("/game/start", handler.StartGame, middleware.AuthRoom())

@@ -11,7 +11,7 @@ type (
 	}
 
 	Message struct {
-		From       int `json:"-"` // user id
+		From       int // user id
 		To         int `json:"-"` // user id, -1 means all
 		Topic      string
 		Attributes map[string]interface{}

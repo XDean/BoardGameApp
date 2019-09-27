@@ -3,7 +3,9 @@ package handler
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/xdean/goex/xecho"
+	topic "github.com/xdean/miniboardgame/go/server/const/socket"
 	"github.com/xdean/miniboardgame/go/server/model"
+	"github.com/xdean/miniboardgame/go/server/model/space"
 	"net/http"
 )
 
@@ -136,6 +138,36 @@ func SwapSeat(c echo.Context) error {
 			}
 		} else {
 			doSwap()
+		}
+	})
+	return <-resultStream
+}
+func Ready(c echo.Context) error {
+	player, err := GetCurrentPlayer(c)
+	xecho.MustNoError(err)
+
+	room := player.Room
+
+	if player.State == model.HOST {
+		return echo.NewHTTPError(http.StatusBadRequest, "Host don't need ready")
+	}
+
+	resultStream := make(chan error)
+	room.Do(func() {
+		err := player.Ready(GetDB(c))
+		if err == nil {
+			room.SendEvent(space.Message{
+				From:    int(player.UserID),
+				To:      -1,
+				Topic:   topic.PLAYER_READY,
+				Payload: player.State == model.READY,
+			})
+			resultStream <- c.JSON(http.StatusOK, xecho.J{
+				"message": "Ready success",
+				"ready":   player.State == model.READY,
+			})
+		} else {
+			resultStream <- err
 		}
 	})
 	return <-resultStream

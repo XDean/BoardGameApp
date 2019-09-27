@@ -32,3 +32,12 @@ func (p *Player) normalizeDB(db *gorm.DB) error {
 	}
 	return nil
 }
+
+func (p *Player) Ready(db *gorm.DB) error {
+	if p.State == READY {
+		p.State = NOT_READY
+	} else if p.State == NOT_READY {
+		p.State = READY
+	}
+	return db.Save(p).Error
+}

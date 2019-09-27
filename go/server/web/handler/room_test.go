@@ -472,3 +472,98 @@ func TestSwapSeat(t *testing.T) {
 		},
 	}.Run()
 }
+
+func TestReady(t *testing.T) {
+	user1Create := TestHttp{
+		handler: CreateRoom,
+		request: Request{
+			Body: xecho.J{
+				"game_id":      "game name",
+				"room_name":    "room name",
+				"player_count": 2,
+			},
+		},
+		setups: []Setup{
+			WithLogin(t, USER),
+		},
+	}
+	user2Join := TestHttp{
+		handler: JoinRoom,
+		request: Request{
+			Params: Params{
+				"id": "1",
+			},
+		},
+		setups: []Setup{
+			WithLogin(t, USER2),
+		},
+	}
+	// host ready
+	TestHttpSeries{
+		test: t,
+		setups: []Setup{
+			WithUser(t, USER),
+			WithUser(t, USER2),
+		},
+		children: []TestHttp{
+			user1Create,
+			user2Join,
+			{
+				handler: Ready,
+				response: Response{
+					Error: true,
+					Code:  http.StatusBadRequest,
+				},
+				setups: []Setup{
+					WithLogin(t, USER),
+				},
+			},
+		},
+	}.Run()
+	// host ready
+	TestHttpSeries{
+		test: t,
+		setups: []Setup{
+			WithUser(t, USER),
+			WithUser(t, USER2),
+		},
+		children: []TestHttp{
+			user1Create,
+			user2Join,
+			{
+				handler: Ready,
+				response: Response{
+					Body: xecho.J{
+						"ready": true,
+					},
+					Extra: func(db *gorm.DB, recorder *httptest.ResponseRecorder) {
+						player := new(model.Player)
+						err := player.GetByUserID(db, USERID2)
+						assert.NoError(t, err)
+						assert.Equal(t, model.READY, player.State)
+					},
+				},
+				setups: []Setup{
+					WithLogin(t, USER2),
+				},
+			},
+			{
+				handler: Ready,
+				response: Response{
+					Body: xecho.J{
+						"ready": false,
+					},
+					Extra: func(db *gorm.DB, recorder *httptest.ResponseRecorder) {
+						player := new(model.Player)
+						err := player.GetByUserID(db, USERID2)
+						assert.NoError(t, err)
+						assert.Equal(t, model.NOT_READY, player.State)
+					},
+				},
+				setups: []Setup{
+					WithLogin(t, USER2),
+				},
+			},
+		},
+	}.Run()
+}
