@@ -17,7 +17,7 @@ func TestCreateRoom(t *testing.T) {
 		handler: CreateRoom,
 		request: Request{
 			Body: xecho.J{
-				"game_id":      "game name",
+				"game_id":      GAME_ID,
 				"room_name":    "room name",
 				"player_count": 3,
 			},
@@ -27,11 +27,51 @@ func TestCreateRoom(t *testing.T) {
 				room := new(model.Room)
 				err := room.FindByUserID(db, USERID)
 				assert.NoError(t, err)
-				assert.Equal(t, "game name", room.GameId)
+				assert.Equal(t, GAME_ID, room.GameId)
 				assert.Equal(t, "room name", room.RoomName)
 				assert.Equal(t, uint(3), room.PlayerCount)
 				assert.Equal(t, uint(USERID), room.Players[0].UserID)
 			},
+		},
+		setups: []Setup{
+			WithUser(t, USER),
+			WithLogin(t, USER),
+		},
+	}.Run()
+
+	TestHttp{
+		test:    t,
+		handler: CreateRoom,
+		request: Request{
+			Body: xecho.J{
+				"game_id":      GAME_ID,
+				"room_name":    "room name",
+				"player_count": 5,
+			},
+		},
+		response: Response{
+			Error: true,
+			Code:  http.StatusBadRequest,
+		},
+		setups: []Setup{
+			WithUser(t, USER),
+			WithLogin(t, USER),
+		},
+	}.Run()
+
+	TestHttp{
+		test:    t,
+		handler: CreateRoom,
+		request: Request{
+			Body: xecho.J{
+				"game_id":      "no game",
+				"room_name":    "room name",
+				"player_count": 5,
+			},
+		},
+		response: Response{
+			Error: true,
+			Code:  http.StatusBadRequest,
 		},
 		setups: []Setup{
 			WithUser(t, USER),
@@ -46,7 +86,7 @@ func TestCreateRoomExist(t *testing.T) {
 		handler: CreateRoom,
 		request: Request{
 			Body: xecho.J{
-				"game_id":      "game name",
+				"game_id":      GAME_ID,
 				"room_name":    "room name",
 				"player_count": 3,
 			},
@@ -177,7 +217,7 @@ func TestJoinRoom(t *testing.T) {
 		handler: CreateRoom,
 		request: Request{
 			Body: xecho.J{
-				"game_id":      "game name",
+				"game_id":      GAME_ID,
 				"room_name":    "room name",
 				"player_count": 2,
 			},
@@ -187,7 +227,7 @@ func TestJoinRoom(t *testing.T) {
 				room := new(model.Room)
 				err := room.FindByUserID(db, USERID)
 				assert.NoError(t, err)
-				assert.Equal(t, "game name", room.GameId)
+				assert.Equal(t, GAME_ID, room.GameId)
 				assert.Equal(t, "room name", room.RoomName)
 				assert.Equal(t, uint(2), room.PlayerCount)
 				assert.Equal(t, uint(USERID), room.Players[0].UserID)
@@ -336,7 +376,7 @@ func TestSwapSeat(t *testing.T) {
 		handler: CreateRoom,
 		request: Request{
 			Body: xecho.J{
-				"game_id":      "game name",
+				"game_id":      GAME_ID,
 				"room_name":    "room name",
 				"player_count": 3,
 			},
@@ -478,7 +518,7 @@ func TestReady(t *testing.T) {
 		handler: CreateRoom,
 		request: Request{
 			Body: xecho.J{
-				"game_id":      "game name",
+				"game_id":      GAME_ID,
 				"room_name":    "room name",
 				"player_count": 2,
 			},

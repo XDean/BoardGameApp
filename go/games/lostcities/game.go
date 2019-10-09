@@ -6,7 +6,6 @@ import (
 )
 
 type (
-	// Events
 	Event struct {
 		game.BaseEvent
 

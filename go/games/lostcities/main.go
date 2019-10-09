@@ -16,10 +16,11 @@ var Instance = &game.Game{
 	},
 	Options: nil,
 	NewEvent: func() game.Event {
-		return Event{}
+		e := Event{}
+		e.BaseEvent.ResponseStream = make(chan game.Response, 5)
+		return e
 	},
 	OnEvent: func(e game.Event) game.Response { // card or error
-
 		eventStream <- e
 		return e.GetResponse()
 	},

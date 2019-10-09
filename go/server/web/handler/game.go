@@ -31,6 +31,7 @@ func StartGame(c echo.Context) error {
 		BaseEvent: game.BaseEvent{
 			ResponseStream: make(chan game.Response),
 			User:           user,
+			Room:           room,
 		},
 	})
 	return eventResponse(c, res)
@@ -42,6 +43,16 @@ func GameEvent(c echo.Context) error {
 
 	e := g.NewEvent()
 	xecho.MustBindAndValidate(c, &e)
+
+	user, err := GetCurrentUser(c)
+	xecho.MustNoError(err)
+
+	room, err := GetCurrentRoom(c)
+	xecho.MustNoError(err)
+
+	e.SetUser(user)
+	e.SetRoom(room)
+
 	res := g.OnEvent(e)
 	return eventResponse(c, res)
 }
@@ -57,12 +68,14 @@ func eventResponse(c echo.Context, res game.Response) error {
 	}
 }
 
-func gamesJson(games []*game.Game) []interface{} {
+func gamesJson(games []*game.Game) xecho.J {
 	result := make([]interface{}, 0)
 	for _, v := range games {
 		result = append(result, gameJson(v))
 	}
-	return result
+	return xecho.J{
+		"Games": result,
+	}
 }
 
 func gameJson(v *game.Game) interface{} {

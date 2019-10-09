@@ -9,6 +9,7 @@ import (
 	"github.com/xdean/goex/xecho"
 	"github.com/xdean/goex/xgo"
 	_const "github.com/xdean/miniboardgame/go/server/const"
+	"github.com/xdean/miniboardgame/go/server/game"
 	"github.com/xdean/miniboardgame/go/server/model"
 	"github.com/xdean/miniboardgame/go/server/web/handler/openid"
 	"net/http"
@@ -34,16 +35,39 @@ const (
 	ADMINNAME = "adminname"
 	ADMINPWD  = "admin123456"
 	ROOMID    = 1
+
+	GAME_ID   = "test-game"
+	GAME_NAME = "Test Game"
 )
 
 var (
 	USER, USER2, USER3, ADMIN   = new(model.User), new(model.User), new(model.User), new(model.User)
 	USER_PROFILE, ADMIN_PROFILE = new(model.Profile), new(model.Profile)
 	ROOM                        = new(model.Room)
+
+	GAME = &game.Game{
+		Id:      GAME_ID,
+		Name:    GAME_NAME,
+		Player:  game.Range{Min: 2, Max: 3},
+		Options: []game.Option{},
+		NewEvent: func() game.Event {
+			e := game.BaseEvent{}
+			e.ResponseStream = make(chan game.Response, 5)
+			return e
+		},
+		OnEvent: func(event game.Event) game.Response {
+			switch event.(type) {
+			case game.NewGameEvent:
+				return event.GetUser().ID
+			}
+			return event
+		},
+	}
 )
 
 func init() {
 	initVars()
+	game.Register(GAME)
 }
 
 type (
@@ -191,7 +215,7 @@ func initVars() {
 	}
 	*ROOM = model.Room{
 		ID:          ROOMID,
-		GameId:      "game name",
+		GameId:      GAME_ID,
 		RoomName:    "room name",
 		PlayerCount: 3,
 	}

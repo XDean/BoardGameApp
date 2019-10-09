@@ -6,7 +6,9 @@ type (
 	Event interface {
 		PutResponse(Response)
 		GetResponse() Response
+		SetUser(user *model.User)
 		GetUser() *model.User
+		SetRoom(room *model.Room)
 		GetRoom() *model.Room
 	}
 
@@ -18,11 +20,15 @@ type (
 
 	Response interface {
 	}
-
-	NewGameEvent struct {
-		BaseEvent
-	}
 )
+
+func (e BaseEvent) SetUser(user *model.User) {
+	e.User = user
+}
+
+func (e BaseEvent) SetRoom(room *model.Room) {
+	e.Room = room
+}
 
 func (e BaseEvent) PutResponse(res Response) {
 	e.ResponseStream <- res

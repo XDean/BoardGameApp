@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/xdean/goex/xecho"
 	topic "github.com/xdean/miniboardgame/go/server/const/socket"
+	"github.com/xdean/miniboardgame/go/server/game"
 	"github.com/xdean/miniboardgame/go/server/model"
 	"github.com/xdean/miniboardgame/go/server/model/space"
 	"net/http"
@@ -29,6 +31,15 @@ func CreateRoom(c echo.Context) error {
 
 	if player.RoomID != 0 {
 		return echo.NewHTTPError(http.StatusMethodNotAllowed, "You have been in a room")
+	}
+
+	g, err := game.FindGame(param.GameId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "No such game: "+param.GameId)
+	}
+	if !g.Player.Contain(int(param.PlayerCount)) {
+		return echo.NewHTTPError(http.StatusBadRequest,
+			fmt.Sprintf("Game %s doesn't allow %d player game", param.GameId, param.PlayerCount))
 	}
 
 	room := new(model.Room)
