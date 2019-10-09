@@ -7,30 +7,12 @@ import (
 	"github.com/xdean/miniboardgame/go/server/model/space"
 )
 
-type (
-	Value int
-	Game  struct {
-		Values []Value
-		Thread space.Publisher
-	}
-	Event struct {
-		game.BaseEvent
-		Value Value
-	}
-)
-
-const (
-	ROCK Value = iota + 1
-	PAPER
-	SCISSORS
-)
-
 var Instance = &game.Game{
 	Id:   "rps",
 	Name: "石头剪刀布",
 	Player: game.Range{
 		Min: 2,
-		Max: 4,
+		Max: 10,
 	},
 	Options: nil,
 	NewEvent: func() game.Event {
@@ -74,37 +56,11 @@ func handleEvent(event game.Event) game.Response {
 		if room != nil {
 			return errors.New("The game has started")
 		}
-		g := Game{Values: make([]Value, event.GetRoom().PlayerCount)}
+		g := NewGame(int(event.GetRoom().PlayerCount))
 		g.Thread = space.Publish(event.GetRoom())
-		games[event.GetRoom().ID] = &g
+		games[event.GetRoom().ID] = g
 		return "Create Success"
 	default:
 		return errors.New("Unknown event")
 	}
-}
-
-func (g *Game) Play(event Event) game.Response {
-	seat := event.GetSeat()
-	if g.Values[seat] != 0 {
-		return errors.New("You had given your choice")
-	}
-	g.Values[seat] = event.Value
-	defer func() {
-		for _, v := range g.Values {
-			if v == -1 {
-				return
-			}
-		}
-		winner := g.winner()
-		g.Thread.SendEvent(space.Message{
-			To:      -1,
-			Topic:   "Win",
-			Payload: winner,
-		})
-	}()
-	return "Accept"
-}
-
-func (g *Game) winner() int {
-	return 0
 }
