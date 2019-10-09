@@ -17,6 +17,7 @@ var dbContext *gorm.DB
 func TestMain(m *testing.M) {
 	config.Debug = true
 	echoContext = echo.New()
+	echoContext.Debug = true
 	echoContext.Validator = NewValidator()
 
 	result := m.Run()

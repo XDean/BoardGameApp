@@ -3,11 +3,13 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/xdean/goex/xecho"
 	"github.com/xdean/goex/xgo"
+	"github.com/xdean/miniboardgame/go/games/rps"
 	_const "github.com/xdean/miniboardgame/go/server/const"
 	"github.com/xdean/miniboardgame/go/server/game"
 	"github.com/xdean/miniboardgame/go/server/model"
@@ -36,38 +38,19 @@ const (
 	ADMINPWD  = "admin123456"
 	ROOMID    = 1
 
-	GAME_ID   = "test-game"
-	GAME_NAME = "Test Game"
+	GAME_ID   = "rps"
+	ROOM_NAME = "Test Game"
 )
 
 var (
 	USER, USER2, USER3, ADMIN   = new(model.User), new(model.User), new(model.User), new(model.User)
 	USER_PROFILE, ADMIN_PROFILE = new(model.Profile), new(model.Profile)
 	ROOM                        = new(model.Room)
-
-	GAME = &game.Game{
-		Id:      GAME_ID,
-		Name:    GAME_NAME,
-		Player:  game.Range{Min: 2, Max: 3},
-		Options: []game.Option{},
-		NewEvent: func() game.Event {
-			e := game.BaseEvent{}
-			e.ResponseStream = make(chan game.Response, 5)
-			return e
-		},
-		OnEvent: func(event game.Event) game.Response {
-			switch event.(type) {
-			case game.NewGameEvent:
-				return event.GetUser().ID
-			}
-			return event
-		},
-	}
 )
 
 func init() {
 	initVars()
-	game.Register(GAME)
+	game.Register(rps.Instance)
 }
 
 type (
@@ -80,11 +63,12 @@ type (
 	}
 
 	TestHttp struct {
-		test     *testing.T
-		handler  echo.HandlerFunc
-		request  Request
-		response Response
-		setups   []Setup
+		test       *testing.T
+		handler    echo.HandlerFunc
+		request    Request
+		response   Response
+		setups     []Setup
+		middleware []echo.MiddlewareFunc
 	}
 
 	TestHttpSeries struct {
@@ -261,7 +245,9 @@ func (t TestHttp) doRun(tx *gorm.DB) {
 	t.setupContext(c)
 	// handle
 	err := t.doHttp(c)
-	echoContext.HTTPErrorHandler(err, c)
+	if err != nil {
+		echoContext.HTTPErrorHandler(err, c)
+	}
 	// assert
 	t.doAssert(err, rec, tx)
 }
@@ -280,9 +266,12 @@ func (t TestHttp) doAssert(err error, rec *httptest.ResponseRecorder, tx *gorm.D
 	assert.Equal(t.test, t.response.Code, rec.Code)
 	// assert body
 	expectBody := t.response.Body
+	bodyBytes := rec.Body.Bytes()
+
 	if expectBody != nil {
+
 		actualResponse := make(xecho.J)
-		err := json.Unmarshal(rec.Body.Bytes(), &actualResponse)
+		err = json.Unmarshal(bodyBytes, &actualResponse)
 		assert.NoError(t.test, err)
 
 		expectResponse := make(xecho.J)
@@ -303,6 +292,9 @@ func (t TestHttp) doAssert(err error, rec *httptest.ResponseRecorder, tx *gorm.D
 	if t.response.Extra != nil {
 		t.response.Extra(tx, rec)
 	}
+	fmt.Println("---------------------------------------------------")
+	fmt.Printf("Code %d\nError: %v\nBody: %s", rec.Code, err, string(bodyBytes))
+	fmt.Println("---------------------------------------------------")
 }
 
 func (t TestHttp) doHttp(c echo.Context) (err error) {
@@ -315,7 +307,11 @@ func (t TestHttp) doHttp(c echo.Context) (err error) {
 			err = e.Actual
 		}
 	}()
-	return t.handler(c)
+	h := t.handler
+	for _, v := range t.middleware {
+		h = v(h)
+	}
+	return h(c)
 }
 
 func (t TestHttp) setupContext(c echo.Context) {

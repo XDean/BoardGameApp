@@ -1,32 +1,23 @@
 package handler
 
 import (
-	"github.com/jinzhu/gorm"
-	"github.com/stretchr/testify/assert"
+	"github.com/labstack/echo/v4"
 	"github.com/xdean/goex/xecho"
-	"github.com/xdean/miniboardgame/go/server/model"
-	"net/http/httptest"
+	"github.com/xdean/miniboardgame/go/games/rps"
+	"github.com/xdean/miniboardgame/go/server/game"
+	"github.com/xdean/miniboardgame/go/server/web/middleware"
+	"net/http"
 	"testing"
 )
+
+func init() {
+	game.Register(rps.Instance)
+}
 
 func TestGetGameList(t *testing.T) {
 	TestHttp{
 		test:    t,
 		handler: GetGameList,
-		response: Response{
-			Body: xecho.J{
-				"Games": []xecho.J{
-					{
-						"Id":   GAME_ID,
-						"Name": GAME_NAME,
-						"Player": xecho.J{
-							"Min": 2,
-							"Max": 3,
-						},
-					},
-				},
-			},
-		},
 	}.Run()
 }
 
@@ -74,27 +65,58 @@ func TestStartGame(t *testing.T) {
 			{
 				handler: StartGame,
 				response: Response{
-					Extra: func(db *gorm.DB, recorder *httptest.ResponseRecorder) {
-						player := new(model.Player)
-						err := player.GetByUserID(db, USERID)
-						assert.Nil(t, player.Room)
-						assert.NoError(t, err)
-						assert.Equal(t, model.OUT_OF_GAME, player.State)
-						assert.Equal(t, uint(0), player.RoomID)
-						assert.Equal(t, uint(0), player.Seat)
-
-						player2 := new(model.Player)
-						err = player2.GetByUserID(db, USERID2)
-						assert.NoError(t, err)
-						assert.NotNil(t, player2.Room)
-						assert.Equal(t, 1, len(player2.Room.Players))
-						assert.Equal(t, model.HOST, player2.State)
-						assert.Equal(t, uint(1), player2.RoomID)
-						assert.Equal(t, uint(1), player2.Seat)
-					},
+					Body: xecho.M("Create Success"),
 				},
+				middleware: []echo.MiddlewareFunc{middleware.AuthRoom()},
 				setups: []Setup{
 					WithLogin(t, USER),
+				},
+			},
+		},
+	}.Run()
+	TestHttpSeries{
+		test: t,
+		setups: []Setup{
+			WithUser(t, USER),
+			WithUser(t, USER2),
+		},
+		children: []TestHttp{
+			user1Create,
+			user2Join,
+			{
+				handler: StartGame,
+				response: Response{
+					Error: true,
+					Code:  http.StatusBadRequest,
+					Body:  xecho.M("Players not ready"),
+				},
+				middleware: []echo.MiddlewareFunc{middleware.AuthRoom()},
+				setups: []Setup{
+					WithLogin(t, USER),
+				},
+			},
+		},
+	}.Run()
+	TestHttpSeries{
+		test: t,
+		setups: []Setup{
+			WithUser(t, USER),
+			WithUser(t, USER2),
+		},
+		children: []TestHttp{
+			user1Create,
+			user2Join,
+			user2Ready,
+			{
+				handler: StartGame,
+				response: Response{
+					Error: true,
+					Code:  http.StatusBadRequest,
+					Body:  xecho.M("You are not host"),
+				},
+				middleware: []echo.MiddlewareFunc{middleware.AuthRoom()},
+				setups: []Setup{
+					WithLogin(t, USER2),
 				},
 			},
 		},

@@ -17,17 +17,16 @@ type (
 	}
 )
 
-var Games []*Game
+var Games = map[string]*Game{}
 
 func Register(game *Game) {
-	Games = append(Games, game)
+	Games[game.Id] = game
 }
 
 func FindGame(id string) (*Game, error) {
-	for _, v := range Games {
-		if v.Id == id {
-			return v, nil
-		}
+	if game, ok := Games[id]; ok {
+		return game, nil
+	} else {
+		return nil, errors.New("No such game")
 	}
-	return nil, errors.New("No such game")
 }

@@ -68,7 +68,7 @@ func eventResponse(c echo.Context, res game.Response) error {
 	}
 }
 
-func gamesJson(games []*game.Game) xecho.J {
+func gamesJson(games map[string]*game.Game) xecho.J {
 	result := make([]interface{}, 0)
 	for _, v := range games {
 		result = append(result, gameJson(v))
