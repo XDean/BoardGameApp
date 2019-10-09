@@ -51,7 +51,7 @@ func handleEvent(event game.Event) game.Response {
 			return errors.New("No such game room")
 		}
 		g := games[event.GetRoom().ID]
-		return g.Play(t)
+		return g.Play(t.GetSeat(), t.Value)
 	case game.NewGameEvent:
 		if room != nil {
 			return errors.New("The game has started")
