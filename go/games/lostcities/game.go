@@ -19,7 +19,7 @@ type (
 	}
 )
 
-func (g *Game) Play(event Event) game.Response {
+func (g *Game) Play(event *Event) game.Response {
 	seat := event.GetSeat()
 	if g.Current != seat {
 		return errors.New("You are not current player")

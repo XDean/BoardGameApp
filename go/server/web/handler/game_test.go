@@ -21,8 +21,8 @@ func TestGetGameList(t *testing.T) {
 	}.Run()
 }
 
-func TestStartGame(t *testing.T) {
-	user1Create := TestHttp{
+var (
+	user1Create = TestHttp{
 		handler: CreateRoom,
 		request: Request{
 			Body: xecho.J{
@@ -32,10 +32,10 @@ func TestStartGame(t *testing.T) {
 			},
 		},
 		setups: []Setup{
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}
-	user2Join := TestHttp{
+	user2Join = TestHttp{
 		handler: JoinRoom,
 		request: Request{
 			Params: Params{
@@ -43,15 +43,18 @@ func TestStartGame(t *testing.T) {
 			},
 		},
 		setups: []Setup{
-			WithLogin(t, USER2),
+			WithLogin(USER2),
 		},
 	}
-	user2Ready := TestHttp{
+	user2Ready = TestHttp{
 		handler: Ready,
 		setups: []Setup{
-			WithLogin(t, USER2),
+			WithLogin(USER2),
 		},
 	}
+)
+
+func TestStartGame(t *testing.T) {
 	TestHttpSeries{
 		test: t,
 		setups: []Setup{
@@ -69,7 +72,7 @@ func TestStartGame(t *testing.T) {
 				},
 				middleware: []echo.MiddlewareFunc{middleware.AuthRoom()},
 				setups: []Setup{
-					WithLogin(t, USER),
+					WithLogin(USER),
 				},
 			},
 		},
@@ -92,7 +95,7 @@ func TestStartGame(t *testing.T) {
 				},
 				middleware: []echo.MiddlewareFunc{middleware.AuthRoom()},
 				setups: []Setup{
-					WithLogin(t, USER),
+					WithLogin(USER),
 				},
 			},
 		},
@@ -116,7 +119,69 @@ func TestStartGame(t *testing.T) {
 				},
 				middleware: []echo.MiddlewareFunc{middleware.AuthRoom()},
 				setups: []Setup{
-					WithLogin(t, USER2),
+					WithLogin(USER2),
+				},
+			},
+		},
+	}.Run()
+}
+
+func TestGameEvent(t *testing.T) {
+	TestHttpSeries{
+		test: t,
+		setups: []Setup{
+			WithUser(t, USER),
+			WithUser(t, USER2),
+		},
+		children: []TestHttp{
+			user1Create,
+			user2Join,
+			user2Ready,
+			{
+				handler:    StartGame,
+				middleware: []echo.MiddlewareFunc{middleware.AuthRoom()},
+				setups: []Setup{
+					WithLogin(USER),
+				},
+			},
+			{
+				handler:    GameEvent,
+				middleware: []echo.MiddlewareFunc{middleware.AuthRoom()},
+				request: Request{
+					Body: xecho.J{
+						"value": rps.ROCK,
+					},
+				},
+				setups: []Setup{
+					WithLogin(USER),
+				},
+			},
+			{
+				handler:    GameEvent,
+				middleware: []echo.MiddlewareFunc{middleware.AuthRoom()},
+				request: Request{
+					Body: xecho.J{
+						"value": rps.ROCK,
+					},
+				},
+				response: Response{
+					Error: true,
+					Code:  http.StatusBadRequest,
+				},
+				setups: []Setup{
+					WithLogin(USER),
+				},
+			},
+			{
+				handler:    GameEvent,
+				middleware: []echo.MiddlewareFunc{middleware.AuthRoom()},
+				request: Request{
+					Body: xecho.J{
+						"value": rps.PAPER,
+					},
+				},
+				setups: []Setup{
+					WithLogin(USER2),
 				},
 			},
 		},

@@ -19,7 +19,7 @@ func TestGetUser(t *testing.T) {
 			},
 		},
 		setups: []Setup{
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 
@@ -54,7 +54,7 @@ func TestGetUserById(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 
@@ -75,7 +75,7 @@ func TestGetUserById(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, ADMIN),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 
@@ -92,7 +92,7 @@ func TestGetUserById(t *testing.T) {
 			Error: true,
 		},
 		setups: []Setup{
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 
@@ -109,7 +109,7 @@ func TestGetUserById(t *testing.T) {
 			Error: true,
 		},
 		setups: []Setup{
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 }

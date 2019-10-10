@@ -18,7 +18,7 @@ var Instance = &game.Game{
 	NewEvent: func() game.Event {
 		e := Event{}
 		e.BaseEvent.ResponseStream = make(chan game.Response, 5)
-		return e
+		return &e
 	},
 	OnEvent: func(e game.Event) game.Response { // card or error
 		eventStream <- e
@@ -31,6 +31,10 @@ var games = make(map[uint]*Game)
 
 func init() {
 	go run()
+}
+
+func Reset() {
+	games = make(map[uint]*Game)
 }
 
 func run() {
@@ -46,13 +50,13 @@ func run() {
 func handleEvent(event game.Event) game.Response {
 	room := games[event.GetRoom().ID]
 	switch t := event.(type) {
-	case Event:
+	case *Event:
 		if room == nil {
 			return errors.New("No such game room")
 		}
 		g := games[event.GetRoom().ID]
 		return g.Play(t.GetSeat(), t.Value)
-	case game.NewGameEvent:
+	case *game.NewGameEvent:
 		if room != nil {
 			return errors.New("The game has started")
 		}

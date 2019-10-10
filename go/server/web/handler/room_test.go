@@ -35,7 +35,7 @@ func TestCreateRoom(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 
@@ -46,7 +46,7 @@ func TestCreateRoom(t *testing.T) {
 			Body: xecho.J{
 				"game_id":      GAME_ID,
 				"room_name":    "room name",
-				"player_count": 5,
+				"player_count": 100,
 			},
 		},
 		response: Response{
@@ -55,7 +55,7 @@ func TestCreateRoom(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 
@@ -75,7 +75,7 @@ func TestCreateRoom(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 }
@@ -97,7 +97,7 @@ func TestCreateRoomExist(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 			WithCreateRoom(t, ROOM, USER),
 		},
 	}.Run()
@@ -125,9 +125,9 @@ func TestGetRoom(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 			WithCreateRoom(t, ROOM, USER),
-			WithInRoom(t, ROOM),
+			WithInRoom(ROOM),
 		},
 	}.Run()
 
@@ -157,7 +157,7 @@ func TestGetRoom(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 			WithCreateRoom(t, ROOM, USER2),
 		},
 	}.Run()
@@ -176,7 +176,7 @@ func TestGetRoom(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 
@@ -194,7 +194,7 @@ func TestGetRoom(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 
@@ -207,7 +207,7 @@ func TestGetRoom(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 }
@@ -234,7 +234,7 @@ func TestJoinRoom(t *testing.T) {
 			},
 		},
 		setups: []Setup{
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}
 	user2Join := TestHttp{
@@ -256,7 +256,7 @@ func TestJoinRoom(t *testing.T) {
 			},
 		},
 		setups: []Setup{
-			WithLogin(t, USER2),
+			WithLogin(USER2),
 		},
 	}
 	// 1 create 2 join 1 exit
@@ -292,7 +292,7 @@ func TestJoinRoom(t *testing.T) {
 					},
 				},
 				setups: []Setup{
-					WithLogin(t, USER),
+					WithLogin(USER),
 				},
 			},
 		},
@@ -317,7 +317,7 @@ func TestJoinRoom(t *testing.T) {
 					Code: http.StatusBadRequest,
 				},
 				setups: []Setup{
-					WithLogin(t, USER),
+					WithLogin(USER),
 				},
 			},
 		},
@@ -344,7 +344,7 @@ func TestJoinRoom(t *testing.T) {
 					Error: true,
 				},
 				setups: []Setup{
-					WithLogin(t, USER3),
+					WithLogin(USER3),
 				},
 			},
 		},
@@ -364,7 +364,7 @@ func TestJoinRoom(t *testing.T) {
 					Code: http.StatusBadRequest,
 				},
 				setups: []Setup{
-					WithLogin(t, USER2),
+					WithLogin(USER2),
 				},
 			},
 		},
@@ -382,7 +382,7 @@ func TestSwapSeat(t *testing.T) {
 			},
 		},
 		setups: []Setup{
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}
 	user2Join := TestHttp{
@@ -393,7 +393,7 @@ func TestSwapSeat(t *testing.T) {
 			},
 		},
 		setups: []Setup{
-			WithLogin(t, USER2),
+			WithLogin(USER2),
 		},
 	}
 	// swap 1 -> 2
@@ -424,7 +424,7 @@ func TestSwapSeat(t *testing.T) {
 					},
 				},
 				setups: []Setup{
-					WithLogin(t, USER2),
+					WithLogin(USER2),
 				},
 			},
 		},
@@ -451,7 +451,7 @@ func TestSwapSeat(t *testing.T) {
 					Error: true,
 				},
 				setups: []Setup{
-					WithLogin(t, USER2),
+					WithLogin(USER2),
 				},
 			},
 		},
@@ -477,7 +477,7 @@ func TestSwapSeat(t *testing.T) {
 					Code: http.StatusOK,
 				},
 				setups: []Setup{
-					WithLogin(t, USER2),
+					WithLogin(USER2),
 				},
 			},
 			{
@@ -506,7 +506,7 @@ func TestSwapSeat(t *testing.T) {
 					},
 				},
 				setups: []Setup{
-					WithLogin(t, USER),
+					WithLogin(USER),
 				},
 			},
 		},
@@ -524,7 +524,7 @@ func TestReady(t *testing.T) {
 			},
 		},
 		setups: []Setup{
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}
 	user2Join := TestHttp{
@@ -535,7 +535,7 @@ func TestReady(t *testing.T) {
 			},
 		},
 		setups: []Setup{
-			WithLogin(t, USER2),
+			WithLogin(USER2),
 		},
 	}
 	// host ready
@@ -555,7 +555,7 @@ func TestReady(t *testing.T) {
 					Code:  http.StatusBadRequest,
 				},
 				setups: []Setup{
-					WithLogin(t, USER),
+					WithLogin(USER),
 				},
 			},
 		},
@@ -584,7 +584,7 @@ func TestReady(t *testing.T) {
 					},
 				},
 				setups: []Setup{
-					WithLogin(t, USER2),
+					WithLogin(USER2),
 				},
 			},
 			{
@@ -601,7 +601,7 @@ func TestReady(t *testing.T) {
 					},
 				},
 				setups: []Setup{
-					WithLogin(t, USER2),
+					WithLogin(USER2),
 				},
 			},
 		},

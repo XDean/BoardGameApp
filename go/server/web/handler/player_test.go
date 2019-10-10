@@ -23,7 +23,7 @@ func TestGetPlayer(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 			WithCreateRoom(t, ROOM, USER),
 		},
 	}.Run()
@@ -42,7 +42,7 @@ func TestGetPlayer(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 }
@@ -68,7 +68,7 @@ func TestGetPlayerByID(t *testing.T) {
 		setups: []Setup{
 			WithUser(t, USER),
 			WithUser(t, ADMIN),
-			WithLogin(t, ADMIN),
+			WithLogin(ADMIN),
 		},
 	}.Run()
 
@@ -87,7 +87,7 @@ func TestGetPlayerByID(t *testing.T) {
 		setups: []Setup{
 			WithUser(t, USER),
 			WithUser(t, ADMIN),
-			WithLogin(t, ADMIN),
+			WithLogin(ADMIN),
 		},
 	}.Run()
 }

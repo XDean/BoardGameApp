@@ -18,30 +18,23 @@ func SignUp(c echo.Context) error {
 		Password string `json:"password" form:"password" query:"password" validate:"required,regexp=PASSWORD"`
 	}
 	param := new(Param)
-	if err := c.Bind(param); err != nil {
-		return err
-	}
-	if err := c.Validate(param); err != nil {
-		return err
-	}
+	xecho.MustBindAndValidate(c, param)
 	user := &model.User{
 		Username: param.Username,
 		Password: param.Password,
 		Roles:    []model.Role{{Name: _const.ROLE_USER}},
 	}
-	if err := user.CreateAccount(GetDB(c)); err == nil {
-		if t, err := user.GenerateToken(config.SecretKey); err == nil {
-			c.SetCookie(generateTokenCookie(t))
-			return c.JSON(http.StatusCreated, xecho.J{
-				"message": "Sign up success",
-				"token":   t,
-			})
-		} else {
-			return err
-		}
-	} else {
-		return err
-	}
+	err := user.CreateAccount(GetDB(c))
+	xecho.MustNoError(err)
+
+	t, err := user.GenerateToken(config.SecretKey)
+	xecho.MustNoError(err)
+
+	c.SetCookie(generateTokenCookie(t))
+	return c.JSON(http.StatusCreated, xecho.J{
+		"message": "Sign up success",
+		"token":   t,
+	})
 }
 
 type LoginParam struct {
@@ -53,13 +46,13 @@ type LoginParam struct {
 }
 
 func Login(c echo.Context) error {
+	_, err := GetCurrentUser(c)
+	if err == nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "You had login. Logout first")
+	}
 	param := new(LoginParam)
-	if err := c.Bind(param); err != nil {
-		return err
-	}
-	if err := c.Validate(param); err != nil {
-		return err
-	}
+	xecho.MustBindAndValidate(c, param)
+
 	switch param.Type {
 	case "openid":
 		return LoginOpenid(c, *param)
@@ -77,17 +70,18 @@ func LoginPassword(c echo.Context, param LoginParam) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Username and password are required")
 	}
 	user := new(model.User)
-	if err := user.FindByUsername(GetDB(c), param.Username); err == nil {
+	err := user.FindByUsername(GetDB(c), param.Username)
+
+	if err == nil {
 		if user.MatchPassword(param.Password) {
-			if t, err := user.GenerateToken(config.SecretKey); err == nil {
-				c.SetCookie(generateTokenCookie(t))
-				return c.JSON(http.StatusOK, xecho.J{
-					"message": "Login success",
-					"token":   t,
-				})
-			} else {
-				return err
-			}
+			t, err := user.GenerateToken(config.SecretKey)
+			xecho.MustNoError(err)
+
+			c.SetCookie(generateTokenCookie(t))
+			return c.JSON(http.StatusOK, xecho.J{
+				"message": "Login success",
+				"token":   t,
+			})
 		}
 	}
 	return echo.NewHTTPError(http.StatusUnauthorized, "Bad Credentials")
@@ -98,38 +92,29 @@ func LoginOpenid(c echo.Context, param LoginParam) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Provider and token are required")
 	}
 	oid, err := openid.Get(param.Provider, param.Token)
-	if err == nil {
-		user := &model.User{
-			Username: oid + "@" + param.Provider,
-			Password: oid,
-			Roles:    []model.Role{{Name: _const.ROLE_USER}},
-		}
-		db := GetDB(c)
-		yes, err := model.UserExistByUsername(db, user.Username)
-		if err != nil {
-			return err
-		}
-		if yes {
-			if err := user.FindByUsername(db, user.Username); err != nil {
-				return err
-			}
-		} else {
-			if err := user.CreateAccount(db); err != nil {
-				return err
-			}
-		}
-		if t, err := user.GenerateToken(config.SecretKey); err == nil {
-			c.SetCookie(generateTokenCookie(t))
-			return c.JSON(http.StatusOK, xecho.J{
-				"message": "Login success",
-				"token":   t,
-			})
-		} else {
-			return err
-		}
-	} else {
-		return err
+	xecho.MustNoError(err)
+
+	user := &model.User{
+		Username: oid + "@" + param.Provider,
+		Password: oid,
+		Roles:    []model.Role{{Name: _const.ROLE_USER}},
 	}
+	db := GetDB(c)
+	yes, err := model.UserExistByUsername(db, user.Username)
+	xecho.MustNoError(err)
+	if yes {
+		xecho.MustNoError(user.FindByUsername(db, user.Username))
+	} else {
+		xecho.MustNoError(user.CreateAccount(db))
+	}
+	t, err := user.GenerateToken(config.SecretKey)
+	xecho.MustNoError(err)
+
+	c.SetCookie(generateTokenCookie(t))
+	return c.JSON(http.StatusOK, xecho.J{
+		"message": "Login success",
+		"token":   t,
+	})
 }
 
 func Logout(c echo.Context) error {

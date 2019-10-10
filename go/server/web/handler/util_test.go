@@ -117,11 +117,11 @@ func WithCreateRoom(t *testing.T, room *model.Room, host *model.User) DBSetup {
 	}
 }
 
-func WithLogin(t *testing.T, user *model.User) ContextSetup {
+func WithLogin(user *model.User) ContextSetup {
 	return func(c echo.Context) { c.Set(_const.USER, user) }
 }
 
-func WithInRoom(t *testing.T, room *model.Room) ContextSetup {
+func WithInRoom(room *model.Room) ContextSetup {
 	return func(c echo.Context) { c.Set(_const.ROOM, room) }
 }
 

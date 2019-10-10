@@ -22,31 +22,31 @@ type (
 	}
 )
 
-func (e BaseEvent) SetUser(user *model.User) {
+func (e *BaseEvent) SetUser(user *model.User) {
 	e.User = user
 }
 
-func (e BaseEvent) SetRoom(room *model.Room) {
+func (e *BaseEvent) SetRoom(room *model.Room) {
 	e.Room = room
 }
 
-func (e BaseEvent) PutResponse(res Response) {
+func (e *BaseEvent) PutResponse(res Response) {
 	e.ResponseStream <- res
 	close(e.ResponseStream)
 }
 
-func (e BaseEvent) GetResponse() Response {
+func (e *BaseEvent) GetResponse() Response {
 	return <-e.ResponseStream
 }
 
-func (e BaseEvent) GetUser() *model.User {
+func (e *BaseEvent) GetUser() *model.User {
 	return e.User
 }
 
-func (e BaseEvent) GetRoom() *model.Room {
+func (e *BaseEvent) GetRoom() *model.Room {
 	return e.Room
 }
 
-func (e BaseEvent) GetSeat() int {
+func (e *BaseEvent) GetSeat() int {
 	return e.Room.FindSeatByPlayer(e.User.ID)
 }

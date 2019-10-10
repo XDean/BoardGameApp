@@ -27,7 +27,7 @@ func StartGame(c echo.Context) error {
 	if !room.IsAllReady() {
 		return echo.NewHTTPError(http.StatusBadRequest, xecho.M("Players not ready"))
 	}
-	res := g.OnEvent(game.NewGameEvent{
+	res := g.OnEvent(&game.NewGameEvent{
 		BaseEvent: game.BaseEvent{
 			ResponseStream: make(chan game.Response),
 			User:           user,
@@ -42,7 +42,7 @@ func GameEvent(c echo.Context) error {
 	xecho.MustNoError(err)
 
 	e := g.NewEvent()
-	xecho.MustBindAndValidate(c, &e)
+	xecho.MustBindAndValidate(c, e)
 
 	user, err := GetCurrentUser(c)
 	xecho.MustNoError(err)
@@ -60,7 +60,7 @@ func GameEvent(c echo.Context) error {
 func eventResponse(c echo.Context, res game.Response) error {
 	switch t := res.(type) {
 	case error:
-		return c.JSON(http.StatusBadRequest, xecho.M(t.Error()))
+		return echo.NewHTTPError(http.StatusBadRequest, t.Error())
 	case string:
 		return c.JSON(http.StatusOK, xecho.M(t))
 	default:

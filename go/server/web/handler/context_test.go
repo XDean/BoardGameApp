@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/xdean/goex/xgo"
+	"github.com/xdean/miniboardgame/go/games/rps"
 	"github.com/xdean/miniboardgame/go/server/config"
 	"github.com/xdean/miniboardgame/go/server/log"
 	"github.com/xdean/miniboardgame/go/server/model"
@@ -32,6 +33,9 @@ func resetDB() func() {
 	xgo.MustNoError(err)
 	db.SetLogger(log.GormStdLogger{})
 	dbContext = db
+
+	rps.Reset()
+
 	return func() {
 		db.Close()
 	}

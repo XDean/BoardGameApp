@@ -17,7 +17,7 @@ type (
 	}
 	Event struct {
 		game.BaseEvent
-		Value Value
+		Value Value `json:"value" query:"value" form:"value" validate:"required"`
 	}
 )
 

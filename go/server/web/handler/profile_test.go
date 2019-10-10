@@ -17,7 +17,7 @@ func TestGetProfile(t *testing.T) {
 		handler: GetProfile,
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 			WithProfile(t, USER_PROFILE),
 		},
 	}.Run()
@@ -30,7 +30,7 @@ func TestGetProfile(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 
@@ -62,7 +62,7 @@ func TestGetProfileById(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 			WithProfile(t, USER_PROFILE),
 		},
 	}.Run()
@@ -81,7 +81,7 @@ func TestGetProfileById(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 			WithProfile(t, USER_PROFILE),
 		},
 	}.Run()
@@ -96,7 +96,7 @@ func TestGetProfileById(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 
@@ -114,7 +114,7 @@ func TestGetProfileById(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 }
@@ -148,7 +148,7 @@ func TestUpdateProfile(t *testing.T) {
 		},
 		setups: []Setup{
 			WithUser(t, USER),
-			WithLogin(t, USER),
+			WithLogin(USER),
 			WithProfile(t, USER_PROFILE),
 		},
 	}.Run()

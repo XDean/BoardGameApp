@@ -67,7 +67,7 @@ func TestSignUp(t *testing.T) {
 	}.Run()
 }
 
-func TestLogin(t *testing.T) {
+func TestLoginWrong(t *testing.T) {
 	TestHttp{
 		test:    t,
 		handler: Login,
@@ -79,6 +79,24 @@ func TestLogin(t *testing.T) {
 		response: Response{
 			Code:  http.StatusBadRequest,
 			Error: true,
+		},
+	}.Run()
+	TestHttp{
+		test:    t,
+		handler: Login,
+		request: Request{
+			Body: xecho.J{
+				"type":     "password",
+				"username": USERNAME,
+				"password": USERPWD,
+			},
+		},
+		response: Response{
+			Code:  http.StatusBadRequest,
+			Error: true,
+		},
+		setups: []Setup{
+			WithLogin(USER),
 		},
 	}.Run()
 }
@@ -185,6 +203,17 @@ func TestLoginOpenid(t *testing.T) {
 			WithUser(t, &model.User{
 				Username: "token@test",
 			}),
+		},
+	}.Run()
+}
+
+func TestLogout(t *testing.T) {
+	TestHttp{
+		test:    t,
+		handler: Logout,
+		setups: []Setup{
+			WithUser(t, USER),
+			WithLogin(USER),
 		},
 	}.Run()
 }
