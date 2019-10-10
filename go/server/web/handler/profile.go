@@ -3,19 +3,19 @@ package handler
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"github.com/xdean/goex/xecho"
 	"github.com/xdean/miniboardgame/go/server/model"
 	"net/http"
 	"strconv"
 )
 
 func GetProfile(c echo.Context) error {
-	if user, err := GetCurrentUser(c); err == nil {
-		profile := model.EmptyProfile(user.ID)
-		if err := profile.FindByUserID(GetDB(c), user.ID); err == nil || gorm.IsRecordNotFoundError(err) {
-			return c.JSON(http.StatusOK, profile)
-		} else {
-			return err
-		}
+	user, err := GetCurrentUser(c)
+	xecho.MustNoError(err)
+	profile := model.EmptyProfile(user.ID)
+	err = profile.FindByUserID(GetDB(c), user.ID)
+	if err == nil || gorm.IsRecordNotFoundError(err) {
+		return c.JSON(http.StatusOK, profile)
 	} else {
 		return err
 	}
@@ -47,33 +47,23 @@ func UpdateProfile(c echo.Context) error {
 		AvatarURL string    `json:"avatarurl" query:"avatarurl" form:"avatarurl"`
 	}
 	param := new(Param)
-
-	if err := c.Bind(param); err != nil {
-		return err
-	}
-	if err := c.Validate(param); err != nil {
-		return err
-	}
-	if user, err := GetCurrentUser(c); err == nil {
-		profile := model.EmptyProfile(user.ID)
-		if err := profile.FindByUserID(GetDB(c), user.ID); err == nil || gorm.IsRecordNotFoundError(err) {
-			if param.Nickname != "" {
-				profile.Nickname = param.Nickname
-			}
-			if param.AvatarURL != "" {
-				profile.AvatarURL = param.AvatarURL
-			}
-			if param.Sex != model.Unknown {
-				profile.Sex = param.Sex
-			}
-			if err := profile.Save(GetDB(c)); err == nil {
-				return c.JSON(http.StatusOK, profile)
-			} else {
-				return err
-			}
-		} else {
-			return err
+	xecho.MustBindAndValidate(c, param)
+	user, err := GetCurrentUser(c)
+	xecho.MustNoError(err)
+	profile := model.EmptyProfile(user.ID)
+	if err := profile.FindByUserID(GetDB(c), user.ID); err == nil || gorm.IsRecordNotFoundError(err) {
+		if param.Nickname != "" {
+			profile.Nickname = param.Nickname
 		}
+		if param.AvatarURL != "" {
+			profile.AvatarURL = param.AvatarURL
+		}
+		if param.Sex != model.Unknown {
+			profile.Sex = param.Sex
+		}
+		err := profile.Save(GetDB(c))
+		xecho.MustNoError(err)
+		return c.JSON(http.StatusOK, profile)
 	} else {
 		return err
 	}
